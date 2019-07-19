@@ -1,12 +1,12 @@
 const path = require('path');
 const webpack = require("webpack");
 const merge = require('webpack-merge');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 const StylesLoader = require('styles-loader');
 const stylesLoader = (production) => {
   return new StylesLoader({
     extract: 'bundled.css',
-    image:{
+    image: {
       disable: !production
     }
   });
@@ -29,10 +29,10 @@ const common = {
   },
   plugins: [
     new webpack.ProvidePlugin({
-      $utils: path.resolve('./public/prod/modules/utils/index'),
-      $commons: path.resolve('./public/prod/modules/commons/index'),
-      $icons: path.resolve('./public/prod/modules/icons/index'),
-      $data: path.resolve('./public/prod/modules/data/index')
+      $utils: path.resolve('./src/modules/utils/index.js'),
+      $commons: path.resolve('./src/modules/commons/index.js'),
+      $icons: path.resolve('./src/modules/icons/index.js'),
+      $data: path.resolve('./src/modules/data/index.js')
     })
   ],
 };
@@ -42,19 +42,7 @@ const prod = {
   watch: false,
   stats: false,
   optimization: {
-    minimizer: [
-      new UglifyJsPlugin({
-        uglifyOptions: {
-          compress: true,
-          mangle: false,
-          output: {
-            indent_level: 2,
-            comments: false,
-            beautify: false
-          }
-        }
-      })
-    ]
+    minimizer: [new TerserPlugin()]
   }
 };
 
@@ -88,26 +76,24 @@ const dev = {
 const start = {
   target: 'web',
   entry: {
-    index: './public/prod/index.js'
+    index: './src/index.js'
   },
   output: {
     filename: 'bundled.js',
-    path: path.resolve(__dirname, 'public/dist'),
-    library: 'bundled',
-    libraryTarget: 'var',
-    libraryExport: 'default',
-    globalObject: 'this'
+    path: path.resolve(__dirname, './docs/src'),
+    publicPath: 'src/',
+    globalObject: 'window'
   },
   devServer: {
-    contentBase: path.resolve(__dirname, 'public'),
+    contentBase: path.resolve(__dirname, 'docs'),
     watchContentBase: true,
-    publicPath:'/',
+    publicPath: '/src/',
     compress: true,
     port: 8080,
     open: true
   },
 };
 
-module.exports = (env)=>{
-  return merge(common, env.prod ? prod:dev, stylesLoader(env.prod), start);
+module.exports = (env) => {
+  return merge(common, env.prod ? prod : dev, stylesLoader(env.prod), start);
 };
