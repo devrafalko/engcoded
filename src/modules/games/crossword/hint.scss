@@ -178,8 +178,51 @@ $hint-margin: 14px;
 }
 
 .hint-box .hint-dialog .card.audio {
-  height: 60px;
+  $autoplay-height: 22px;
+  height: 80px;
   position: relative;
+
+  .section.button {
+    height: 80px - $autoplay-height;
+    position: relative;
+  }
+
+  .section.autoplay {
+    cursor: pointer;
+    height: $autoplay-height;
+  }
+
+  .section.autoplay .check {
+    display: none;
+    height: $autoplay-height;
+    width: $autoplay-height;
+    .icon {
+      fill: #00c3cc;
+    }
+    &.on {
+      display: inline-block;
+    }
+    &.off {
+      display: none;
+    }
+  }
+
+  .section.autoplay.on {
+    .check.on {
+      display: none;
+    }
+    .check.off {
+      display: inline-block;
+    }
+  }
+
+  .section.autoplay .label {
+    color: #859ba0;
+    display: inline-block;
+    font-size: 14px;
+    line-height: $autoplay-height;
+    vertical-align: top;
+  }
 
   .button.player {
     @extend %center;

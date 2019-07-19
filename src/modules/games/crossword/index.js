@@ -10,8 +10,8 @@ const { Slider, Scroller } = $commons;
 const { $randomItem, $templater, $loopParents, $loopBetween } = $utils;
 const { $words } = $data;
 const { $iconCheckIn, $iconCheckOut, $iconConfig, $iconGameCrossword, $iconPrevious, $iconNext, $iconStar,
-        $iconMinimize, $iconWarning, $iconGameFinish, $iconQuestionMark, $iconGameTranslate,
-        $iconGameDefinition, $iconGamePronunciation, $iconGameImage, $iconClose, $iconVolume } = $icons;
+  $iconMinimize, $iconWarning, $iconGameFinish, $iconQuestionMark, $iconGameTranslate,
+  $iconGameDefinition, $iconGamePronunciation, $iconGameImage, $iconClose, $iconVolume } = $icons;
 
 class Words {
   constructor({ words }) {
@@ -367,6 +367,12 @@ class Hint {
 
   _addListeners() {
     this.dom.get('button').addEventListener('click', () => this.switch('toggle'));
+    this.dom.get('autoplay').addEventListener('click', () => this._toggleAutoplay());
+  }
+
+  _toggleAutoplay() {
+    this.state.autoplay = !this.state.autoplay;
+    this.classes.get('autoplay')[this.state.autoplay ? 'add' : 'remove']('on');
   }
 
   _addPlayerListeners() {
@@ -374,14 +380,8 @@ class Hint {
     const classes = this.classes.get('player');
     const audio = this.data.player;
 
-    player.addEventListener('click', () => {
-      this.state.currentAudioIndex = 0;
-      audio.src = this.data.audioSources[0];
-      audio.play();
-    });
-
+    player.addEventListener('click', () => this._playAudio());
     audio.addEventListener('play', () => classes.add('playing'));
-
     audio.addEventListener('ended', () => {
       if (this.state.currentAudioIndex < this.data.audioSources.length - 1) {
         this.state.currentAudioIndex++;
@@ -392,13 +392,19 @@ class Hint {
         this.state.currentAudioIndex = Infinity;
       }
     });
+  }
 
+  _playAudio() {
+    this.state.currentAudioIndex = 0;
+    this.data.player.src = this.data.audioSources[0];
+    this.data.player.play();
   }
 
   _loadAudio(word) {
     const audio = word.record.audio;
     const sources = type(audio, String) ? [audio] : audio.filter((item) => type(item, Array)).map(([word, source]) => source);
     this.data.audioSources = sources;
+    if (this.state.autoplay) this._playAudio();
   }
 
   _loadContent({ element, type }) {
@@ -466,10 +472,10 @@ class Hint {
                   ${child($iconVolume())}
                 </span>
               </div>
-              <div class="section autoplay">
-                <span class="on">${child($iconCheckIn())}</span>
-                <span class="off">${child($iconCheckOut())}</span>
-                <span>autoplay</span>
+              <div ${ref('autoplay')} ${classes('autoplay')} class="section autoplay">
+                <span class="check on">${child($iconCheckIn())}</span>
+                <span class="check off">${child($iconCheckOut())}</span>
+                <span class="label">autoplay</span>
               </div>
             </li>
           </ul>
@@ -1617,7 +1623,7 @@ class CrosswordView {
       this._switchCrosswordPage('crossword');
     });
 
-    button.get('toggle').addEventListener('click',()=> this._toggleNavigation('toggle'));
+    button.get('toggle').addEventListener('click', () => this._toggleNavigation('toggle'));
     window.addEventListener('resize', () => this._toggleNavigation('close'));
   }
 
@@ -1667,8 +1673,8 @@ class CrosswordView {
     if (this.classes.get('button').get(name).has('disabled')) return;
     if (previous === name) return;
     this.state.activePage = name;
-    
-    if(name==='config') this._toggleNavigation('close');
+
+    if (name === 'config') this._toggleNavigation('close');
 
     this.dom.get('panel').setAttribute('data-page', name);
     this.classes.get('button').get(name).add('active');

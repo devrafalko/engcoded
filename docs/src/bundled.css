@@ -1,190 +1,184 @@
-@import url(https://fonts.googleapis.com/css?family=Open+Sans|PT+Sans|Raleway|Roboto|Source+Sans+Pro|Cardo|EB+Garamond|PT+Serif);@keyframes resolved {
-  0% {
-    font-size: 18px; }
-  100% {
-    font-size: 28px;
-    color: #a8f5f5; } }
+@import url(https://fonts.googleapis.com/css?family=Open+Sans|PT+Sans|Raleway|Roboto|Source+Sans+Pro|Cardo|EB+Garamond|PT+Serif);#navigation-container .navigation-panel {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none; }
 
-@keyframes flag {
-  0% {
-    transform: rotate(0deg); }
-  80% {
-    transform: rotate(-30deg); }
-  100% {
-    transform: rotate(-30deg); } }
+body {
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  padding-top: 35px; }
+  @media (min-width: 480px) and (min-height: 480px) {
+    body {
+      padding-top: 47px; } }
+  @media (min-width: 768px) and (min-height: 768px) {
+    body {
+      padding-top: 71px; } }
 
-.game-container.crossword > .navigation-panel {
+#navigation-container {
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
   z-index: 1; }
 
-.game-container.crossword .navigation-panel .controls * {
-  color: #2fe0e0; }
+#navigation-container.opened {
+  z-index: 3; }
+  #navigation-container.opened .navigation-panel {
+    padding-top: 0px;
+    height: auto; }
 
-.game-container.crossword
-> .navigation-panel
-.controls.navigation
-.toggle-menu {
-  display: none; }
-
-.dialog-box .game-container.crossword .navigation-panel[data-page="config"] .controls.game .buttons.game,
-.dialog-box .game-container.crossword .navigation-panel[data-page="config"] .controls.game .buttons.info,
-.dialog-box .game-container.crossword .navigation-panel[data-page="config"] .controls.game .buttons.control {
-  display: none; }
-
-@media (max-width: 443px) {
-  .dialog-box .game-container.crossword .navigation-panel[data-page="crossword"] {
-    padding-top: 34px; }
-    .dialog-box .game-container.crossword .navigation-panel[data-page="crossword"] .toggle-menu {
-      display: block; }
-    .dialog-box .game-container.crossword .navigation-panel[data-page="crossword"] .controls.game {
-      height: auto; }
-      .dialog-box .game-container.crossword .navigation-panel[data-page="crossword"] .controls.game .buttons.pages,
-      .dialog-box .game-container.crossword .navigation-panel[data-page="crossword"] .controls.game .buttons.game,
-      .dialog-box .game-container.crossword .navigation-panel[data-page="crossword"] .controls.game .buttons.info,
-      .dialog-box .game-container.crossword .navigation-panel[data-page="crossword"] .controls.game .buttons.control {
-        margin-left: 0px;
-        height: 34px;
-        display: block; } }
-
-.game-container.crossword > .navigation-panel .controls.game .buttons.game .button-star {
-  margin-right: 0px; }
-  .game-container.crossword > .navigation-panel .controls.game .buttons.game .button-star,
-  .game-container.crossword > .navigation-panel .controls.game .buttons.game .button-star > .icon {
-    cursor: grab; }
-
-.game-container.crossword > .navigation-panel .controls.game .buttons.game .count-container {
-  margin: 0px;
-  cursor: default;
-  font-size: 16px;
-  vertical-align: top;
-  width: 22px; }
-
-.game-container.crossword > .navigation-panel .controls.game .buttons.game .cursor-star {
-  display: none;
-  height: 22px;
-  opacity: 0;
-  position: fixed;
-  transform: rotate(45deg);
-  transition-duration: 0.25s, 0.25s, 0.3s, 0.3s;
-  transition-property: opacity, transform, width, height;
-  transition-timing-function: ease-in-out, ease-in-out, cubic-bezier(1, 0.01, 0.04, 2), cubic-bezier(1, 0.01, 0.04, 2);
-  width: 22px;
-  z-index: 4; }
-  .game-container.crossword > .navigation-panel .controls.game .buttons.game .cursor-star.visible {
-    opacity: 1;
-    transform: rotate(0deg); }
-  .game-container.crossword > .navigation-panel .controls.game .buttons.game .cursor-star.displayed {
-    display: block; }
-  .game-container.crossword > .navigation-panel .controls.game .buttons.game .cursor-star .icon {
-    fill: #868686;
-    stroke: #868686;
-    transition-duration: 0.1s, 0.1s;
-    transition-property: fill, stroke;
-    transition-timing-function: ease-in-out, ease-in-out; }
-  .game-container.crossword > .navigation-panel .controls.game .buttons.game .cursor-star.allowed {
-    height: 36px;
-    width: 36px; }
-    .game-container.crossword > .navigation-panel .controls.game .buttons.game .cursor-star.allowed .icon {
-      fill: #01b9b9;
-      stroke: #01b9b9; }
-
-.game-container.crossword > .navigation-panel .controls.game .buttons.info {
-  vertical-align: top; }
-  .game-container.crossword > .navigation-panel .controls.game .buttons.info li {
-    color: #01b9b9;
-    cursor: default;
-    font-size: 16px;
-    vertical-align: middle;
-    width: auto; }
-
-.game-container.crossword
-> .navigation-panel
-.controls.game
-.buttons.info
-.output {
-  color: #2fe0e0;
-  font-size: 18px;
-  text-align: left;
-  width: 36px; }
-  .game-container.crossword
-> .navigation-panel
-.controls.game
-.buttons.info
-.output.score {
-    text-align: right; }
-  .game-container.crossword
-> .navigation-panel
-.controls.game
-.buttons.info
-.output.resolved {
-    animation-duration: 0.2s;
-    animation-direction: alternate;
-    animation-iteration-count: 6;
-    animation-name: resolved;
-    animation-timing-function: ease-in-out; }
-  .game-container.crossword
-> .navigation-panel
-.controls.game
-.buttons.info
-.output.total.resolved {
-    animation-delay: 0.2s;
-    animation-iteration-count: 10; }
-
-.game-container.crossword > .navigation-panel .controls.game .buttons.control .icon {
-  animation-direction: alternate;
-  animation-duration: 0.2s;
-  animation-iteration-count: infinite;
-  animation-name: flag;
-  transform-origin: 20% 80%;
-  animation-play-state: paused;
-  animation-timing-function: ease-in-out; }
-
-.game-container.crossword > .navigation-panel .controls.game .buttons.control > li:hover .icon {
-  animation-play-state: running; }
-
-.game-container.crossword > .navigation-panel .controls.game {
-  padding: 0px 4px; }
-  .game-container.crossword > .navigation-panel .controls.game > .buttons > li {
-    width: 26px; }
-  .game-container.crossword > .navigation-panel .controls.game .buttons.pages,
-  .game-container.crossword > .navigation-panel .controls.game .buttons.game,
-  .game-container.crossword > .navigation-panel .controls.game .buttons.info,
-  .game-container.crossword > .navigation-panel .controls.game .buttons.control {
-    display: inline-block; }
-  .game-container.crossword > .navigation-panel .controls.game .buttons.game {
-    margin-left: 12px; }
-  .game-container.crossword > .navigation-panel .controls.game .buttons.info {
-    margin-left: 0px; }
-  .game-container.crossword > .navigation-panel .controls.game .buttons.info li {
-    line-height: 34px; }
-  .game-container.crossword > .navigation-panel .controls.game .buttons.control {
-    margin-left: 0px; }
-  @media (min-width: 480px) and (min-height: 480px) {
-    .game-container.crossword > .navigation-panel .controls.game {
-      padding: 0px 8px; }
-      .game-container.crossword > .navigation-panel .controls.game .buttons.info li {
-        line-height: 42px; } }
-  @media (min-width: 768px) and (min-height: 768px) {
-    .game-container.crossword > .navigation-panel .controls.game {
-      padding: 0px 12px; }
-      .game-container.crossword > .navigation-panel .controls.game > .buttons > li {
-        width: 30px; }
-      .game-container.crossword > .navigation-panel .controls.game .buttons.game {
-        margin-left: 44px; }
-      .game-container.crossword > .navigation-panel .controls.game .buttons.info {
-        margin-left: 22px; }
-      .game-container.crossword > .navigation-panel .controls.game .buttons.info li {
-        line-height: 52px; }
-      .game-container.crossword > .navigation-panel .controls.game .buttons.control {
-        margin-left: 42px; } }
-
-.game-container.crossword > .game-pages {
+#navigation-container .toggle-menu {
+  width: 60px;
   height: 100%;
-  position: relative;
-  z-index: 0; }
-  .game-container.crossword > .game-pages > li {
-    display: block;
+  cursor: pointer;
+  pointer-events: auto;
+  display: none;
+  position: absolute;
+  margin: 0px 12px;
+  height: 35px;
+  bottom: 0px;
+  right: 0px; }
+  #navigation-container .toggle-menu.hidden {
+    pointer-events: none; }
+  #navigation-container .toggle-menu.hidden > * > * {
+    width: 0px;
+    height: 0px; }
+  #navigation-container .toggle-menu:hover > * > * {
+    width: 16px;
+    height: 16px;
+    background-color: #73f8ed; }
+  #navigation-container .toggle-menu > * {
+    position: relative;
+    width: 33.33333%;
     height: 100%; }
-  .game-container.crossword > .game-pages > li.hidden {
+    #navigation-container .toggle-menu > * > * {
+      position: absolute;
+      display: block;
+      margin: auto;
+      top: -100%;
+      bottom: -100%;
+      left: -100%;
+      right: -100%;
+      width: 12px;
+      height: 12px;
+      background-color: #0cdbd1;
+      border-radius: 50%; }
+    #navigation-container .toggle-menu > *:nth-child(1) > * {
+      transition: width 0.1s 0s cubic-bezier(0.24, 2, 0.44, 0.99), height 0.1s 0s cubic-bezier(0.24, 2, 0.44, 0.99), background-color 0.1s 0s ease-in-out; }
+    #navigation-container .toggle-menu > *:nth-child(2) > * {
+      transition: width 0.1s 0.03s cubic-bezier(0.24, 2, 0.44, 0.99), height 0.1s 0.03s cubic-bezier(0.24, 2, 0.44, 0.99), background-color 0.1s 0.03s ease-in-out; }
+    #navigation-container .toggle-menu > *:nth-child(3) > * {
+      transition: width 0.1s 0.06s cubic-bezier(0.24, 2, 0.44, 0.99), height 0.1s 0.06s cubic-bezier(0.24, 2, 0.44, 0.99), background-color 0.1s 0.06s ease-in-out; }
+  #navigation-container .toggle-menu > div {
+    float: left; }
+  @media (max-width: 441px) {
+    #navigation-container .toggle-menu {
+      display: block; } }
+
+#navigation-container .navigation-panel {
+  background: linear-gradient(to bottom, #00dada 10%, #0086a8 65%, 85%, #1d7a86 95%);
+  box-shadow: 0px 4px 12px 0px #004852;
+  display: block;
+  font-family: "Raleway", sans-serif;
+  font-size: 18px;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 100%;
+  height: 35px; }
+  @media (min-width: 480px) and (min-height: 480px) {
+    #navigation-container .navigation-panel {
+      height: 47px; } }
+  @media (min-width: 768px) and (min-height: 768px) {
+    #navigation-container .navigation-panel {
+      height: 71px; } }
+  @media (max-width: 441px) {
+    #navigation-container .navigation-panel {
+      padding-top: 35px; } }
+
+#navigation-container .navigation-button {
+  cursor: pointer;
+  display: inline-block;
+  font-variant: small-caps;
+  padding: 3px 3px;
+  text-align: center; }
+  #navigation-container .navigation-button > span {
+    background-color: rgba(255, 255, 255, 0);
+    border: solid 1px rgba(255, 255, 255, 0);
+    border-radius: 4px;
+    color: #c3fffc;
+    display: inline-block;
+    min-width: 100px;
+    padding: 3px 3px;
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border 0.2s ease-in-out; }
+  #navigation-container .navigation-button:hover:not(.active) > span {
+    border: solid 1px rgba(255, 255, 255, 0.3);
+    color: white; }
+  #navigation-container .navigation-button:active:not(.active) > span {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #006e7c;
+    transition: none; }
+  #navigation-container .navigation-button.active > span {
+    background-color: rgba(255, 255, 255, 0.3);
+    color: white;
+    transition: background-color 0.5s, color 0.5s; }
+  @media (min-width: 480px) and (min-height: 480px) {
+    #navigation-container .navigation-button,
+    #navigation-container .navigation-button > span {
+      padding: 6px 6px; } }
+  @media (min-width: 768px) and (min-height: 768px) {
+    #navigation-container .navigation-button {
+      padding: 12px 10px; }
+      #navigation-container .navigation-button > span {
+        padding: 12px 12px; } }
+  @media (max-width: 441px) {
+    #navigation-container .navigation-button {
+      display: block; } }
+
+#pages-container {
+  height: 100%;
+  overflow: hidden;
+  padding: 12px;
+  padding-top: 16px;
+  position: relative;
+  z-index: 2; }
+  #pages-container > ul {
+    height: 100%;
+    position: relative;
+    width: 100%; }
+
+@media screen and (min-width: 1201px) {
+  #pages-container {
+    margin: auto;
+    max-width: 1200px; } }
+
+#pages-container .navigation-page {
+  background-color: white;
+  box-shadow: 0px 3px 12px -2px rgba(0, 76, 82, 0.7);
+  display: block;
+  font-family: "Roboto", sans-serif;
+  height: 100%;
+  opacity: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: absolute;
+  top: -20px;
+  width: 100%; }
+  #pages-container .navigation-page.visible {
+    opacity: 1;
+    top: 0px;
+    transition: top 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    z-index: 2; }
+  #pages-container .navigation-page.hidden {
+    opacity: 0;
+    top: 20px;
+    transition: top 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    z-index: 1; }
+  #pages-container .navigation-page.none {
     display: none; }
 body *,
 * {
@@ -506,6 +500,71 @@ body *,
     text-indent: 0px; }
   .card .page.definition .sentence [data-keyword] {
     font-weight: bold; }
+button.switch-button > span {
+  bottom: -0%;
+  margin: auto;
+  position: absolute;
+  top: -0%; }
+
+button.setting-button {
+  background-color: white;
+  border: solid 1px #00abbe;
+  border-radius: 2px;
+  box-shadow: 1px 1px 3px rgba(155, 155, 155, 0.5);
+  cursor: pointer;
+  font-family: "PT Sans", sans-serif;
+  font-size: 20px;
+  font-variant: small-caps;
+  outline: none;
+  overflow: hidden;
+  transition-property: border, box-shadow;
+  transition-duration: 0.1s;
+  transition-timing-function: ease-in-out; }
+  button.setting-button span {
+    border-bottom: solid 4px #00abbe;
+    bottom: -4px;
+    color: #00abbe;
+    display: block;
+    height: 100%;
+    padding: 4px 12px;
+    position: relative;
+    transition-property: color, bottom;
+    transition-duration: 0.1s;
+    transition-timing-function: ease-in-out; }
+  button.setting-button.disabled {
+    border: solid 1px #c9caca;
+    cursor: not-allowed; }
+    button.setting-button.disabled span {
+      color: #c9caca; }
+  button.setting-button:not(.disabled):hover {
+    border: solid 1px #00b8b8;
+    box-shadow: 0px 0px 3px #00abbe; }
+    button.setting-button:not(.disabled):hover span {
+      bottom: 0px;
+      color: #00b8b8; }
+
+button.switch-button {
+  background: linear-gradient(to bottom, #00a8bc, #0095b1);
+  border: solid 2px #00abbe;
+  border-radius: 10px;
+  cursor: pointer;
+  display: inline-block;
+  height: 20px;
+  margin: 0px 4px;
+  outline: 0px;
+  position: relative;
+  width: 40px; }
+  button.switch-button > span {
+    background-color: #008cab;
+    border-radius: 50%;
+    box-shadow: 0px 0px 3px 0px rgba(88, 88, 88, 0.6) inset;
+    height: 100%;
+    left: 20px;
+    transition: left 0.15s ease-in-out, background-color 0.15s 0.15s ease-in-out;
+    width: 16px; }
+  button.switch-button.on > span {
+    background-color: white;
+    left: 0px; }
 .dialog-box .navigation-panel .controls .icon, .dialog-box .navigation-panel .controls.text .font-select select {
   bottom: -0%;
   margin: auto;
@@ -865,71 +924,6 @@ h2 {
     .dialog-box .content-container.color-text [data-word].active {
       background-color: #00bac7;
       color: white; }
-button.switch-button > span {
-  bottom: -0%;
-  margin: auto;
-  position: absolute;
-  top: -0%; }
-
-button.setting-button {
-  background-color: white;
-  border: solid 1px #00abbe;
-  border-radius: 2px;
-  box-shadow: 1px 1px 3px rgba(155, 155, 155, 0.5);
-  cursor: pointer;
-  font-family: "PT Sans", sans-serif;
-  font-size: 20px;
-  font-variant: small-caps;
-  outline: none;
-  overflow: hidden;
-  transition-property: border, box-shadow;
-  transition-duration: 0.1s;
-  transition-timing-function: ease-in-out; }
-  button.setting-button span {
-    border-bottom: solid 4px #00abbe;
-    bottom: -4px;
-    color: #00abbe;
-    display: block;
-    height: 100%;
-    padding: 4px 12px;
-    position: relative;
-    transition-property: color, bottom;
-    transition-duration: 0.1s;
-    transition-timing-function: ease-in-out; }
-  button.setting-button.disabled {
-    border: solid 1px #c9caca;
-    cursor: not-allowed; }
-    button.setting-button.disabled span {
-      color: #c9caca; }
-  button.setting-button:not(.disabled):hover {
-    border: solid 1px #00b8b8;
-    box-shadow: 0px 0px 3px #00abbe; }
-    button.setting-button:not(.disabled):hover span {
-      bottom: 0px;
-      color: #00b8b8; }
-
-button.switch-button {
-  background: linear-gradient(to bottom, #00a8bc, #0095b1);
-  border: solid 2px #00abbe;
-  border-radius: 10px;
-  cursor: pointer;
-  display: inline-block;
-  height: 20px;
-  margin: 0px 4px;
-  outline: 0px;
-  position: relative;
-  width: 40px; }
-  button.switch-button > span {
-    background-color: #008cab;
-    border-radius: 50%;
-    box-shadow: 0px 0px 3px 0px rgba(88, 88, 88, 0.6) inset;
-    height: 100%;
-    left: 20px;
-    transition: left 0.15s ease-in-out, background-color 0.15s 0.15s ease-in-out;
-    width: 16px; }
-  button.switch-button.on > span {
-    background-color: white;
-    left: 0px; }
 .game-container {
   background-color: white;
   height: 100%;
@@ -948,6 +942,194 @@ button.switch-button {
 
 .game-container.hidden {
   display: none; }
+@keyframes resolved {
+  0% {
+    font-size: 18px; }
+  100% {
+    font-size: 28px;
+    color: #a8f5f5; } }
+
+@keyframes flag {
+  0% {
+    transform: rotate(0deg); }
+  80% {
+    transform: rotate(-30deg); }
+  100% {
+    transform: rotate(-30deg); } }
+
+.game-container.crossword > .navigation-panel {
+  z-index: 1; }
+
+.game-container.crossword .navigation-panel .controls * {
+  color: #2fe0e0; }
+
+.game-container.crossword
+> .navigation-panel
+.controls.navigation
+.toggle-menu {
+  display: none; }
+
+.dialog-box .game-container.crossword .navigation-panel[data-page="config"] .controls.game .buttons.game,
+.dialog-box .game-container.crossword .navigation-panel[data-page="config"] .controls.game .buttons.info,
+.dialog-box .game-container.crossword .navigation-panel[data-page="config"] .controls.game .buttons.control {
+  display: none; }
+
+@media (max-width: 443px) {
+  .dialog-box .game-container.crossword .navigation-panel[data-page="crossword"] {
+    padding-top: 34px; }
+    .dialog-box .game-container.crossword .navigation-panel[data-page="crossword"] .toggle-menu {
+      display: block; }
+    .dialog-box .game-container.crossword .navigation-panel[data-page="crossword"] .controls.game {
+      height: auto; }
+      .dialog-box .game-container.crossword .navigation-panel[data-page="crossword"] .controls.game .buttons.pages,
+      .dialog-box .game-container.crossword .navigation-panel[data-page="crossword"] .controls.game .buttons.game,
+      .dialog-box .game-container.crossword .navigation-panel[data-page="crossword"] .controls.game .buttons.info,
+      .dialog-box .game-container.crossword .navigation-panel[data-page="crossword"] .controls.game .buttons.control {
+        margin-left: 0px;
+        height: 34px;
+        display: block; } }
+
+.game-container.crossword > .navigation-panel .controls.game .buttons.game .button-star {
+  margin-right: 0px; }
+  .game-container.crossword > .navigation-panel .controls.game .buttons.game .button-star,
+  .game-container.crossword > .navigation-panel .controls.game .buttons.game .button-star > .icon {
+    cursor: grab; }
+
+.game-container.crossword > .navigation-panel .controls.game .buttons.game .count-container {
+  margin: 0px;
+  cursor: default;
+  font-size: 16px;
+  vertical-align: top;
+  width: 22px; }
+
+.game-container.crossword > .navigation-panel .controls.game .buttons.game .cursor-star {
+  display: none;
+  height: 22px;
+  opacity: 0;
+  position: fixed;
+  transform: rotate(45deg);
+  transition-duration: 0.25s, 0.25s, 0.3s, 0.3s;
+  transition-property: opacity, transform, width, height;
+  transition-timing-function: ease-in-out, ease-in-out, cubic-bezier(1, 0.01, 0.04, 2), cubic-bezier(1, 0.01, 0.04, 2);
+  width: 22px;
+  z-index: 4; }
+  .game-container.crossword > .navigation-panel .controls.game .buttons.game .cursor-star.visible {
+    opacity: 1;
+    transform: rotate(0deg); }
+  .game-container.crossword > .navigation-panel .controls.game .buttons.game .cursor-star.displayed {
+    display: block; }
+  .game-container.crossword > .navigation-panel .controls.game .buttons.game .cursor-star .icon {
+    fill: #868686;
+    stroke: #868686;
+    transition-duration: 0.1s, 0.1s;
+    transition-property: fill, stroke;
+    transition-timing-function: ease-in-out, ease-in-out; }
+  .game-container.crossword > .navigation-panel .controls.game .buttons.game .cursor-star.allowed {
+    height: 36px;
+    width: 36px; }
+    .game-container.crossword > .navigation-panel .controls.game .buttons.game .cursor-star.allowed .icon {
+      fill: #01b9b9;
+      stroke: #01b9b9; }
+
+.game-container.crossword > .navigation-panel .controls.game .buttons.info {
+  vertical-align: top; }
+  .game-container.crossword > .navigation-panel .controls.game .buttons.info li {
+    color: #01b9b9;
+    cursor: default;
+    font-size: 16px;
+    vertical-align: middle;
+    width: auto; }
+
+.game-container.crossword
+> .navigation-panel
+.controls.game
+.buttons.info
+.output {
+  color: #2fe0e0;
+  font-size: 18px;
+  text-align: left;
+  width: 36px; }
+  .game-container.crossword
+> .navigation-panel
+.controls.game
+.buttons.info
+.output.score {
+    text-align: right; }
+  .game-container.crossword
+> .navigation-panel
+.controls.game
+.buttons.info
+.output.resolved {
+    animation-duration: 0.2s;
+    animation-direction: alternate;
+    animation-iteration-count: 6;
+    animation-name: resolved;
+    animation-timing-function: ease-in-out; }
+  .game-container.crossword
+> .navigation-panel
+.controls.game
+.buttons.info
+.output.total.resolved {
+    animation-delay: 0.2s;
+    animation-iteration-count: 10; }
+
+.game-container.crossword > .navigation-panel .controls.game .buttons.control .icon {
+  animation-direction: alternate;
+  animation-duration: 0.2s;
+  animation-iteration-count: infinite;
+  animation-name: flag;
+  transform-origin: 20% 80%;
+  animation-play-state: paused;
+  animation-timing-function: ease-in-out; }
+
+.game-container.crossword > .navigation-panel .controls.game .buttons.control > li:hover .icon {
+  animation-play-state: running; }
+
+.game-container.crossword > .navigation-panel .controls.game {
+  padding: 0px 4px; }
+  .game-container.crossword > .navigation-panel .controls.game > .buttons > li {
+    width: 26px; }
+  .game-container.crossword > .navigation-panel .controls.game .buttons.pages,
+  .game-container.crossword > .navigation-panel .controls.game .buttons.game,
+  .game-container.crossword > .navigation-panel .controls.game .buttons.info,
+  .game-container.crossword > .navigation-panel .controls.game .buttons.control {
+    display: inline-block; }
+  .game-container.crossword > .navigation-panel .controls.game .buttons.game {
+    margin-left: 12px; }
+  .game-container.crossword > .navigation-panel .controls.game .buttons.info {
+    margin-left: 0px; }
+  .game-container.crossword > .navigation-panel .controls.game .buttons.info li {
+    line-height: 34px; }
+  .game-container.crossword > .navigation-panel .controls.game .buttons.control {
+    margin-left: 0px; }
+  @media (min-width: 480px) and (min-height: 480px) {
+    .game-container.crossword > .navigation-panel .controls.game {
+      padding: 0px 8px; }
+      .game-container.crossword > .navigation-panel .controls.game .buttons.info li {
+        line-height: 42px; } }
+  @media (min-width: 768px) and (min-height: 768px) {
+    .game-container.crossword > .navigation-panel .controls.game {
+      padding: 0px 12px; }
+      .game-container.crossword > .navigation-panel .controls.game > .buttons > li {
+        width: 30px; }
+      .game-container.crossword > .navigation-panel .controls.game .buttons.game {
+        margin-left: 44px; }
+      .game-container.crossword > .navigation-panel .controls.game .buttons.info {
+        margin-left: 22px; }
+      .game-container.crossword > .navigation-panel .controls.game .buttons.info li {
+        line-height: 52px; }
+      .game-container.crossword > .navigation-panel .controls.game .buttons.control {
+        margin-left: 42px; } }
+
+.game-container.crossword > .game-pages {
+  height: 100%;
+  position: relative;
+  z-index: 0; }
+  .game-container.crossword > .game-pages > li {
+    display: block;
+    height: 100%; }
+  .game-container.crossword > .game-pages > li.hidden {
+    display: none; }
 .subtitles-container {
   scrollbar-color: #39aac2 white;
   scrollbar-width: thin; }
@@ -1033,188 +1215,6 @@ button.switch-button {
 @media screen and (min-width: 993px) {
   .text-content {
     width: 947px; } }
-#navigation-container .navigation-panel {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none; }
-
-body {
-  height: 100vh;
-  overflow: hidden;
-  position: relative;
-  width: 100%;
-  padding-top: 35px; }
-  @media (min-width: 480px) and (min-height: 480px) {
-    body {
-      padding-top: 47px; } }
-  @media (min-width: 768px) and (min-height: 768px) {
-    body {
-      padding-top: 71px; } }
-
-#navigation-container {
-  left: 0;
-  position: absolute;
-  top: 0;
-  width: 100%;
-  z-index: 1; }
-
-#navigation-container.opened {
-  z-index: 3; }
-  #navigation-container.opened .navigation-panel {
-    padding-top: 0px;
-    height: auto; }
-
-#navigation-container .toggle-menu {
-  width: 60px;
-  height: 100%;
-  cursor: pointer;
-  pointer-events: auto;
-  display: none;
-  position: absolute;
-  margin: 0px 12px;
-  height: 35px;
-  bottom: 0px;
-  right: 0px; }
-  #navigation-container .toggle-menu.hidden {
-    pointer-events: none; }
-  #navigation-container .toggle-menu.hidden > * > * {
-    width: 0px;
-    height: 0px; }
-  #navigation-container .toggle-menu:hover > * > * {
-    width: 16px;
-    height: 16px;
-    background-color: #73f8ed; }
-  #navigation-container .toggle-menu > * {
-    position: relative;
-    width: 33.33333%;
-    height: 100%; }
-    #navigation-container .toggle-menu > * > * {
-      position: absolute;
-      display: block;
-      margin: auto;
-      top: -100%;
-      bottom: -100%;
-      left: -100%;
-      right: -100%;
-      width: 12px;
-      height: 12px;
-      background-color: #0cdbd1;
-      border-radius: 50%; }
-    #navigation-container .toggle-menu > *:nth-child(1) > * {
-      transition: width 0.1s 0s cubic-bezier(0.24, 2, 0.44, 0.99), height 0.1s 0s cubic-bezier(0.24, 2, 0.44, 0.99), background-color 0.1s 0s ease-in-out; }
-    #navigation-container .toggle-menu > *:nth-child(2) > * {
-      transition: width 0.1s 0.03s cubic-bezier(0.24, 2, 0.44, 0.99), height 0.1s 0.03s cubic-bezier(0.24, 2, 0.44, 0.99), background-color 0.1s 0.03s ease-in-out; }
-    #navigation-container .toggle-menu > *:nth-child(3) > * {
-      transition: width 0.1s 0.06s cubic-bezier(0.24, 2, 0.44, 0.99), height 0.1s 0.06s cubic-bezier(0.24, 2, 0.44, 0.99), background-color 0.1s 0.06s ease-in-out; }
-  #navigation-container .toggle-menu > div {
-    float: left; }
-  @media (max-width: 441px) {
-    #navigation-container .toggle-menu {
-      display: block; } }
-
-#navigation-container .navigation-panel {
-  background: linear-gradient(to bottom, #00dada 10%, #0086a8 65%, 85%, #1d7a86 95%);
-  box-shadow: 0px 4px 12px 0px #004852;
-  display: block;
-  font-family: "Raleway", sans-serif;
-  font-size: 18px;
-  overflow: hidden;
-  white-space: nowrap;
-  width: 100%;
-  height: 35px; }
-  @media (min-width: 480px) and (min-height: 480px) {
-    #navigation-container .navigation-panel {
-      height: 47px; } }
-  @media (min-width: 768px) and (min-height: 768px) {
-    #navigation-container .navigation-panel {
-      height: 71px; } }
-  @media (max-width: 441px) {
-    #navigation-container .navigation-panel {
-      padding-top: 35px; } }
-
-#navigation-container .navigation-button {
-  cursor: pointer;
-  display: inline-block;
-  font-variant: small-caps;
-  padding: 3px 3px;
-  text-align: center; }
-  #navigation-container .navigation-button > span {
-    background-color: rgba(255, 255, 255, 0);
-    border: solid 1px rgba(255, 255, 255, 0);
-    border-radius: 4px;
-    color: #c3fffc;
-    display: inline-block;
-    min-width: 100px;
-    padding: 3px 3px;
-    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border 0.2s ease-in-out; }
-  #navigation-container .navigation-button:hover:not(.active) > span {
-    border: solid 1px rgba(255, 255, 255, 0.3);
-    color: white; }
-  #navigation-container .navigation-button:active:not(.active) > span {
-    background-color: rgba(255, 255, 255, 0.9);
-    color: #006e7c;
-    transition: none; }
-  #navigation-container .navigation-button.active > span {
-    background-color: rgba(255, 255, 255, 0.3);
-    color: white;
-    transition: background-color 0.5s, color 0.5s; }
-  @media (min-width: 480px) and (min-height: 480px) {
-    #navigation-container .navigation-button,
-    #navigation-container .navigation-button > span {
-      padding: 6px 6px; } }
-  @media (min-width: 768px) and (min-height: 768px) {
-    #navigation-container .navigation-button {
-      padding: 12px 10px; }
-      #navigation-container .navigation-button > span {
-        padding: 12px 12px; } }
-  @media (max-width: 441px) {
-    #navigation-container .navigation-button {
-      display: block; } }
-
-#pages-container {
-  height: 100%;
-  overflow: hidden;
-  padding: 12px;
-  padding-top: 16px;
-  position: relative;
-  z-index: 2; }
-  #pages-container > ul {
-    height: 100%;
-    position: relative;
-    width: 100%; }
-
-@media screen and (min-width: 1201px) {
-  #pages-container {
-    margin: auto;
-    max-width: 1200px; } }
-
-#pages-container .navigation-page {
-  background-color: white;
-  box-shadow: 0px 3px 12px -2px rgba(0, 76, 82, 0.7);
-  display: block;
-  font-family: "Roboto", sans-serif;
-  height: 100%;
-  opacity: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  position: absolute;
-  top: -20px;
-  width: 100%; }
-  #pages-container .navigation-page.visible {
-    opacity: 1;
-    top: 0px;
-    transition: top 0.3s ease-in-out, opacity 0.3s ease-in-out;
-    z-index: 2; }
-  #pages-container .navigation-page.hidden {
-    opacity: 0;
-    top: 20px;
-    transition: top 0.3s ease-in-out, opacity 0.3s ease-in-out;
-    z-index: 1; }
-  #pages-container .navigation-page.none {
-    display: none; }
 .crossword-page > div > div {
   scrollbar-color: #39aac2 white;
   scrollbar-width: thin; }
@@ -1353,6 +1353,78 @@ div > span {
 
 #crossword-table td.clue-cell.active .arrow svg {
   fill: #05d8bc; }
+.game-container.crossword .config-page section.warnings .warning > .prompt .icon {
+  bottom: -0%;
+  margin: auto;
+  position: absolute;
+  top: -0%; }
+
+.game-container.crossword .config-page {
+  overflow: auto;
+  padding: 12px; }
+  .game-container.crossword .config-page section {
+    text-align: center;
+    margin: 22px 0px; }
+    .game-container.crossword .config-page section > div {
+      display: inline-block;
+      text-align: center; }
+
+.game-container.crossword .config-page section.settings {
+  font-family: "Open Sans", sans-serif;
+  font-size: 16px; }
+  @media (min-width: 480px) and (min-height: 480px) {
+    .game-container.crossword .config-page section.settings {
+      font-size: 17px; } }
+  @media (min-width: 768px) and (min-height: 768px) {
+    .game-container.crossword .config-page section.settings {
+      font-size: 18px; } }
+  .game-container.crossword .config-page section.settings > div {
+    border-bottom: solid 1px #00abbe;
+    padding-bottom: 22px;
+    text-align: left; }
+  .game-container.crossword .config-page section.settings p {
+    margin: 6px; }
+  .game-container.crossword .config-page section.settings .selection-list {
+    padding-left: 16px; }
+    .game-container.crossword .config-page section.settings .selection-list > li {
+      margin: 6px; }
+    .game-container.crossword .config-page section.settings .selection-list > li > span {
+      vertical-align: top; }
+  .game-container.crossword .config-page section.settings .setting-buttons {
+    display: inline-block;
+    margin-bottom: 8px;
+    vertical-align: top; }
+  .game-container.crossword .config-page section.settings button.setting-button {
+    font-size: 18px;
+    min-width: 30px;
+    vertical-align: top; }
+    .game-container.crossword .config-page section.settings button.setting-button span {
+      padding: 2px 3px; }
+  .game-container.crossword .config-page section.settings .output {
+    display: inline-block;
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0px 8px;
+    min-width: 35px; }
+
+.game-container.crossword .config-page section.warnings .warning {
+  text-align: center;
+  display: none; }
+  .game-container.crossword .config-page section.warnings .warning.visible {
+    display: block; }
+  .game-container.crossword .config-page section.warnings .warning > .prompt {
+    border: solid 1px #f1664d;
+    display: inline-block;
+    font-family: "PT Sans", sans-serif;
+    font-size: 16px;
+    margin: 8px 0px;
+    padding: 8px;
+    padding-left: 30px;
+    position: relative; }
+    .game-container.crossword .config-page section.warnings .warning > .prompt .icon {
+      left: 4px; }
+  .game-container.crossword .config-page section.warnings .warning > .controls {
+    margin: 8px 0px; }
 .hint-box .hint-button > div {
   bottom: -0%;
   margin: auto;
@@ -1507,8 +1579,34 @@ div > span {
     margin-top: 8px; }
 
 .hint-box .hint-dialog .card.audio {
-  height: 60px;
+  height: 80px;
   position: relative; }
+  .hint-box .hint-dialog .card.audio .section.button {
+    height: 58px;
+    position: relative; }
+  .hint-box .hint-dialog .card.audio .section.autoplay {
+    cursor: pointer;
+    height: 22px; }
+  .hint-box .hint-dialog .card.audio .section.autoplay .check {
+    display: none;
+    height: 22px;
+    width: 22px; }
+    .hint-box .hint-dialog .card.audio .section.autoplay .check .icon {
+      fill: #00c3cc; }
+    .hint-box .hint-dialog .card.audio .section.autoplay .check.on {
+      display: inline-block; }
+    .hint-box .hint-dialog .card.audio .section.autoplay .check.off {
+      display: none; }
+  .hint-box .hint-dialog .card.audio .section.autoplay.on .check.on {
+    display: none; }
+  .hint-box .hint-dialog .card.audio .section.autoplay.on .check.off {
+    display: inline-block; }
+  .hint-box .hint-dialog .card.audio .section.autoplay .label {
+    color: #859ba0;
+    display: inline-block;
+    font-size: 14px;
+    line-height: 22px;
+    vertical-align: top; }
   .hint-box .hint-dialog .card.audio .button.player {
     cursor: pointer;
     height: 36px;
@@ -1523,78 +1621,6 @@ div > span {
     transform: rotate(-45deg); }
     .hint-box .hint-dialog .card.audio .button.player.playing .icon {
       fill: #05d8bc; }
-.game-container.crossword .config-page section.warnings .warning > .prompt .icon {
-  bottom: -0%;
-  margin: auto;
-  position: absolute;
-  top: -0%; }
-
-.game-container.crossword .config-page {
-  overflow: auto;
-  padding: 12px; }
-  .game-container.crossword .config-page section {
-    text-align: center;
-    margin: 22px 0px; }
-    .game-container.crossword .config-page section > div {
-      display: inline-block;
-      text-align: center; }
-
-.game-container.crossword .config-page section.settings {
-  font-family: "Open Sans", sans-serif;
-  font-size: 16px; }
-  @media (min-width: 480px) and (min-height: 480px) {
-    .game-container.crossword .config-page section.settings {
-      font-size: 17px; } }
-  @media (min-width: 768px) and (min-height: 768px) {
-    .game-container.crossword .config-page section.settings {
-      font-size: 18px; } }
-  .game-container.crossword .config-page section.settings > div {
-    border-bottom: solid 1px #00abbe;
-    padding-bottom: 22px;
-    text-align: left; }
-  .game-container.crossword .config-page section.settings p {
-    margin: 6px; }
-  .game-container.crossword .config-page section.settings .selection-list {
-    padding-left: 16px; }
-    .game-container.crossword .config-page section.settings .selection-list > li {
-      margin: 6px; }
-    .game-container.crossword .config-page section.settings .selection-list > li > span {
-      vertical-align: top; }
-  .game-container.crossword .config-page section.settings .setting-buttons {
-    display: inline-block;
-    margin-bottom: 8px;
-    vertical-align: top; }
-  .game-container.crossword .config-page section.settings button.setting-button {
-    font-size: 18px;
-    min-width: 30px;
-    vertical-align: top; }
-    .game-container.crossword .config-page section.settings button.setting-button span {
-      padding: 2px 3px; }
-  .game-container.crossword .config-page section.settings .output {
-    display: inline-block;
-    font-size: 24px;
-    font-weight: bold;
-    margin: 0px 8px;
-    min-width: 35px; }
-
-.game-container.crossword .config-page section.warnings .warning {
-  text-align: center;
-  display: none; }
-  .game-container.crossword .config-page section.warnings .warning.visible {
-    display: block; }
-  .game-container.crossword .config-page section.warnings .warning > .prompt {
-    border: solid 1px #f1664d;
-    display: inline-block;
-    font-family: "PT Sans", sans-serif;
-    font-size: 16px;
-    margin: 8px 0px;
-    padding: 8px;
-    padding-left: 30px;
-    position: relative; }
-    .game-container.crossword .config-page section.warnings .warning > .prompt .icon {
-      left: 4px; }
-  .game-container.crossword .config-page section.warnings .warning > .controls {
-    margin: 8px 0px; }
 .youtube-container {
   height: 100%;
   overflow: hidden;
