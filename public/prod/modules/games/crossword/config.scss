@@ -1,0 +1,99 @@
+@import "./../../../styles/rules";
+@import "./../../../styles/responsive";
+
+.game-container.crossword .config-page {
+  overflow: auto;
+  padding: 12px;
+  section {
+    text-align: center;
+    margin: 22px 0px;
+    & > div {
+      display: inline-block;
+      text-align: center;
+    }
+  }
+}
+
+.game-container.crossword .config-page section.settings {
+  font-family: "Open Sans", sans-serif;
+  font-size: 16px;
+
+  @media (min-width: $grid-small) and (min-height: $grid-small) {
+    font-size: 17px;
+  }
+
+  @media (min-width: $grid-medium) and (min-height: $grid-medium) {
+    font-size: 18px;
+  }
+
+  & > div {
+    border-bottom: solid 1px #00abbe;
+    padding-bottom: 22px;
+    text-align: left;
+  }
+
+  p {
+    margin: 6px;
+  }
+
+  .selection-list {
+    padding-left: 16px;
+    & > li {
+      margin: 6px;
+    }
+    & > li > span {
+      vertical-align: top;
+    }
+  }
+
+  .setting-buttons {
+    display: inline-block;
+    margin-bottom: 8px;
+    vertical-align: top;
+  }
+
+  button.setting-button {
+    font-size: 18px;
+    min-width: 30px;
+    vertical-align: top;
+    span {
+      padding: 2px 3px;
+    }
+  }
+
+  .output {
+    display: inline-block;
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0px 8px;
+    min-width: 35px;
+  }
+}
+
+.game-container.crossword .config-page section.warnings .warning {
+  text-align: center;
+  display: none;
+
+  &.visible {
+    display: block;
+  }
+
+  & > .prompt {
+    border: solid 1px #f1664d;
+    display: inline-block;
+    font-family: "PT Sans", sans-serif;
+    font-size: 16px;
+    margin: 8px 0px;
+    padding: 8px;
+    padding-left: 30px;
+    position: relative;
+    .icon {
+      @extend %vertical-center;
+      left: 4px;
+    }
+  }
+
+  & > .controls {
+    margin: 8px 0px;
+  }
+}

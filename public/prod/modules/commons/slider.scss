@@ -1,0 +1,57 @@
+@import "./../../styles/rules";
+
+$dot-size: 16px;
+$dot-hover-size: 20px;
+
+.image-slider {
+  padding: 4px;
+}
+
+.image-slider .image-element {
+  border-radius: 4px;
+  display: block;
+  width: 100%;
+}
+
+.image-slider .image-navigation {
+  height: 20px;
+  margin: 6px 0px;
+  padding: 0px;
+  text-align: center;
+  width: 100%;
+
+  &:empty {
+    display: none;
+  }
+
+  li {
+    display: inline-block;
+    height: 20px;
+    position: relative;
+    width: 20px;
+  }
+
+  li > span {
+    @extend %center;
+    background-color: #03adad;
+    border-radius: 50%;
+    cursor: pointer;
+    height: 12px;
+    transition-duration: 0.25s;
+    transition-property: background-color, width, height;
+    transition-timing-function: ease-in-out, cubic-bezier(1, 0.19, 0, 0.84),
+      cubic-bezier(1, 0.19, 0, 0.84);
+    width: 12px;
+
+    &:hover {
+      height: $dot-size;
+      width: $dot-size;
+    }
+
+    &.active {
+      background-color: #00d6d6;
+      height: $dot-hover-size;
+      width: $dot-hover-size;
+    }
+  }
+}

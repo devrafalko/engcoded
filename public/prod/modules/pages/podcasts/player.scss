@@ -1,0 +1,234 @@
+@import "./../../../styles/rules";
+@import "./../../../styles/responsive";
+
+%player-range {
+  margin: 0px 6px;
+
+  & > div {
+    @extend %vertical-center;
+    background-color: rgba(30, 96, 119, 0.05);
+    border-radius: 4px;
+    box-shadow: 0px 0px 4px rgba(12, 99, 130, 1) inset;
+    cursor: pointer;
+    height: 25px;
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .span {
+    background-color: rgba(36, 110, 135, 0.4);
+    height: 100%;
+    left: 0px;
+    position: absolute;
+    top: 0px;
+  }
+
+  .output {
+    color: #1b6279;
+    font-family: "Roboto";
+    left: 4px;
+    line-height: 25px;
+    position: absolute;
+    top: 0px;
+  }
+}
+
+.podcast-player {
+  @extend %no-select;
+  background: linear-gradient(to bottom, #4dd3db, #53a8bb);
+  box-shadow: 0px -4px 8px 8px rgba(44, 44, 44, 0.5);
+  height: 76px;
+  overflow: hidden;
+  padding-top: 38px;
+
+  @media (min-width: $grid-small) and (min-height: $grid-small) {
+    height: 38px;
+    padding-top: 0px;
+  }
+
+  @media (min-width: $grid-medium) and (min-height: $grid-medium) {
+    height: 42px;
+  }
+}
+
+.podcast-player > li {
+  height: 100%;
+  float: left;
+  position: relative;
+}
+
+.podcast-player > li.button {
+  cursor: pointer;
+  margin: 0px 6px;
+
+  .icon {
+    @extend %center;
+    fill: #236d86;
+  }
+
+  &.play {
+    width: 18px;
+  }
+  &.play .icon.spinner {
+    width: 26px;
+  }
+  &.rewind {
+    width: 24px;
+  }
+  &.forward {
+    width: 24px;
+  }
+  &.muted {
+    width: 20px;
+  }
+  &.speed {
+    width: 22px;
+  }
+  &.muted {
+    margin-right: 2px;
+    .icon {
+      fill: #2c809c;
+    }
+  }
+  &.speed {
+    margin-right: 2px;
+    .icon {
+      fill: #2c809c;
+    }
+  }
+
+  @media (min-width: $grid-small) and (min-height: $grid-small) {
+    margin: 0px 2px;
+    &.play {
+      width: 20px;
+    }
+    &.play .icon.spinner {
+      width: 28px;
+    }
+    &.rewind {
+      margin: 0px 4px;
+      width: 26px;
+    }
+    &.forward {
+      width: 26px;
+    }
+    &.muted {
+      width: 22px;
+    }
+    &.speed {
+      width: 24px;
+    }
+  }
+
+  @media (min-width: $grid-medium) and (min-height: $grid-medium) {
+    margin: 0px 6px;
+    &.play {
+      width: 22px;
+    }
+    &.play .icon.spinner {
+      width: 30px;
+    }
+    &.rewind {
+      width: 28px;
+    }
+    &.forward {
+      width: 28px;
+    }
+    &.muted {
+      width: 24px;
+    }
+    &.speed {
+      width: 26px;
+    }
+  }
+}
+
+.podcast-player > li.range {
+  &.volume,
+  &.speed {
+    @extend %player-range;
+    margin-left: 2px;
+    width: calc((100% - 176px) / 2);
+
+    @media (min-width: $grid-small) and (min-height: $grid-small) {
+      width: 80px;
+    }
+
+    @media (min-width: $grid-medium) and (min-height: $grid-medium) {
+      width: 128px;
+    }
+  }
+}
+
+.podcast-player > li.range.time {
+  @extend %player-range;
+
+  & > div {
+    height: 32px;
+  }
+  .output {
+    line-height: 32px;
+  }
+
+  @media (max-width: $grid-small - 1px), (max-height: $grid-small - 1px) {
+    height: 42px;
+    left: 0px;
+    position: absolute;
+    top: 0px;
+    width: calc(100% - 12px);
+  }
+
+  @media (min-width: $grid-small) and (min-height: $grid-small) {
+    width: calc(100% - 330px);
+  }
+
+  @media (min-width: $grid-medium) and (min-height: $grid-medium) {
+    width: calc(100% - 468px);
+    & > div {
+      height: 36px;
+    }
+    .output {
+      line-height: 36px;
+    }
+  }
+
+  .output.duration {
+    left: auto;
+    right: 4px;
+  }
+
+  .span.current {
+    background-color: rgba(255, 255, 255, 0.4);
+    display: inline-block;
+    height: 100%;
+    left: 0px;
+    position: absolute;
+    top: 0px;
+    z-index: 1;
+  }
+
+  .span.buffer,
+  .span.played {
+    height: 4px;
+    left: 0px;
+    position: absolute;
+    width: 100%;
+
+    span {
+      background-color: #287a95;
+      height: 100%;
+      position: absolute;
+      top: 0px;
+    }
+  }
+
+  .span.buffer {
+    bottom: 5px;
+    top: auto;
+  }
+
+  .span.played {
+    bottom: auto;
+    top: 5px;
+  }
+}

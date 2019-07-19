@@ -1,0 +1,204 @@
+@import "./../../../styles/rules";
+
+$hint-margin: 14px;
+
+.hint-box {
+  bottom: 24px;
+  height: 0px;
+  left: $hint-margin;
+  position: absolute;
+  width: calc(100% - #{$hint-margin * 2});
+  z-index: 5;
+}
+
+.hint-box .hint-button {
+  bottom: 0px;
+  height: 30px;
+  left: 0px;
+  position: absolute;
+  width: 30px;
+  z-index: 7;
+
+  & > div {
+    @extend %vertical-center;
+    background-color: #00c3cc;
+    border-radius: 50%;
+    box-shadow: 2px 2px 4px rgba(122, 122, 122, 0.3);
+    cursor: pointer;
+    height: 100%;
+    left: -100%;
+    overflow: hidden;
+    right: -100%;
+    transition-duration: 0.25s;
+    transition-property: width, height, background-color, padding;
+    transition-timing-function: ease-in-out;
+    width: 100%;
+  }
+
+  &:hover > div {
+    background-color: #00d8d9;
+    height: 40px;
+    padding: 4px;
+    transition-timing-function: cubic-bezier(0.75, -0.15, 0, 2);
+    width: 40px;
+  }
+
+  .sprite {
+    position: relative;
+    top: 0%;
+    transition: top 0.5s 0.05s cubic-bezier(1, -1.45, 0, 1.95);
+    width: 100%;
+    .open {
+      padding: 4px;
+    }
+    .close {
+      padding: 8px;
+    }
+  }
+
+  .icon {
+    display: block;
+    fill: white;
+    height: 100%;
+    width: 100%;
+  }
+}
+
+.hint-box .hint-dialog {
+  background-color: white;
+  border-radius: 16px;
+  bottom: -20px;
+  box-shadow: 2px -2px 12px rgba(122, 122, 122, 0.7);
+  display: none;
+  font-family: "Roboto", sans-serif;
+  height: auto;
+  left: 0px;
+  max-width: 480px;
+  min-width: 140px;
+  opacity: 0;
+  padding: 0px 0px 32px 32px;
+  position: absolute;
+  transition-delay: 0.25s, 0.05s;
+  transition-duration: 0.25s, 0.5s;
+  transition-property: opacity, bottom;
+  transition-timing-function: ease-out, cubic-bezier(1, -1.45, 0, 1.95);
+  width: auto;
+  z-index: 6;
+}
+
+.hint-box .hint-dialog .word-type {
+  border-top: solid 1px #b4b4b4;
+  bottom: 0px;
+  color: #9b9b9b;
+  font-size: 16px;
+  font-style: italic;
+  height: 26px;
+  line-height: 26px;
+  margin: 3px 0px;
+  overflow: hidden;
+  padding-left: 12px;
+  position: absolute;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: calc(100% - 40px);
+}
+
+.hint-box .hint-dialog .list {
+  height: 100%;
+  width: 100%;
+}
+
+.hint-box .hint-dialog .list .card {
+  display: none;
+  height: 100%;
+  width: 100%;
+  &.active {
+    display: block;
+  }
+}
+
+.hint-box.visible {
+  .hint-dialog {
+    bottom: 0px;
+    opacity: 1;
+  }
+  .sprite {
+    top: -100%;
+  }
+}
+
+.hint-box.displayed {
+  .hint-dialog {
+    display: inline-block;
+  }
+}
+
+.hint-box .hint-dialog .meaning-list {
+  padding: 8px;
+  padding-right: 16px;
+  & > li {
+    border: dotted 1px #9c9c9c;
+    border-radius: 4px;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    padding: 2px 8px;
+  }
+}
+
+.hint-box .hint-dialog .definition-list {
+  padding: 8px;
+  padding-right: 16px;
+  & > li {
+    font-size: 17px;
+    line-height: 1.25;
+    text-align: justify;
+  }
+  & > li:not(:last-child) {
+    margin-bottom: 12px;
+  }
+  & > li:not(:only-child) {
+    list-style-type: decimal;
+    margin-left: 12px;
+  }
+  [data-keyword] {
+    letter-spacing: 2px;
+  }
+}
+
+.hint-box .hint-dialog .image-slider {
+  padding-right: 12px;
+
+  .image-navigation {
+    &:empty + .image-element {
+      border-top-right-radius: 12px;
+      margin-top: 8px;
+    }
+  }
+}
+
+.hint-box .hint-dialog .card.audio {
+  height: 60px;
+  position: relative;
+
+  .button.player {
+    @extend %center;
+    cursor: pointer;
+    height: 36px;
+    transition: transform 0.15s ease-in-out;
+    width: 36px;
+    .icon {
+      fill: #008cab;
+      height: 100%;
+      transition: fill 0.15s ease-in-out;
+      width: 100%;
+    }
+  }
+
+  .button.player.playing {
+    transform: rotate(-45deg);
+    .icon {
+      fill: #05d8bc;
+    }
+  }
+}

@@ -1,0 +1,49 @@
+.youtube-container {
+  height: 100%;
+  overflow: hidden;
+  width: 100%;
+}
+
+.movie-box {
+  background-color: #000000;
+  overflow: hidden;
+  position: relative;
+
+  iframe {
+    display: block;
+    margin: auto;
+    width: 100%;
+  }
+
+  .mask {
+    background-color: transparent;
+    display: none;
+    height: 100%;
+    left: 0px;
+    position: absolute;
+    top: 0px;
+    width: 100%;
+
+    &.block {
+      display: block;
+    }
+  }
+}
+
+.movie-zip {
+  background: linear-gradient(to bottom, #292929, #0c0c0c);
+  box-shadow: 0px 0px 0px 0px rgba(255, 255, 255, 0) inset;
+  cursor: row-resize;
+  display: block;
+  height: 12px;
+  transition: box-shadow 0.15s ease-in-out;
+  width: 100%;
+
+  &:hover {
+    box-shadow: 0px -10px 8px -8px rgba(255, 255, 255, 0.6) inset;
+  }
+
+  &.hidden {
+    display: block;
+  }
+}

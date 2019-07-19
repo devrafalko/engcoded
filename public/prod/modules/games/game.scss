@@ -1,0 +1,25 @@
+@import "./../../styles/rules";
+@import "./../../styles/responsive";
+
+.game-container {
+  background-color: white;
+  height: 100%;
+  left: 0px;
+  padding-top: $grid-nav-small;
+  position: absolute;
+  top: 0px;
+  width: 100%;
+  z-index: 2;
+
+  @media (min-width: $grid-small) and (min-height: $grid-small) {
+    padding-top: $grid-nav-medium;
+  }
+
+  @media (min-width: $grid-medium) and (min-height: $grid-medium) {
+    padding-top: $grid-nav-large;
+  }
+}
+
+.game-container.hidden {
+  display: none;
+}

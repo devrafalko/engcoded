@@ -1,0 +1,13 @@
+.player-container {
+  margin-bottom: 12px;
+}
+
+.podcasts-container {
+  height: 100%;
+  overflow: hidden;
+  width: 100%;
+}
+
+.dialog-box[data-dialog="podcasts"] .subtitles-container {
+  height: calc(100% - 54px);
+}

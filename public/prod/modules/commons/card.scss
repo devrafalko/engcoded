@@ -1,0 +1,228 @@
+@import "./../../styles/rules.scss";
+
+$card-navigation-height: 36px;
+$button-navigation-size: 28px;
+$button-play-size: 34px;
+
+$bezier-soft-in: cubic-bezier(0.19, 0.61, 0.25, 0.93);
+$bezier-soft-out: cubic-bezier(0.73, 0.18, 0.86, 0.45);
+
+.card.container {
+  background-color: transparent;
+  display: none;
+  max-width: 360px;
+  opacity: 0;
+  position: absolute;
+  transition: opacity 0.3s $bezier-soft-out;
+  visibility: hidden;
+  z-index: 3;
+
+  &.displayed {
+    display: block;
+    visibility: visible;
+  }
+
+  &.visible {
+    opacity: 1;
+    transition: opacity 0.3s $bezier-soft-in;
+  }
+
+  &.visible .relative-box {
+    top: 0px;
+    transition: top 0.3s $bezier-soft-in;
+  }
+}
+
+.card.relative-box {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 2px 2px 5px 2px rgba(80, 80, 80, 0.5);
+  min-width: 176px;
+  overflow: hidden;
+  position: relative;
+  top: 10px;
+  transition: top 0.3s $bezier-soft-out;
+}
+
+.card.navigation {
+  @extend %no-select;
+  box-shadow: 0px 2px 3px 0px rgba(77, 106, 107, 0.5);
+  height: $card-navigation-height;
+
+  .button {
+    border-radius: 4px;
+    cursor: pointer;
+    float: left;
+    height: $button-navigation-size;
+    margin: 4px;
+    padding: 3px;
+    width: $button-navigation-size;
+
+    &.active {
+      background-color: #00c9b8;
+    }
+
+    &.disabled {
+      cursor: default;
+    }
+  }
+
+  .button.close {
+    float: right;
+    height: $button-navigation-size - 4px;
+    width: $button-navigation-size - 4px;
+  }
+}
+
+.icon {
+  .card.navigation .button & {
+    fill: #00c9b8;
+    transition: fill 0.15s ease-in-out, background-color 0.15s ease-in-out;
+  }
+  .card.navigation .button:hover & {
+    fill: #00e7c1;
+  }
+
+  .card.navigation .button.active & {
+    fill: white;
+  }
+
+  .card.navigation .button.disabled & {
+    fill: #87aca9;
+  }
+}
+
+.card.content {
+  .page {
+    display: none;
+    padding: 12px;
+  }
+
+  .page.active {
+    display: block;
+  }
+
+  .page.image {
+    padding: 0px;
+    .image-slider .image-element {
+      border-radius: 8px 8px 12px 12px;
+      padding: 4px;
+    }
+  }
+}
+
+.icon {
+  .card .section.word .button.sound & {
+    fill: #00a59d;
+    transition: transform 0.15s ease-in-out, fill 0.15s ease-in-out;
+  }
+
+  .card .section.word .button.sound[data-mp3]:hover & {
+    fill: #00e7c1;
+  }
+
+  .card .section.word .sound-on & {
+    fill: #00e7c1 !important;
+    transform: rotate(-45deg);
+  }
+}
+
+.card .page.word .section.word {
+  padding-left: $button-play-size;
+  position: relative;
+  min-height: $button-play-size;
+
+  .button.sound {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    height: $button-play-size;
+    padding: 0px 6px;
+    width: $button-play-size;
+  }
+
+  .button.sound[data-mp3] {
+    cursor: pointer;
+  }
+
+  .button.sound:not([data-mp3]) ~ .word-tab:not([data-mp3]) {
+    color: #748682;
+    font-size: 15px;
+    font-style: italic;
+  }
+
+  .word-tab {
+    display: inline-block;
+    font-family: "Raleway", sans-serif;
+    font-size: 17px;
+    margin-right: 0.34em;
+    &[data-mp3] {
+      border-bottom: dotted 1px #00a59d;
+      cursor: pointer;
+      transition-duration: 0.15s;
+      transition-property: border-bottom, color;
+      transition-timing-function: ease-in-out;
+      &:hover {
+        color: #009191;
+        border-bottom: dotted 1px #009191;
+      }
+    }
+  }
+}
+
+.card .page.word .section.translation {
+  border-top: solid 1px #009191;
+  margin-top: 12px;
+  padding-top: 12px;
+
+  .translation-tab {
+    border: dotted 1px #748682;
+    border-radius: 4px;
+    color: #748682;
+    display: inline-block;
+    font-family: "PT Sans", sans-serif;
+    font-size: 17px;
+    margin: 3px 6px;
+    padding: 2px 8px;
+
+    &[data-keyword] {
+      border: dotted 1px #00ac8f;
+      color: black;
+    }
+
+    & [data-pronoun] {
+      color: #748682;
+      font-size: 15px;
+      font-style: italic;
+    }
+
+    & [data-explanation] {
+      color: #039089;
+      display: inline-block;
+      font-size: 14px;
+      font-style: italic;
+      margin: 0px 4px;
+    }
+  }
+}
+
+.card .page.definition {
+  .sentence {
+    padding: 4px;
+
+    &:not(:only-child) {
+      list-style-type: decimal;
+      margin-left: 20px;
+    }
+
+    p {
+      font-family: "Raleway", sans-serif;
+      font-size: 17px;
+      text-indent: 0px;
+    }
+
+    & [data-keyword] {
+      font-weight: bold;
+    }
+  }
+}

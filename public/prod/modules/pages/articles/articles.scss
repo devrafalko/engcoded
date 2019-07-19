@@ -1,0 +1,28 @@
+@import "./../../../styles/rules";
+
+.dialog-box .content-container .article-content {
+  h1,
+  h2,
+  p {
+    text-align: justify;
+  }
+
+  h1 {
+    margin-bottom: 16px;
+  }
+
+  h2 {
+    margin-top: 12px;
+    margin-bottom: 6px;
+  }
+
+  p {
+    text-indent: 1em;
+  }
+}
+
+.dialog-box[data-dialog="articles"] .content-container {
+  overflow-y: auto;
+  overflow-x: auto;
+  @extend %scrollbar;
+}

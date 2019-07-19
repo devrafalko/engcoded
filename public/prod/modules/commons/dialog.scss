@@ -1,0 +1,446 @@
+@import "./../../styles/rules";
+@import "./../../styles/responsive";
+
+$dialog-margin: 12px;
+$grid-articles-hide-point: 391px;
+$grid-youtube-hide-point: 561px;
+
+.dialog-box {
+  background-color: white;
+  display: block;
+  height: 100%;
+  left: 0px;
+  overflow: hidden;
+  min-height: 300px;
+  padding-top: $grid-nav-small;
+  position: fixed;
+  top: 0px;
+  width: 100%;
+  z-index: 2;
+
+  @media (min-width: $grid-small) and (min-height: $grid-small) {
+    height: calc(100% - #{$dialog-margin * 2});
+    left: $dialog-margin;
+    padding-top: $grid-nav-medium;
+    position: absolute;
+    top: $dialog-margin;
+    width: calc(100% - #{$dialog-margin * 2});
+  }
+
+  @media (min-width: $grid-medium) and (min-height: $grid-medium) {
+    padding-top: $grid-nav-large;
+  }
+}
+
+.dialog-box .navigation-panel {
+  @extend %no-select;
+  background: linear-gradient(to bottom, #3394b4, #1b586d);
+  font-family: "Open Sans", sans-serif;
+  height: $grid-nav-small;
+  left: 0px;
+  overflow: hidden;
+  padding-right: $grid-control-small;
+  position: absolute;
+  top: 0px;
+  width: 100%;
+  z-index: 1;
+
+  @media (min-width: $grid-small) and (min-height: $grid-small) {
+    height: $grid-nav-medium;
+    padding-right: $grid-control-medium;
+  }
+
+  @media (min-width: $grid-medium) and (min-height: $grid-medium) {
+    height: $grid-nav-large;
+    padding-right: $grid-control-large;
+  }
+}
+
+.dialog-box .navigation-panel.opened {
+  height: auto;
+}
+
+.dialog-box .navigation-panel .controls {
+  & > ul {
+    height: 100%;
+    white-space: nowrap;
+    display: inline-block;
+  }
+
+  &.game,
+  &.text {
+    height: 100%;
+  }
+
+  &.game {
+    float: left;
+  }
+
+  &.text {
+    float: right;
+  }
+
+  &.navigation {
+    height: $grid-nav-small;
+    position: absolute;
+    right: 0px;
+    text-align: center;
+    top: 0px;
+    width: $grid-control-small;
+
+    .close {
+      width: 16px;
+    }
+
+    @media (min-width: $grid-small) and (min-height: $grid-small) {
+      height: $grid-nav-medium;
+      width: $grid-control-medium;
+      .close {
+        width: 18px;
+      }
+    }
+
+    @media (min-width: $grid-medium) and (min-height: $grid-medium) {
+      height: $grid-nav-large;
+      width: $grid-control-large;
+      .close {
+        width: 20px;
+      }
+    }
+  }
+
+  &.navigation .toggle-menu {
+    @include menu-button(
+      $dots: 3,
+      $time: 0.1s,
+      $delay: 0.03s,
+      $width: 60px,
+      $height: 100%,
+      $diameter: 8px,
+      $hover-diameter: 14px,
+      $color: #01b9b9,
+      $hover-color: #2cd6d6
+    );
+    display: none;
+    position: absolute;
+    margin: 0px 12px;
+    right: 100%;
+    & > div {
+      float: left;
+    }
+  }
+
+  .section-subtitles {
+    display: none;
+    &.displayed {
+      display: inline-block;
+    }
+  }
+
+  .section-font {
+    display: inline-block;
+  }
+}
+
+.dialog-box .navigation-panel .controls > ul > li {
+  display: inline-block;
+  height: 100%;
+  margin: 0px 2px;
+  position: relative;
+
+  &.active .icon {
+    fill: #39f3f3;
+    stroke: #39f3f3;
+  }
+
+  &.disabled {
+    cursor: not-allowed;
+    .icon {
+      cursor: not-allowed;
+      fill: #70a3a3;
+      stroke: #70a3a3;
+    }
+  }
+
+  &:not(.disabled):hover {
+    cursor: pointer;
+    .icon {
+      cursor: pointer;
+      fill: #2cd6d6;
+      stroke: #2cd6d6;
+    }
+  }
+}
+
+.dialog-box .navigation-panel .controls .icon {
+  @extend %vertical-center;
+  width: 100%;
+  left: 0px;
+  fill: #01b9b9;
+  stroke: #01b9b9;
+  transition-property: fill, stroke;
+  transition-duration: 0.1s;
+  transition-timing-function: ease-in-out;
+}
+
+.dialog-box .navigation-panel .controls.text .font-select select {
+  @extend %vertical-center;
+  border: solid 1px #01b9b9;
+  color: #39f3f3;
+  left: 0px;
+  outline-width: 0px;
+  padding: 2px;
+  width: 100%;
+
+  & > option {
+    background-color: #20667e;
+    color: #39f3f3;
+
+    &:checked {
+      background-color: #388fac;
+    }
+  }
+}
+
+.dialog-box > .navigation-panel .controls {
+  &.text,
+  &.game {
+    padding: 0px 4px;
+  }
+  &.game > ul > li {
+    width: 26px;
+  }
+  &.text > ul > li {
+    width: 20px;
+  }
+  &.text .font-select {
+    width: 100px;
+    select {
+      font-size: 16px;
+      height: 26px;
+    }
+  }
+  &.text .font-size-button {
+    &.text-small {
+      width: 14px;
+      .icon {
+        padding-top: 10px;
+        height: 24px;
+      }
+    }
+    &.text-medium {
+      width: 18px;
+      .icon {
+        padding-top: 6px;
+        height: 24px;
+      }
+    }
+    &.text-big {
+      width: 22px;
+      .icon {
+        height: 22px;
+      }
+    }
+  }
+
+  @media (min-width: $grid-small) and (min-height: $grid-small) {
+    &.text,
+    &.game {
+      padding: 0px 8px;
+    }
+    &.text > ul > li {
+      width: 22px;
+    }
+    &.text .font-select {
+      width: 120px;
+      select {
+        font-size: 18px;
+        height: 28px;
+      }
+    }
+  }
+
+  @media (min-width: $grid-medium) and (min-height: $grid-medium) {
+    &.text,
+    &.game {
+      padding: 0px 12px;
+    }
+    &.game > ul > li {
+      width: 30px;
+    }
+    &.text > ul > li {
+      width: 24px;
+    }
+    &.text .font-select {
+      width: 140px;
+      select {
+        height: 36px;
+      }
+    }
+    &.text .font-size-button {
+      &.text-small {
+        width: 14px;
+        .icon {
+          padding-top: 14px;
+          height: 28px;
+        }
+      }
+      &.text-medium {
+        width: 22px;
+        .icon {
+          padding-top: 6px;
+          height: 28px;
+        }
+      }
+      &.text-big {
+        width: 28px;
+        .icon {
+          height: 28px;
+        }
+      }
+    }
+  }
+}
+
+.dialog-box[data-dialog="articles"] {
+  @media (max-width: $grid-articles-hide-point) {
+    & > .navigation-panel {
+      padding-top: $grid-nav-small;
+    }
+
+    & > .navigation-panel .controls {
+      &.game,
+      &.navigation,
+      &.text > .section-subtitles,
+      &.text > .section-font {
+        display: block;
+        height: $grid-nav-small;
+        float: none;
+      }
+
+      &.text {
+        display: block;
+        float: none;
+      }
+
+      &.navigation .toggle-menu {
+        display: block;
+      }
+    }
+  }
+}
+
+.dialog-box[data-dialog="youtube"],
+.dialog-box[data-dialog="podcasts"] {
+  @media (max-width: $grid-youtube-hide-point) {
+    & > .navigation-panel {
+      padding-top: $grid-nav-small;
+    }
+
+    & > .navigation-panel .controls {
+      &.text .section-font {
+        display: block;
+      }
+
+      &.text {
+        float: left;
+      }
+
+      &.navigation .toggle-menu {
+        display: block;
+      }
+
+      .section-font {
+        display: block;
+      }
+
+      &.game,
+      &.navigation,
+      &.text > .section-subtitles,
+      &.text > .section-font {
+        display: block;
+        height: $grid-nav-small;
+        float: none;
+      }
+
+      @media (min-width: $grid-small) {
+        &.game,
+        &.navigation,
+        &.text > .section-subtitles,
+        &.text > .section-font {
+          height: $grid-nav-medium;
+        }
+      }
+    }
+  }
+}
+
+.dialog-box .content-container {
+  position: relative;
+  height: 100%;
+}
+
+p,
+h2 {
+  .dialog-box .content-container[data-align="left"] & {
+    text-align: left;
+  }
+  .dialog-box .content-container[data-align="center"] & {
+    text-align: center;
+  }
+}
+
+.dialog-box .content-container[data-size="md-small"] {
+  p {
+    font-size: 16px;
+  }
+  h2 {
+    font-size: 20px;
+  }
+}
+
+.dialog-box .content-container[data-size="md-medium"] {
+  p {
+    font-size: 19px;
+  }
+  h2 {
+    font-size: 23px;
+  }
+}
+
+.dialog-box .content-container[data-size="md-big"] {
+  p {
+    font-size: 22px;
+  }
+  h2 {
+    font-size: 26px;
+  }
+}
+
+.subtitles-container {
+  .dialog-box .content-container[data-spy="true"] & {
+    overflow-y: hidden;
+  }
+}
+
+[data-word] {
+  padding: 0px 3px;
+  cursor: pointer;
+  .dialog-box .content-container.color-text & {
+    border-radius: 4px;
+    color: #347b85;
+    text-shadow: 0px 0px 0px rgba(1, 185, 185, 0.5);
+    transition: color 0.15s ease-in-out, text-shadow 0.15s ease-in-out,
+      background-color 0.15s ease-in-out;
+
+    &:hover {
+      color: #1581ac;
+      text-shadow: 1px 1px 3px rgba(12, 214, 214, 0.6);
+    }
+
+    &.active {
+      background-color: #00bac7;
+      color: white;
+    }
+  }
+}

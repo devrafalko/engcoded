@@ -1,0 +1,80 @@
+@import "./../../styles/rules";
+
+.subtitles-container {
+  @extend %scrollbar;
+  overflow-y: auto;
+  overflow-x: auto;
+  overflow: auto;
+  position: relative;
+}
+
+.subtitles-container .subtitles-content {
+  li {
+    background-color: white;
+    transition: background-color 0.1s ease-in-out;
+  }
+
+  li[data-current],
+  li:hover:not([data-header]) {
+    background-color: #f0f0f0;
+  }
+
+  h1 {
+    padding-left: 54px;
+    padding-bottom: 16px;
+  }
+
+  li p {
+    display: inline-block;
+    margin: 0px;
+    padding: 8px;
+    width: calc(100% - 54px);
+  }
+
+  li .jump-to-button {
+    vertical-align: top;
+    cursor: pointer;
+    height: 100%;
+    width: 46px;
+    display: inline-block;
+    visibility: hidden;
+
+    .icon {
+      fill: #686868;
+      height: 26px;
+      margin: 8px;
+      transition: fill 0.15s ease-in-out;
+      width: 26px;
+    }
+
+    &:hover .icon {
+      fill: #1581ac;
+    }
+  }
+
+  li:hover .jump-to-button {
+    visibility: visible;
+  }
+
+  li[data-current] .jump-to-button {
+    visibility: visible;
+    .icon {
+      fill: rgba(0, 186, 199, 1);
+    }
+  }
+}
+
+.text-content {
+  width: 100%;
+  margin: auto;
+  padding: 6px;
+  @include media(small, andsmaller) {
+    width: 100%;
+  }
+  @include media(medium) {
+    width: 734px;
+  }
+  @include media(large, andlarger) {
+    width: 947px;
+  }
+}
