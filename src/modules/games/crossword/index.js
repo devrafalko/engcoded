@@ -1557,6 +1557,34 @@ class CrosswordView {
                 </li>
               </ul>
             </section>
+            <section class="shortcuts">
+              <ul>
+                <li>
+                  <span class="key">Enter</span>
+                  <span class="action">Switch to the next clue</span>
+                </li>
+                <li>
+                  <span class="key">Space</span>
+                  <span class="action">Toggle hint box</span>
+                </li>
+                <li>
+                  <span class="key">Esc</span>
+                  <span class="action">Close hint box</span>
+                </li>
+                <li>
+                  <span class="key">Ctrl</span> + 
+                  <span class="key">Enter</span>
+                  <span class="action">Play pronunciation | Switch image</span>
+                </li>
+                <li>
+                  <span class="key">↑</span>, 
+                  <span class="key">↓</span>, 
+                  <span class="key">←</span>, 
+                  <span class="key">→</span>
+                  <span class="action">Scroll crossword</span>
+                </li>
+              </ul>
+            </section>
           </li>
           <li ${ref('page.crossword')} ${classes('page.crossword')} class="crossword-page hidden"></li>
         </ul>
