@@ -14,10 +14,10 @@ export default class Slider {
   set image(next) {
     const previous = this._data.current;
     const image = this.dom.get('image');
-    image.src = $images.get(this._data.list[next]); 
+    image.src = $images.get(this._data.list[next]);
     this._data.current = String(next);
-    if(this._data.list.length <= 1) return;
-    if(this.buttons.has(previous)) this.buttons.get(previous).remove('active');
+    if (this._data.list.length <= 1) return;
+    if (this.buttons.has(previous)) this.buttons.get(previous).remove('active');
     this.buttons.get(this._data.current).add('active');
   }
 
@@ -35,6 +35,13 @@ export default class Slider {
     navigation.innerHTML = '';
     if (this._data.list.length > 1) navigation.appendChild(this._buttonsView(this._data.list.length));
     this.image = 0;
+  }
+
+  next() {
+    if (this._data.list.length <= 1) return;
+    let next = Number(this._data.current) + 1;
+    if (next === this._data.list.length) next = 0;
+    this.image = next;
   }
 
   _buttonsView(number) {
@@ -58,9 +65,9 @@ export default class Slider {
     this.classes = classes;
   }
 
-  _addListeners(){
-    this.dom.get('navigation').addEventListener('click',(event)=>{
-      if(event.target.hasAttribute('data-image')){
+  _addListeners() {
+    this.dom.get('navigation').addEventListener('click', (event) => {
+      if (event.target.hasAttribute('data-image')) {
         this.image = event.target.getAttribute('data-image');
       }
     });

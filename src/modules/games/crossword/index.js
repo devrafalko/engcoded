@@ -292,7 +292,8 @@ class Hint {
       classes: null,
       element: null,
       currentAudioIndex: Infinity,
-      autoplay: false
+      autoplay: false,
+      opened: false
     };
     this._buildView();
     this._buildMedia();
@@ -318,12 +319,20 @@ class Hint {
     return this.dom.get('container');
   }
 
+  perform() {
+    if (!this.state.opened) return;
+    if (this.state.clueType === 'audio') this._playAudio();
+    if (this.state.clueType === 'img') this.slider.next();
+  }
+
   switch(action) {
     const classes = this.classes.get('container');
     switch (action) {
       case 'open':
+        this.state.opened = true;
         return classes.add('displayed').wait(10).add('visible');
       case 'close':
+        this.state.opened = false;
         return classes.remove('visible').wait(480).remove('displayed');
       case 'toggle':
         return this.switch(classes.has('displayed') ? 'close' : 'open');
@@ -334,6 +343,7 @@ class Hint {
     this._loadWordType(word);
     this.data.player.pause();
     this.classes.get('player').remove('playing');
+    this.state.clueType = word.clue.type;
 
     switch (word.clue.type) {
       case 'meaning':
@@ -1678,6 +1688,7 @@ class CrosswordView {
   _addKeywordListeners() {
     window.addEventListener('keydown', (event) => {
       if (this.state.activePage !== 'crossword') return;
+      if (event.keyCode === 13 && event.ctrlKey) this.hint.perform();
       if (event.ctrlKey === true) return;
       if (event.keyCode === 13) this.game.switchWord(1);
       if (event.keyCode === 8) this.game.word.backspace();
