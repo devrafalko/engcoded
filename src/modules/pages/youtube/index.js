@@ -205,6 +205,8 @@ class YouTube {
     });
     this.data.player.addEventListener('onStateChange', (event) => {
       if (this.events.state) this.events.state(event);
+      const state = this.data.player.getPlayerState();
+      if(state === 1) Card.hide(false);
     });
   }
 
@@ -227,7 +229,14 @@ class YouTube {
       else this.onMoviePause();
     }
 
+    Card.onSwitch = () => {
+      this.instances[movieName].scroller.break();
+      if (this.data.player.getPlayerState() === 1) this.state.playAfterClose = true;
+      this.data.player.pauseVideo();
+    };
+
     Card.onOpen = () => {
+      this.instances[movieName].scroller.break();
       if (this.data.player.getPlayerState() === 1) this.state.playAfterClose = true;
       this.data.player.pauseVideo();
     };

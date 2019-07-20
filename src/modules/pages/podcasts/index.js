@@ -87,7 +87,14 @@ class Podcasts {
     container.appendChild(Player.dom.player);
     Player.load(source);
 
+    Card.onSwitch = () => {
+      this.instances[name].scroller.break();
+      if (Player.playing) this.state.playAfterClose = true;
+      Player.pause();
+    };
+
     Card.onOpen = () => {
+      this.instances[name].scroller.break();
       if (Player.playing) this.state.playAfterClose = true;
       Player.pause();
     };
@@ -242,7 +249,7 @@ class Podcasts {
 
     Player.on.next = () => this.moveLine('next');
     Player.on.previous = () => this.moveLine('previous');
-
+    Player.on.play = ()=> Card.hide(false);
     Player.on.playing = () => {
       const name = this.state.currentName;
       const nodesMap = this.views[name].references.get('line');

@@ -10,7 +10,7 @@ class Card {
   constructor() {
     this.slider = new Slider();
     this.data = { words: $words, images: $images };
-    this.state = { active: null, currentContainer: null, currentIndex: null, currentWords: null };
+    this.state = { opened: false, active: null, currentContainer: null, currentIndex: null, currentWords: null };
     this.events = {};
     this._renderView();
     this._addListeners();
@@ -25,6 +25,14 @@ class Card {
 
   set onOpen(fn) {
     this.events.onOpen = fn;
+  }
+
+  get onSwitch() {
+    return this.events.onSwitch || null;
+  }
+
+  set onSwitch(fn) {
+    this.events.onSwitch = fn;
   }
 
   get onClose() {
@@ -86,6 +94,7 @@ class Card {
     const element = this.state.currentWords.occurrenceMap.get(index)[0];
     if (scroll === false) return this.show(index, container);
     this.scroller.container = this.state.currentContainer;
+    if (this.events.onSwitch) this.events.onSwitch();
     this.scroller.scroll(element, () => this.show(index, container));
   }
 
@@ -194,11 +203,14 @@ class Card {
     }
     classes.add('visible');
     elements.forEach(element => element.classList.add('active'));
-    if (this.state.currentIndex === null && this.events.onOpen) this.events.onOpen();
+    this.state.opened = true;
+    if (this.state.currentIndex !== null && this.events.onOpen) this.events.onOpen();
   }
 
   hide($switch) {
+    if(this.state.opened === false) return;
     this.classes.get('view').clear().remove('visible').wait($switch === false ? 300 : null).remove('displayed');
+    this.state.opened = false;
     if (this.state.currentIndex !== null) {
       if ($switch === false && this.events.onClose) this.events.onClose();
       const elements = this.state.currentWords.occurrenceMap.get(this.state.currentIndex);
