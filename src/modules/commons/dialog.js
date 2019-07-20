@@ -55,7 +55,8 @@ class Dialog {
       dialog.setAttribute('data-dialog', name);
       this.contentContainer.innerHTML = '';
       this.contentContainer.appendChild(content);
-      this.data.wordsMap = words;
+      this._findWordElements(content, words);
+      this.data.words = words;
       this.state.currentContentElements.cardArea = cardArea;
       this.state.currentContentElements.container = container;
       this.state.currentContentElements.content = content;
@@ -81,6 +82,17 @@ class Dialog {
     if (this.events.onClose) this.events.onClose(dialog);
   }
 
+  _findWordElements(content, words) {
+    if (words.occurrenceMap) return;
+    const occurrenceMap = new Map();
+    content.querySelectorAll('[data-word]').forEach((element) => {
+      let index = Number(element.getAttribute('data-word'));
+      if (!occurrenceMap.has(index)) occurrenceMap.set(index, []);
+      occurrenceMap.get(index).push(element);
+    });
+    words.occurrenceMap = occurrenceMap;
+  }
+
   _addListeners() {
     const button = this.dom.get('button');
     const buttonClasses = this.classes.get('button');
@@ -88,27 +100,25 @@ class Dialog {
     game.get('presentation').addEventListener('click', () => Presentation.open());
     game.get('word-test').addEventListener('click', () => Test.open());
     game.get('voice-test').addEventListener('click', () => Pronunciation.open());
-    game.get('crossword').addEventListener('click', () => Crossword.open(this.data.wordsMap));
+    game.get('crossword').addEventListener('click', () => Crossword.open(this.data.words.wordsMap));
     button.get('color-text').addEventListener('click', () => colorText.call(this));
     button.get('close').addEventListener('click', () => this.close());
-    button.get('text-small').addEventListener('click', (event) => fontSize.call(this, 'md-small', buttonClasses.get('text-small')));
-    button.get('text-medium').addEventListener('click', (event) => fontSize.call(this, 'md-medium', buttonClasses.get('text-medium')));
-    button.get('text-big').addEventListener('click', (event) => fontSize.call(this, 'md-big', buttonClasses.get('text-big')));
-    button.get('align-left').addEventListener('click', (event) => subtitlesAlign.call(this, 'left', buttonClasses.get('align-left')));
-    button.get('align-center').addEventListener('click', (event) => subtitlesAlign.call(this, 'center', buttonClasses.get('align-center')));
-    button.get('spy-subtitles').addEventListener('click', (event) => this.spySubtitles(null));
+    button.get('text-small').addEventListener('click', () => fontSize.call(this, 'md-small', buttonClasses.get('text-small')));
+    button.get('text-medium').addEventListener('click', () => fontSize.call(this, 'md-medium', buttonClasses.get('text-medium')));
+    button.get('text-big').addEventListener('click', () => fontSize.call(this, 'md-big', buttonClasses.get('text-big')));
+    button.get('align-left').addEventListener('click', () => subtitlesAlign.call(this, 'left', buttonClasses.get('align-left')));
+    button.get('align-center').addEventListener('click', () => subtitlesAlign.call(this, 'center', buttonClasses.get('align-center')));
+    button.get('spy-subtitles').addEventListener('click', () => this.spySubtitles(null));
     button.get('font-select').addEventListener('change', (event) => fontFamily.call(this, event.target.selectedIndex));
     button.get('toggle').addEventListener('click', () => toggleNavigation.call(this, 'toggle'));
     window.addEventListener('resize', () => toggleNavigation.call(this, 'close'));
     this.contentContainer.addEventListener('click', (event) => {
       if (event.target.hasAttribute('data-word')) {
-        const index = Number(event.target.getAttribute('data-word'));
-        const { id, meaning } = this.data.wordsMap.get(index);
         Card.refresh({
           container: this.state.currentContentElements.cardArea,
-          element: event.target,
-          meanings: meaning,
-          id
+          scroll: false,
+          index: Number(event.target.getAttribute('data-word')),
+          words: this.data.words
         });
       }
     });

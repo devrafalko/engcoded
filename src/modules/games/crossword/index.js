@@ -1705,6 +1705,7 @@ class CrosswordView {
     const warning = this.classes.get('warning').get('insufficient-words');
     warning.remove('visible');
     this._enableButtons('min', 'max', 'increase', 'decrease', 'generate');
+    this.classes.get('warning').get('remove-crossword').remove('visible');
     this.state.disabled = false;
 
     switch (true) {

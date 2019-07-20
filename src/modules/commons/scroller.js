@@ -1,3 +1,5 @@
+import type from 'of-type';
+
 export default class Scroller {
   constructor({ container, scrollTime, fps, offset, vertically = true, horizontally = false }) {
     this.dom = { container };
@@ -5,6 +7,10 @@ export default class Scroller {
     this.config = { scrollTime, fps, offset };
     this.state = { interval: null, isScrolling: false, currentTime: 0, breakTime: 0 };
     this.params = { currentElement: null };
+  }
+
+  set container(element) {
+    this.dom.container = element;
   }
 
   get scrolling() {
@@ -66,7 +72,7 @@ export default class Scroller {
     }
   }
 
-  scroll(element) {
+  scroll(element, callback) {
     this.element = element;
 
     const { start: startY, range: rangeY } = this.paramsY;
@@ -92,6 +98,7 @@ export default class Scroller {
         this.state.currentTime = 0;
         this.state.breakTime = 0;
         this.state.interval = null;
+        if (type(callback, Function)) callback();
       }
     }, intervalTime);
 

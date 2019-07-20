@@ -69,8 +69,8 @@ class Articles {
       name: 'articles',
       container: this.dom.container,
       content: this.views[articleName].template,
-      cardArea: this.views[articleName].references.get('article'),
-      words: this.instances[articleName].wordsMap,
+      cardArea: this.views[articleName].references.get('scrollable'),
+      words: this.instances[articleName],
       viewSubtitles: false
     });
   }
@@ -80,18 +80,25 @@ class Articles {
     const instance = this.instances[articleName];
     const article = this.data.articles[articleName];
     instance.wordsMap = new Map();
-    article.words.forEach((item) => instance.wordsMap.set(item.index, item));
+    instance.idMap = new Map();
+    article.words.forEach((item) => {
+      if (!instance.idMap.has(item.id)) instance.idMap.set(item.id, []);
+      instance.idMap.get(item.id).push(item);
+      instance.wordsMap.set(item.index, item);
+    });
   }
 
   renderArticle(articleName) {
     const article = this.data.articles[articleName];
     const data = $templater(({ ref, list }) =>/*html*/`
-      <section ${ref('article')} class="article-content text-content">
-        <h1>${article.header}</h1>
-        <article class="md-medium">
-          ${list(article.text, (item) =>/*html*/`${item}`)}
-        </article>
-      </section>
+      <div ${ref('scrollable')} class="article-scroll">
+        <section ${ref('article')} class="article-content text-content">
+          <h1>${article.header}</h1>
+          <article class="md-medium">
+            ${list(article.text, (item) =>/*html*/`${item}`)}
+          </article>
+        </section>
+      </div>
     `);
     this.views[articleName] = data;
   }

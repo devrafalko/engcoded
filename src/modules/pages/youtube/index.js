@@ -173,7 +173,7 @@ class YouTube {
       container: this.dom.container,
       content: this.views[movieName].template,
       cardArea: this.views[movieName].references.get('subtitles'),
-      words: this.instances[movieName].wordsMap,
+      words: this.instances[movieName],
       viewSubtitles: true,
       onStopSpy: () => this.instances[movieName].scroller.break(),
       onClose: () => {
@@ -246,10 +246,15 @@ class YouTube {
   renderMaps(movieName) {
     const instance = this.instances[movieName];
     const movie = this.data.movies[movieName];
+    instance.idMap = new Map();
     instance.wordsMap = new Map();
     instance.subtitlesMap = new Map();
     instance.secondsMap = new Map();
-    movie.words.forEach((item) => instance.wordsMap.set(item.index, item));
+    movie.words.forEach((item) => {
+      if (!instance.idMap.has(item.id)) instance.idMap.set(item.id, []);
+      instance.idMap.get(item.id).push(item);
+      instance.wordsMap.set(item.index, item);
+    });
 
     let index = 0;
     let totalDuration;

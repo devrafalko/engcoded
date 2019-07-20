@@ -1,22 +1,22 @@
 import type from 'of-type';
 import './card.scss';
 
-const { Slider } = $commons;
+const { Slider, Scroller } = $commons;
 const { $templater, $loopParents } = $utils;
 const { $images, $words } = $data;
-const { $iconCardDefinition, $iconCardImage, $iconCardWord, $iconClose, $iconVolume } = $icons;
+const { $iconCardDefinition, $iconCardImage, $iconCardWord, $iconClose, $iconVolume, $iconNextWord, $iconPreviousWord } = $icons;
 
 class Card {
   constructor() {
-    
     this.slider = new Slider();
     this.data = { words: $words, images: $images };
-    this.state = { active: null, currentElement: null, currentContainer: null };
+    this.state = { active: null, currentContainer: null, currentIndex: null, currentWords: null };
     this.events = {};
     this._renderView();
     this._addListeners();
     this._fitOnResize();
     this._supportAudio();
+    this._addScroller();
   }
 
   get onOpen() {
@@ -36,26 +36,27 @@ class Card {
   }
 
   fit() {
-    if (this.state.currentElement) {
+    if (this.state.currentIndex !== null) {
       delayFit.call(this);
 
       function delayFit() {
         if (this.state.fitDelayPending === true) return;
         this.state.fitDelayPending = true;
         setTimeout(() => {
-          this.show(this.state.currentElement, this.state.currentContainer);
+          this.show(this.state.currentIndex, this.state.currentContainer);
           this.state.fitDelayPending = false;
         }, 50);
       }
     }
   }
 
-  refresh({ element, id, meanings, container }) {
-    if (this.state.currentElement === element) {
+  refresh({ container, scroll, index, words }) {
+    if (this.state.currentIndex === index) {
       this.hide(false);
       return;
     }
     this.hide(true);
+    const { id, meaning: meanings } = words.wordsMap.get(index);
     const { word, definition, meaning, audio, img } = this.data.words.get(id);
     this._renderWordPage(word, meaning, audio, meanings, (wordPage) => {
       this.dom.get('card').get('word').innerHTML = '';
@@ -74,12 +75,32 @@ class Card {
       this.classes.get('button').get('image')[empty ? 'add' : 'remove']('disabled');
       if (empty && this.state.active === 'image') this._switchCard('word');
     });
-    this.show(element, container);
-    this.state.currentElement = element;
+
+    const occurrences = words.idMap.get(id);
+    this.classes.get('section').get('control')[occurrences.length > 1 ? 'add' : 'remove']('multiple');
+
+    this.state.currentIndex = index;
     this.state.currentContainer = container;
+    this.state.currentWords = words;
+
+    const element = this.state.currentWords.occurrenceMap.get(index)[0];
+    if (scroll === false) return this.show(index, container);
+    this.scroller.container = this.state.currentContainer;
+    this.scroller.scroll(element, () => this.show(index, container));
   }
 
-  _supportAudio(){
+  _addScroller() {
+    this.scroller = new Scroller({
+      container: null,
+      scrollTime: 600,
+      fps: 32,
+      offset: .1,
+      horizontally: true,
+      vertically: true
+    });
+  }
+
+  _supportAudio() {
     const audio = document.createElement('AUDIO');
     const card = this.dom.get('card').get('word');
 
@@ -115,17 +136,19 @@ class Card {
     styles.right = null;
   }
 
-  show(word, container) {
+  show(index, container) {
+    const elements = this.state.currentWords.occurrenceMap.get(index);
+    const element = elements[0];
     const view = this.dom.get('view');
     const classes = this.classes.get('view');
     if (!container.contains(view)) container.appendChild(view);
     this._resetCardPosition();
     const style = view.style;
-    const parent = word.offsetParent;
-    const wordTop = word.offsetTop;
-    const wordLeft = word.getBoundingClientRect().left - parent.getBoundingClientRect().left;
-    const wordWidth = word.offsetWidth;
-    const wordHeight = word.offsetHeight;
+    const parent = element.offsetParent;
+    const wordTop = element.offsetTop;
+    const wordLeft = element.getBoundingClientRect().left - parent.getBoundingClientRect().left;
+    const wordWidth = element.offsetWidth;
+    const wordHeight = element.offsetHeight;
     const containerWidth = parent.clientWidth;
     const containerHeight = parent.clientHeight;
     const containerScrollY = parent.scrollTop;
@@ -170,16 +193,17 @@ class Card {
         style.top = containerScrollY + 'px';
     }
     classes.add('visible');
-    word.classList.add('active');
-    if (this.state.currentElement === null && this.events.onOpen) this.events.onOpen();
+    elements.forEach(element => element.classList.add('active'));
+    if (this.state.currentIndex === null && this.events.onOpen) this.events.onOpen();
   }
 
   hide($switch) {
     this.classes.get('view').clear().remove('visible').wait($switch === false ? 300 : null).remove('displayed');
-    if (this.state.currentElement) {
+    if (this.state.currentIndex !== null) {
       if ($switch === false && this.events.onClose) this.events.onClose();
-      this.state.currentElement.classList.remove('active');
-      if ($switch !== true) this.state.currentElement = null;
+      const elements = this.state.currentWords.occurrenceMap.get(this.state.currentIndex);
+      elements.forEach(element => element.classList.remove('active'));
+      if ($switch !== true) this.state.currentIndex = null;
     }
   }
 
@@ -189,7 +213,27 @@ class Card {
     button.get('definition').addEventListener('click', this._switchCard.bind(this, 'definition', true));
     button.get('image').addEventListener('click', this._switchCard.bind(this, 'image', true));
     button.get('close').addEventListener('click', this.hide.bind(this, false));
+    button.get('next').addEventListener('click', this._switchOccurrence.bind(this, 'next'));
+    button.get('previous').addEventListener('click', this._switchOccurrence.bind(this, 'previous'));
     this._switchCard('word');
+  }
+
+  _switchOccurrence(side) {
+    const { id } = this.state.currentWords.wordsMap.get(this.state.currentIndex);
+    const ocurrances = this.state.currentWords.idMap.get(id);
+    if (ocurrances.length === 1) return;
+    const current = ocurrances.findIndex(({ index }) => index === this.state.currentIndex);
+    let next = side === 'next' ? current + 1 : current - 1;
+    if (next < 0) next = ocurrances.length - 1;
+    if (next === ocurrances.length) next = 0;
+
+    this.refresh({
+      container: this.state.currentContainer,
+      scroll: true,
+      index: ocurrances[next].index,
+      words: this.state.currentWords
+    })
+
   }
 
   _fitOnResize() {
@@ -213,7 +257,7 @@ class Card {
     button.add('active');
     card.add('active');
     this.state.active = id;
-    if (fitPosition) this.show(this.state.currentElement, this.state.currentContainer);
+    if (fitPosition) this.show(this.state.currentIndex, this.state.currentContainer);
   }
 
   _renderWordPage(words, meanings, audioSource, meaningOrder, callback) {
@@ -284,10 +328,14 @@ class Card {
       <div class="card container" ${ref('view')} ${classes('view')}>
         <div class="card relative-box">
         <nav class="card navigation">
-          <ul>
+          <ul class="section pages">
             <li ${ref('button.word')} ${classes('button.word')} class="button">${child($iconCardWord())}</li>
             <li ${ref('button.definition')} ${classes('button.definition')} class="button">${child($iconCardDefinition())}</li>
             <li ${ref('button.image')} ${classes('button.image')} class="button">${child($iconCardImage())}</li>
+          </ul>
+          <ul class="section control" ${classes('section.control')}>
+            <li ${ref('button.previous')} ${classes('button.previous')} class="button nav previous">${child($iconPreviousWord())}</li>
+            <li ${ref('button.next')} ${classes('button.next')} class="button nav next">${child($iconNextWord())}</li>
             <li ${ref('button.close')} ${classes('button.close')} class="button close">${child($iconClose())}</li>
           </ul>
         </nav>

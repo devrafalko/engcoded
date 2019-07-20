@@ -1,5 +1,14 @@
 @import "./../../../styles/rules";
 
+.dialog-box[data-dialog="articles"] .content-container .article-scroll {
+  @extend %scrollbar;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: auto;
+  position: relative;
+  width: 100%;
+}
+
 .dialog-box .content-container .article-content {
   h1,
   h2,
@@ -19,10 +28,4 @@
   p {
     text-indent: 1em;
   }
-}
-
-.dialog-box[data-dialog="articles"] .content-container {
-  overflow-y: auto;
-  overflow-x: auto;
-  @extend %scrollbar;
 }

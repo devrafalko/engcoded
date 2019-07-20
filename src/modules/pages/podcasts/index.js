@@ -103,7 +103,7 @@ class Podcasts {
       container: this.dom.container,
       content: this.views[name].template,
       cardArea: this.views[name].references.get('subtitles'),
-      words: this.instances[name].wordsMap,
+      words: this.instances[name],
       viewSubtitles: true,
       onStopSpy: () => this.instances[name].scroller.break(),
       onClose: () => {
@@ -119,9 +119,14 @@ class Podcasts {
     const instance = this.instances[name];
     const podcast = this.data.podcasts[name];
     instance.wordsMap = new Map();
+    instance.idMap = new Map();
     instance.subtitlesMap = new Map();
     instance.secondsMap = new Map();
-    podcast.words.forEach((item) => instance.wordsMap.set(item.index, item));
+    podcast.words.forEach((item) => {
+      if (!instance.idMap.has(item.id)) instance.idMap.set(item.id, []);
+      instance.idMap.get(item.id).push(item);
+      instance.wordsMap.set(item.index, item);
+    });
 
     let index = 0;
     let totalDuration;
