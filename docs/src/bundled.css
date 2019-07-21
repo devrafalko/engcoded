@@ -376,9 +376,14 @@ body *,
 .card.navigation {
   box-shadow: 0px 2px 3px 0px rgba(77, 106, 107, 0.5);
   height: 36px; }
+  .card.navigation .section.pages {
+    float: left; }
+  .card.navigation .section.control {
+    float: right; }
   .card.navigation .button {
     border-radius: 4px;
     cursor: pointer;
+    display: block;
     float: left;
     height: 28px;
     margin: 4px;
@@ -388,10 +393,21 @@ body *,
       background-color: #00c9b8; }
     .card.navigation .button.disabled {
       cursor: default; }
-  .card.navigation .button.close {
-    float: right;
+  .card.navigation .button.nav {
+    display: none; }
+    .card.navigation .button.nav .top {
+      fill: #80e4dc; }
+    .card.navigation .button.nav .bottom {
+      fill: #00c9b8; }
+    .card.navigation .button.nav:hover .top {
+      fill: #a4faf1; }
+    .card.navigation .button.nav:hover .bottom {
+      fill: #00e7c1; }
+  .card.navigation .section.control.multiple .button.nav {
+    display: block; }
+  .card.navigation .button.close .icon {
     height: 24px;
-    width: 24px; }
+    width: 17px; }
 
 .card.navigation .button .icon {
   fill: #00c9b8;
@@ -500,71 +516,6 @@ body *,
     text-indent: 0px; }
   .card .page.definition .sentence [data-keyword] {
     font-weight: bold; }
-button.switch-button > span {
-  bottom: -0%;
-  margin: auto;
-  position: absolute;
-  top: -0%; }
-
-button.setting-button {
-  background-color: white;
-  border: solid 1px #00abbe;
-  border-radius: 2px;
-  box-shadow: 1px 1px 3px rgba(155, 155, 155, 0.5);
-  cursor: pointer;
-  font-family: "PT Sans", sans-serif;
-  font-size: 20px;
-  font-variant: small-caps;
-  outline: none;
-  overflow: hidden;
-  transition-property: border, box-shadow;
-  transition-duration: 0.1s;
-  transition-timing-function: ease-in-out; }
-  button.setting-button span {
-    border-bottom: solid 4px #00abbe;
-    bottom: -4px;
-    color: #00abbe;
-    display: block;
-    height: 100%;
-    padding: 4px 12px;
-    position: relative;
-    transition-property: color, bottom;
-    transition-duration: 0.1s;
-    transition-timing-function: ease-in-out; }
-  button.setting-button.disabled {
-    border: solid 1px #c9caca;
-    cursor: not-allowed; }
-    button.setting-button.disabled span {
-      color: #c9caca; }
-  button.setting-button:not(.disabled):hover {
-    border: solid 1px #00b8b8;
-    box-shadow: 0px 0px 3px #00abbe; }
-    button.setting-button:not(.disabled):hover span {
-      bottom: 0px;
-      color: #00b8b8; }
-
-button.switch-button {
-  background: linear-gradient(to bottom, #00a8bc, #0095b1);
-  border: solid 2px #00abbe;
-  border-radius: 10px;
-  cursor: pointer;
-  display: inline-block;
-  height: 20px;
-  margin: 0px 4px;
-  outline: 0px;
-  position: relative;
-  width: 40px; }
-  button.switch-button > span {
-    background-color: #008cab;
-    border-radius: 50%;
-    box-shadow: 0px 0px 3px 0px rgba(88, 88, 88, 0.6) inset;
-    height: 100%;
-    left: 20px;
-    transition: left 0.15s ease-in-out, background-color 0.15s 0.15s ease-in-out;
-    width: 16px; }
-  button.switch-button.on > span {
-    background-color: white;
-    left: 0px; }
 .dialog-box .navigation-panel .controls .icon, .dialog-box .navigation-panel .controls.text .font-select select {
   bottom: -0%;
   margin: auto;
@@ -924,6 +875,71 @@ h2 {
     .dialog-box .content-container.color-text [data-word].active {
       background-color: #00bac7;
       color: white; }
+button.switch-button > span {
+  bottom: -0%;
+  margin: auto;
+  position: absolute;
+  top: -0%; }
+
+button.setting-button {
+  background-color: white;
+  border: solid 1px #00abbe;
+  border-radius: 2px;
+  box-shadow: 1px 1px 3px rgba(155, 155, 155, 0.5);
+  cursor: pointer;
+  font-family: "PT Sans", sans-serif;
+  font-size: 20px;
+  font-variant: small-caps;
+  outline: none;
+  overflow: hidden;
+  transition-property: border, box-shadow;
+  transition-duration: 0.1s;
+  transition-timing-function: ease-in-out; }
+  button.setting-button span {
+    border-bottom: solid 4px #00abbe;
+    bottom: -4px;
+    color: #00abbe;
+    display: block;
+    height: 100%;
+    padding: 4px 12px;
+    position: relative;
+    transition-property: color, bottom;
+    transition-duration: 0.1s;
+    transition-timing-function: ease-in-out; }
+  button.setting-button.disabled {
+    border: solid 1px #c9caca;
+    cursor: not-allowed; }
+    button.setting-button.disabled span {
+      color: #c9caca; }
+  button.setting-button:not(.disabled):hover {
+    border: solid 1px #00b8b8;
+    box-shadow: 0px 0px 3px #00abbe; }
+    button.setting-button:not(.disabled):hover span {
+      bottom: 0px;
+      color: #00b8b8; }
+
+button.switch-button {
+  background: linear-gradient(to bottom, #00a8bc, #0095b1);
+  border: solid 2px #00abbe;
+  border-radius: 10px;
+  cursor: pointer;
+  display: inline-block;
+  height: 20px;
+  margin: 0px 4px;
+  outline: 0px;
+  position: relative;
+  width: 40px; }
+  button.switch-button > span {
+    background-color: #008cab;
+    border-radius: 50%;
+    box-shadow: 0px 0px 3px 0px rgba(88, 88, 88, 0.6) inset;
+    height: 100%;
+    left: 20px;
+    transition: left 0.15s ease-in-out, background-color 0.15s 0.15s ease-in-out;
+    width: 16px; }
+  button.switch-button.on > span {
+    background-color: white;
+    left: 0px; }
 .game-container {
   background-color: white;
   height: 100%;
@@ -1179,15 +1195,24 @@ h2 {
   vertical-align: top;
   cursor: pointer;
   height: 100%;
-  width: 46px;
+  width: 38px;
   display: inline-block;
   visibility: hidden; }
+  @media (min-width: 768px) and (min-height: 768px) {
+    .subtitles-container .subtitles-content li .jump-to-button {
+      width: 46px; } }
   .subtitles-container .subtitles-content li .jump-to-button .icon {
     fill: #686868;
-    height: 26px;
+    height: 22px;
     margin: 8px;
+    margin-top: 10px;
     transition: fill 0.15s ease-in-out;
-    width: 26px; }
+    width: 22px; }
+    @media (min-width: 768px) and (min-height: 768px) {
+      .subtitles-container .subtitles-content li .jump-to-button .icon {
+        margin: 8px;
+        height: 26px;
+        width: 26px; } }
   .subtitles-container .subtitles-content li .jump-to-button:hover .icon {
     fill: #1581ac; }
 
@@ -1353,78 +1378,6 @@ div > span {
 
 #crossword-table td.clue-cell.active .arrow svg {
   fill: #05d8bc; }
-.game-container.crossword .config-page section.warnings .warning > .prompt .icon {
-  bottom: -0%;
-  margin: auto;
-  position: absolute;
-  top: -0%; }
-
-.game-container.crossword .config-page {
-  overflow: auto;
-  padding: 12px; }
-  .game-container.crossword .config-page section {
-    text-align: center;
-    margin: 22px 0px; }
-    .game-container.crossword .config-page section > div {
-      display: inline-block;
-      text-align: center; }
-
-.game-container.crossword .config-page section.settings {
-  font-family: "Open Sans", sans-serif;
-  font-size: 16px; }
-  @media (min-width: 480px) and (min-height: 480px) {
-    .game-container.crossword .config-page section.settings {
-      font-size: 17px; } }
-  @media (min-width: 768px) and (min-height: 768px) {
-    .game-container.crossword .config-page section.settings {
-      font-size: 18px; } }
-  .game-container.crossword .config-page section.settings > div {
-    border-bottom: solid 1px #00abbe;
-    padding-bottom: 22px;
-    text-align: left; }
-  .game-container.crossword .config-page section.settings p {
-    margin: 6px; }
-  .game-container.crossword .config-page section.settings .selection-list {
-    padding-left: 16px; }
-    .game-container.crossword .config-page section.settings .selection-list > li {
-      margin: 6px; }
-    .game-container.crossword .config-page section.settings .selection-list > li > span {
-      vertical-align: top; }
-  .game-container.crossword .config-page section.settings .setting-buttons {
-    display: inline-block;
-    margin-bottom: 8px;
-    vertical-align: top; }
-  .game-container.crossword .config-page section.settings button.setting-button {
-    font-size: 18px;
-    min-width: 30px;
-    vertical-align: top; }
-    .game-container.crossword .config-page section.settings button.setting-button span {
-      padding: 2px 3px; }
-  .game-container.crossword .config-page section.settings .output {
-    display: inline-block;
-    font-size: 24px;
-    font-weight: bold;
-    margin: 0px 8px;
-    min-width: 35px; }
-
-.game-container.crossword .config-page section.warnings .warning {
-  text-align: center;
-  display: none; }
-  .game-container.crossword .config-page section.warnings .warning.visible {
-    display: block; }
-  .game-container.crossword .config-page section.warnings .warning > .prompt {
-    border: solid 1px #f1664d;
-    display: inline-block;
-    font-family: "PT Sans", sans-serif;
-    font-size: 16px;
-    margin: 8px 0px;
-    padding: 8px;
-    padding-left: 30px;
-    position: relative; }
-    .game-container.crossword .config-page section.warnings .warning > .prompt .icon {
-      left: 4px; }
-  .game-container.crossword .config-page section.warnings .warning > .controls {
-    margin: 8px 0px; }
 .hint-box .hint-button > div {
   bottom: -0%;
   margin: auto;
@@ -1621,6 +1574,102 @@ div > span {
     transform: rotate(-45deg); }
     .hint-box .hint-dialog .card.audio .button.player.playing .icon {
       fill: #05d8bc; }
+.game-container.crossword .config-page section.warnings .warning > .prompt .icon {
+  bottom: -0%;
+  margin: auto;
+  position: absolute;
+  top: -0%; }
+
+.game-container.crossword .config-page {
+  overflow: auto;
+  padding: 12px; }
+  .game-container.crossword .config-page section {
+    text-align: center;
+    margin: 22px 0px; }
+    .game-container.crossword .config-page section > div {
+      display: inline-block;
+      text-align: center; }
+
+.game-container.crossword .config-page section.settings {
+  font-family: "Open Sans", sans-serif;
+  font-size: 16px; }
+  @media (min-width: 480px) and (min-height: 480px) {
+    .game-container.crossword .config-page section.settings {
+      font-size: 17px; } }
+  @media (min-width: 768px) and (min-height: 768px) {
+    .game-container.crossword .config-page section.settings {
+      font-size: 18px; } }
+  .game-container.crossword .config-page section.settings > div {
+    border-bottom: solid 1px #00abbe;
+    padding-bottom: 22px;
+    text-align: left; }
+  .game-container.crossword .config-page section.settings p {
+    margin: 6px; }
+  .game-container.crossword .config-page section.settings .selection-list {
+    padding-left: 16px; }
+    .game-container.crossword .config-page section.settings .selection-list > li {
+      margin: 6px; }
+    .game-container.crossword .config-page section.settings .selection-list > li > span {
+      vertical-align: top; }
+  .game-container.crossword .config-page section.settings .setting-buttons {
+    display: inline-block;
+    margin-bottom: 8px;
+    vertical-align: top; }
+  .game-container.crossword .config-page section.settings button.setting-button {
+    font-size: 18px;
+    min-width: 30px;
+    vertical-align: top; }
+    .game-container.crossword .config-page section.settings button.setting-button span {
+      padding: 2px 3px; }
+  .game-container.crossword .config-page section.settings .output {
+    display: inline-block;
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0px 8px;
+    min-width: 35px; }
+
+.game-container.crossword .config-page section.warnings .warning {
+  text-align: center;
+  display: none; }
+  .game-container.crossword .config-page section.warnings .warning.visible {
+    display: block; }
+  .game-container.crossword .config-page section.warnings .warning > .prompt {
+    border: solid 1px #f1664d;
+    display: inline-block;
+    font-family: "PT Sans", sans-serif;
+    font-size: 16px;
+    margin: 8px 0px;
+    padding: 8px;
+    padding-left: 30px;
+    position: relative; }
+    .game-container.crossword .config-page section.warnings .warning > .prompt .icon {
+      left: 4px; }
+  .game-container.crossword .config-page section.warnings .warning > .controls {
+    margin: 8px 0px; }
+
+.game-container.crossword .config-page section.shortcuts {
+  text-align: center; }
+  .game-container.crossword .config-page section.shortcuts > ul {
+    display: inline-block;
+    text-align: left; }
+  .game-container.crossword .config-page section.shortcuts > ul > li {
+    margin: 8px 0px; }
+  .game-container.crossword .config-page section.shortcuts .key {
+    border: solid 1px grey;
+    border-radius: 4px;
+    color: #929292;
+    cursor: default;
+    display: inline-block;
+    font-family: "Raleway", sans-serif;
+    font-size: 16px;
+    padding: 4px;
+    min-width: 26px;
+    text-align: center; }
+  .game-container.crossword .config-page section.shortcuts .action {
+    color: #929292;
+    font-family: "Roboto", sans-serif;
+    font-size: 17px;
+    margin: 0px 12px; }
 .youtube-container {
   height: 100%;
   overflow: hidden;
@@ -1700,26 +1749,33 @@ svg.spinner circle {
 
 .dialog-box[data-dialog="podcasts"] .subtitles-container {
   height: calc(100% - 54px); }
-.dialog-box[data-dialog="articles"] .content-container {
+.dialog-box[data-dialog="articles"] .content-container .article-scroll {
   scrollbar-color: #39aac2 white;
   scrollbar-width: thin; }
-  .dialog-box[data-dialog="articles"] .content-container::-webkit-scrollbar {
+  .dialog-box[data-dialog="articles"] .content-container .article-scroll::-webkit-scrollbar {
     background: white;
     height: 14px;
     width: 14px; }
 
 @media screen and (max-width: 992px) {
-  .dialog-box[data-dialog="articles"] .content-container::-webkit-scrollbar {
+  .dialog-box[data-dialog="articles"] .content-container .article-scroll::-webkit-scrollbar {
     height: 10px;
     width: 10px; } }
-  .dialog-box[data-dialog="articles"] .content-container::-webkit-scrollbar-corner {
+  .dialog-box[data-dialog="articles"] .content-container .article-scroll::-webkit-scrollbar-corner {
     background-color: white; }
-  .dialog-box[data-dialog="articles"] .content-container::-webkit-scrollbar-thumb {
+  .dialog-box[data-dialog="articles"] .content-container .article-scroll::-webkit-scrollbar-thumb {
     background: #39aac2;
     border-radius: 6px;
     box-shadow: 0px 0px 3px 0px rgba(255, 255, 255, 0.3) inset; }
-    .dialog-box[data-dialog="articles"] .content-container::-webkit-scrollbar-thumb:hover {
+    .dialog-box[data-dialog="articles"] .content-container .article-scroll::-webkit-scrollbar-thumb:hover {
       box-shadow: 0px 0px 4px 2px rgba(255, 255, 255, 0.3) inset; }
+
+.dialog-box[data-dialog="articles"] .content-container .article-scroll {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: auto;
+  position: relative;
+  width: 100%; }
 
 .dialog-box .content-container .article-content h1,
 .dialog-box .content-container .article-content h2,
@@ -1735,10 +1791,6 @@ svg.spinner circle {
 
 .dialog-box .content-container .article-content p {
   text-indent: 1em; }
-
-.dialog-box[data-dialog="articles"] .content-container {
-  overflow-y: auto;
-  overflow-x: auto; }
 .podcast-player > li.range.volume > div, .podcast-player > li.range.speed > div, .podcast-player > li.range.time > div {
   bottom: -0%;
   margin: auto;

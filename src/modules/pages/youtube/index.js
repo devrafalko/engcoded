@@ -179,6 +179,7 @@ class YouTube {
       onClose: () => {
         Timer.stop();
         this.state.currentMovieName = null;
+        Card.onSwitch = null;
         Card.onOpen = null;
         Card.onClose = null;
       },

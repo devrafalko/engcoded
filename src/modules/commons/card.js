@@ -208,7 +208,7 @@ class Card {
   }
 
   hide($switch) {
-    if(this.state.opened === false) return;
+    if (this.state.opened === false) return;
     this.classes.get('view').clear().remove('visible').wait($switch === false ? 300 : null).remove('displayed');
     this.state.opened = false;
     if (this.state.currentIndex !== null) {
@@ -228,6 +228,13 @@ class Card {
     button.get('next').addEventListener('click', this._switchOccurrence.bind(this, 'next'));
     button.get('previous').addEventListener('click', this._switchOccurrence.bind(this, 'previous'));
     this._switchCard('word');
+    window.addEventListener('keydown', (event) => {
+      if (event.ctrlKey === true) return;
+      if (!this.state.opened) return;
+      if (event.keyCode === 39) this._switchOccurrence('next');
+      if (event.keyCode === 37) this._switchOccurrence('previous');
+      if (event.keyCode === 27) this.hide(false);
+    });
   }
 
   _switchOccurrence(side) {

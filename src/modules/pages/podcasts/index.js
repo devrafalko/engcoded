@@ -116,6 +116,7 @@ class Podcasts {
       onClose: () => {
         Player.reset();
         this.state.currentName = null;
+        Card.onSwitch = null;
         Card.onOpen = null;
         Card.onClose = null;
       },
