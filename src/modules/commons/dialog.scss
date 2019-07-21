@@ -43,7 +43,7 @@ $grid-youtube-hide-point: 561px;
   position: absolute;
   top: 0px;
   width: 100%;
-  z-index: 1;
+  z-index: 3;
 
   @media (min-width: $grid-small) and (min-height: $grid-small) {
     height: $grid-nav-medium;
@@ -376,8 +376,9 @@ $grid-youtube-hide-point: 561px;
 }
 
 .dialog-box .content-container {
-  position: relative;
   height: 100%;
+  position: relative;
+  z-index: 2;
 }
 
 p,

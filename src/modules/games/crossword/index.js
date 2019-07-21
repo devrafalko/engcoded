@@ -10,7 +10,7 @@ const { Slider, Scroller } = $commons;
 const { $randomItem, $templater, $loopParents, $loopBetween } = $utils;
 const { $words } = $data;
 const { $iconCheckIn, $iconCheckOut, $iconConfig, $iconGameCrossword, $iconPrevious, $iconNext, $iconStar,
-  $iconMinimize, $iconWarning, $iconGameFinish, $iconQuestionMark, $iconGameTranslate,
+  $iconMinimize, $iconWarning, $iconGameFinish, $iconQuestionMark, $iconGameTranslate, $iconOccurrence,
   $iconGameDefinition, $iconGamePronunciation, $iconGameImage, $iconClose, $iconVolume } = $icons;
 
 class Words {
@@ -49,7 +49,9 @@ class Words {
   _buildAllWordsMap(wordsList) {
     wordsList.forEach(({ id }) => {
       if (!$words.has(id) || this.map.all.has(id)) return;
-      this.map.all.set(id, $words.get(id));
+      let record = $words.get(id);
+      record.id = id;
+      this.map.all.set(id, record);
     });
   }
 
@@ -249,6 +251,7 @@ class Game {
     this.virtual.word.forEach((word) => {
       if (!word.state.resolved) word.fix();
     });
+    this.crossword.hint.switchOccurrence(true);
   }
 
   scrollView() {
@@ -276,16 +279,12 @@ class Game {
       this.crossword.state.finished = true;
     }
   }
-
-
-
 }
 
 
-
-
 class Hint {
-  constructor() {
+  constructor(crossword) {
+    this.crossword = crossword;
     this.slider = new Slider();
     this.data = {};
     this.state = {
@@ -340,11 +339,12 @@ class Hint {
   }
 
   update(word) {
+    this.switchOccurrence(word.state.resolved);
     this._loadWordType(word);
     this.data.player.pause();
     this.classes.get('player').remove('playing');
     this.state.clueType = word.clue.type;
-
+    this.state.currentWord = word;
     switch (word.clue.type) {
       case 'meaning':
         this._loadContent({
@@ -375,9 +375,26 @@ class Hint {
     }
   }
 
+  switchOccurrence(action) {
+    const button = this.classes.get('occurrence');
+    switch (action) {
+      case true:
+        button.add('displayed').wait(50).add('visible');
+        break;
+      case false:
+        button.remove('displayed', 'visible');
+        break;
+    }
+  }
+
   _addListeners() {
     this.dom.get('button').addEventListener('click', () => this.switch('toggle'));
     this.dom.get('autoplay').addEventListener('click', () => this._toggleAutoplay());
+    this.dom.get('occurrence').addEventListener('click', () => {
+      if (!this.state.currentWord.state.resolved) return;
+      this.crossword.close();
+      this.crossword.dialog.seekOccurrence(this.state.currentWord.record.id);
+    });
   }
 
   _toggleAutoplay() {
@@ -490,6 +507,11 @@ class Hint {
             </li>
           </ul>
           <p ${ref('word-type')} class="word-type"></p>
+          <div ${ref('occurrence')} ${classes('occurrence')} class="find-occurrence">
+            <div>
+              ${child($iconOccurrence())}
+            </div>
+          </div>
         </li>
       </ul>
     `);
@@ -500,7 +522,6 @@ class Hint {
   _buildMedia() {
     this.data.player = document.createElement('AUDIO');
   }
-
 }
 
 
@@ -896,6 +917,7 @@ class Word {
     if (!valid) return;
     this.fix();
     this.words.guessWord(this.record);
+    this.crossword.hint.switchOccurrence(true);
   }
 
   _createClueData() {
@@ -1427,7 +1449,8 @@ class StarHint {
 }
 
 class CrosswordView {
-  constructor() {
+  constructor(dialog) {
+    this.dialog = dialog;
     this.data = {
       wordMaps: new Map(),
       permitedClueTypes: new Set(),
@@ -1439,7 +1462,8 @@ class CrosswordView {
     this.state = {
       generated: false,
       finished: false,
-      navigationOpened: false
+      navigationOpened: false,
+      activePage: null
     };
     this._buildView();
     this._addListeners();
@@ -1453,7 +1477,7 @@ class CrosswordView {
 
   open(words) {
     this.classes.get('container').remove('hidden');
-    this._switchCrosswordPage('config');
+    if (this.state.activePage === null) this._switchCrosswordPage('config');
     if (this.data.wordMaps.has(words)) return this.data.currentWordsMap = this.data.wordMaps.get(words);
     this.data.wordMaps.set(words, new Words({ words }));
     this.data.currentWordsMap = this.data.wordMaps.get(words);
@@ -1461,6 +1485,7 @@ class CrosswordView {
   }
 
   close() {
+    this._toggleNavigation('close');
     this.classes.get('container').add('hidden');
     this.data.currentWordsMap = null;
   }
@@ -1622,7 +1647,7 @@ class CrosswordView {
 
   _createNewInstances() {
     this.virtual = new VirtualGrid({ crossword: this, words: this.data.currentWordsMap, number: this.data.wordsNumber, clues: this.data.permitedClueTypes });
-    this.hint = new Hint();
+    this.hint = new Hint(this);
     this.grid = new Grid(this.virtual, this.hint);
     this.game = new Game(this.virtual, this.grid, this.hint, this);
     this.star = new StarHint(this.virtual, this.dom, this.classes, this.data.wordsNumber);
@@ -1784,4 +1809,4 @@ class CrosswordView {
 
 }
 
-export default new CrosswordView();
+export default CrosswordView;

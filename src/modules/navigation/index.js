@@ -100,8 +100,8 @@ class Navigation {
     if (this.close && previous !== null) this.close(previous, this.dom, this.classes);
     this._state.active = name;
     if (this.open) this.open(name, this.dom, this.classes);
+    this.toggle('close');
   }
 }
-
 
 export default Navigation;

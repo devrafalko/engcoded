@@ -12,6 +12,9 @@ const { $iconGameCrossword, $iconGameHearing, $iconGameTest, $iconWordList, $ico
 class Dialog {
   constructor() {
     this.data = { controllers: {} };
+    this.games = {
+      crossword: new Crossword(this)
+    };
     this.state = { fontSize: null, opened: false, currentContentElements: {}, navigationOpened: false };
     this.events = { onClose: null, beforeClose: null, onStopSpy: null };
     this._renderView();
@@ -97,10 +100,22 @@ class Dialog {
     const button = this.dom.get('button');
     const buttonClasses = this.classes.get('button');
     const game = button.get('game');
-    game.get('presentation').addEventListener('click', () => Presentation.open());
-    game.get('word-test').addEventListener('click', () => Test.open());
-    game.get('voice-test').addEventListener('click', () => Pronunciation.open());
-    game.get('crossword').addEventListener('click', () => Crossword.open(this.data.words.wordsMap));
+    game.get('presentation').addEventListener('click', () => {
+      toggleNavigation.call(this, 'close');
+      Presentation.open();
+    });
+    game.get('word-test').addEventListener('click', () => {
+      toggleNavigation.call(this, 'close');
+      Test.open();
+    });
+    game.get('voice-test').addEventListener('click', () => {
+      toggleNavigation.call(this, 'close');
+      Pronunciation.open();
+    });
+    game.get('crossword').addEventListener('click', () => {
+      toggleNavigation.call(this, 'close');
+      this.games.crossword.open(this.data.words.wordsMap);
+    });
     button.get('color-text').addEventListener('click', () => colorText.call(this));
     button.get('close').addEventListener('click', () => this.close());
     button.get('text-small').addEventListener('click', () => fontSize.call(this, 'md-small', buttonClasses.get('text-small')));
@@ -181,6 +196,15 @@ class Dialog {
     }
   }
 
+  seekOccurrence(id) {
+    Card.refresh({
+      container: this.state.currentContentElements.cardArea,
+      scroll: true,
+      index: this.data.words.idMap.get(id)[0].index,
+      words: this.data.words
+    });
+  }
+
   spySubtitles(action) {
     this.state.spySubtitles = typeof action === 'boolean' ? action : !this.state.spySubtitles;
     this.classes.get('button').get('spy-subtitles')[this.state.spySubtitles ? 'add' : 'remove']('active');
@@ -234,7 +258,7 @@ class Dialog {
           </nav>
           <div ${ref('content-container')} ${classes('content-container')} class="content-container">
           </div>
-          ${child(Crossword.view)}
+          ${child(this.games.crossword.view)}
           ${child(Presentation.view)}
           ${child(Test.view)}
           ${child(Pronunciation.view)}

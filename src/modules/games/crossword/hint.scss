@@ -2,6 +2,22 @@
 
 $hint-margin: 14px;
 
+%hint-button {
+  @extend %vertical-center;
+  background-color: #00c3cc;
+  border-radius: 50%;
+  box-shadow: 2px 2px 4px rgba(122, 122, 122, 0.3);
+  cursor: pointer;
+  height: 100%;
+  left: -100%;
+  overflow: hidden;
+  right: -100%;
+  transition-duration: 0.25s;
+  transition-property: width, height, background-color, padding;
+  transition-timing-function: cubic-bezier(0.75, -0.15, 0, 2);
+  width: 100%;
+}
+
 .hint-box {
   bottom: 24px;
   height: 0px;
@@ -20,26 +36,13 @@ $hint-margin: 14px;
   z-index: 7;
 
   & > div {
-    @extend %vertical-center;
-    background-color: #00c3cc;
-    border-radius: 50%;
-    box-shadow: 2px 2px 4px rgba(122, 122, 122, 0.3);
-    cursor: pointer;
-    height: 100%;
-    left: -100%;
-    overflow: hidden;
-    right: -100%;
-    transition-duration: 0.25s;
-    transition-property: width, height, background-color, padding;
-    transition-timing-function: ease-in-out;
-    width: 100%;
+    @extend %hint-button;
   }
 
   &:hover > div {
     background-color: #00d8d9;
     height: 40px;
     padding: 4px;
-    transition-timing-function: cubic-bezier(0.75, -0.15, 0, 2);
     width: 40px;
   }
 
@@ -84,6 +87,50 @@ $hint-margin: 14px;
   transition-timing-function: ease-out, cubic-bezier(1, -1.45, 0, 1.95);
   width: auto;
   z-index: 6;
+}
+
+.hint-box .hint-dialog .find-occurrence {
+  display: none;
+  height: 30px;
+  left: 0px;
+  position: absolute;
+  top: 0px;
+  width: 30px;
+
+  & > div {
+    @extend %hint-button;
+    height: 0px;
+    opacity: 0;
+    padding: 0px;
+    width: 0px;
+  }
+
+  .icon {
+    fill: white;
+    height: 100%;
+    stroke: white;
+    width: 100%;
+  }
+}
+
+.hint-box .hint-dialog .find-occurrence {
+  &.displayed {
+    display: block;
+  }
+
+  &.visible > div {
+    height: 100%;
+    opacity: 1;
+    padding: 4px;
+    width: 100%;
+  }
+
+  &.visible:hover > div {
+    background-color: #00d8d9;
+    height: 40px;
+    padding: 8px;
+    width: 40px;
+  }
 }
 
 .hint-box .hint-dialog .word-type {
