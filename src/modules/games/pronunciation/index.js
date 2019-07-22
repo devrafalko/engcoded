@@ -3,12 +3,33 @@ const { $iconMinimize } = $icons;
 
 class VoiceTest {
   constructor() {
+    this._on = {
+      _open: null,
+      _close: null,
+      get open() {
+        return this._open;
+      },
+      set open(fn) {
+        this._open = fn;
+      },
+      get close() {
+        return this._close;
+      },
+      set close(fn) {
+        this._close = fn;
+      },
+    };
+
     this.buildView();
     this.addListeners();
   }
 
   get view() {
     return this.dom.get('container');
+  }
+
+  get on() {
+    return this._on;
   }
 
   buildView() {
@@ -33,13 +54,15 @@ class VoiceTest {
   }
 
   open() {
+    if (this.on.open) this.on.open();
     this.classes.get('container').remove('hidden');
   }
 
   close() {
     this.classes.get('container').add('hidden');
+    if (this.on.close) this.on.close();
   }
 
 }
 
-export default new VoiceTest();
+export default VoiceTest;

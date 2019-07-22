@@ -39,15 +39,6 @@ class Articles {
       });
       this.data.articles[name] = module;
     });
-    for (let name in this.data.articles) this.countWordsNumber(this.data.articles[name]);
-  }
-
-  countWordsNumber(article) {
-    const identifiers = new Map();
-    for (let { id } of article.words) {
-      if (type(id, String) && id.length) identifiers.set(id, null);
-    }
-    article.size = identifiers.size;
   }
 
   renderItems() {
@@ -102,7 +93,6 @@ class Articles {
     `);
     this.views[articleName] = data;
   }
-
 }
 
 export default Articles;

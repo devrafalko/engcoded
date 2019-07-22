@@ -13,12 +13,16 @@ class Dialog {
   constructor() {
     this.data = { controllers: {} };
     this.games = {
+      presentation: new Presentation(),
+      pronunciation: new Pronunciation(),
+      test: new Test(),
       crossword: new Crossword(this)
     };
-    this.state = { fontSize: null, opened: false, currentContentElements: {}, navigationOpened: false };
+    this.state = { fontSize: null, opened: false, currentContentElements: {}, navigationOpened: false, gameActive: false };
     this.events = { onClose: null, beforeClose: null, onStopSpy: null };
     this._renderView();
     this._addListeners();
+    this._addGamesListeners();
   }
 
   get fonts() {
@@ -102,18 +106,22 @@ class Dialog {
     const game = button.get('game');
     game.get('presentation').addEventListener('click', () => {
       toggleNavigation.call(this, 'close');
-      Presentation.open();
+      Card.hide(false);
+      this.games.presentation.open();
     });
     game.get('word-test').addEventListener('click', () => {
       toggleNavigation.call(this, 'close');
-      Test.open();
+      Card.hide(false);
+      this.games.test.open();
     });
     game.get('voice-test').addEventListener('click', () => {
       toggleNavigation.call(this, 'close');
-      Pronunciation.open();
+      Card.hide(false);
+      this.games.pronunciation.open();
     });
     game.get('crossword').addEventListener('click', () => {
       toggleNavigation.call(this, 'close');
+      Card.hide(false);
       this.games.crossword.open(this.data.words.wordsMap);
     });
     button.get('color-text').addEventListener('click', () => colorText.call(this));
@@ -196,6 +204,17 @@ class Dialog {
     }
   }
 
+  _addGamesListeners() {
+    this.games.crossword.on.open = () => this.state.gameActive = this.games.crossword;
+    this.games.crossword.on.close = () => this.state.gameActive = null;
+    this.games.pronunciation.on.open = () => this.state.gameActive = this.games.pronunciation;
+    this.games.pronunciation.on.close = () => this.state.gameActive = null;
+    this.games.test.on.open = () => this.state.gameActive = this.games.test;
+    this.games.test.on.close = () => this.state.gameActive = null;
+    this.games.presentation.on.open = () => this.state.gameActive = this.games.presentation;
+    this.games.presentation.on.close = () => this.state.gameActive = null;
+  }
+
   seekOccurrence(id) {
     Card.refresh({
       container: this.state.currentContentElements.cardArea,
@@ -259,9 +278,9 @@ class Dialog {
           <div ${ref('content-container')} ${classes('content-container')} class="content-container">
           </div>
           ${child(this.games.crossword.view)}
-          ${child(Presentation.view)}
-          ${child(Test.view)}
-          ${child(Pronunciation.view)}
+          ${child(this.games.presentation.view)}
+          ${child(this.games.test.view)}
+          ${child(this.games.pronunciation.view)}
         </div>
       `;
     });

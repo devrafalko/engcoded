@@ -390,11 +390,14 @@ class Hint {
   _addListeners() {
     this.dom.get('button').addEventListener('click', () => this.switch('toggle'));
     this.dom.get('autoplay').addEventListener('click', () => this._toggleAutoplay());
-    this.dom.get('occurrence').addEventListener('click', () => {
-      if (!this.state.currentWord.state.resolved) return;
-      this.crossword.close();
-      this.crossword.dialog.seekOccurrence(this.state.currentWord.record.id);
-    });
+    this.dom.get('occurrence').addEventListener('click', (event) => this.seekOccurrence(event));
+  }
+
+  seekOccurrence(event) {
+    if (!this.state.currentWord.state.resolved) return;
+    event.preventDefault();
+    this.crossword.close();
+    this.crossword.dialog.seekOccurrence(this.state.currentWord.record.id);
   }
 
   _toggleAutoplay() {
@@ -1463,8 +1466,27 @@ class CrosswordView {
       generated: false,
       finished: false,
       navigationOpened: false,
-      activePage: null
+      activePage: null,
+      opened: false
     };
+
+    this._on = {
+      _open: null,
+      _close: null,
+      get open() {
+        return this._open;
+      },
+      set open(fn) {
+        this._open = fn;
+      },
+      get close() {
+        return this._close;
+      },
+      set close(fn) {
+        this._close = fn;
+      },
+    };
+
     this._buildView();
     this._addListeners();
     this._addGameListeners();
@@ -1475,7 +1497,13 @@ class CrosswordView {
     return this.dom.get('container');
   }
 
+  get on() {
+    return this._on;
+  }
+
   open(words) {
+    this.state.opened = true;
+    if (this.on.open) this.on.open();
     this.classes.get('container').remove('hidden');
     if (this.state.activePage === null) this._switchCrosswordPage('config');
     if (this.data.wordMaps.has(words)) return this.data.currentWordsMap = this.data.wordMaps.get(words);
@@ -1488,6 +1516,8 @@ class CrosswordView {
     this._toggleNavigation('close');
     this.classes.get('container').add('hidden');
     this.data.currentWordsMap = null;
+    this.state.opened = false;
+    if (this.on.close) this.on.close();
   }
 
   _switchButtonView(name) {
@@ -1712,14 +1742,15 @@ class CrosswordView {
 
   _addKeywordListeners() {
     window.addEventListener('keydown', (event) => {
-      if (this.state.activePage !== 'crossword') return;
+      if (this.state.activePage !== 'crossword' || !this.state.opened) return;
+      this.grid.dom.get('container').focus();
       if (event.keyCode === 13 && event.ctrlKey) this.hint.perform();
+      if (event.keyCode === 70 && event.ctrlKey) this.hint.seekOccurrence(event);
       if (event.ctrlKey === true) return;
       if (event.keyCode === 13) this.game.switchWord(1);
       if (event.keyCode === 8) this.game.word.backspace();
       if (event.keyCode === 46) this.game.word.delete();
       if (event.keyCode === 27) this.hint.switch('close');
-      if (event.keyCode >= 37 && event.keyCode <= 40) this.grid.dom.get('container').focus();
       this.game.word.type(event, () => this.hint.switch('toggle'));
     });
   }

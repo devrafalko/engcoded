@@ -84,9 +84,11 @@ class YouTube {
   }
 
   addListeners() {
+    window.addEventListener('blur', () => setTimeout(() => window.focus(), 20));
     window.addEventListener('resize', () => this.resizeIframe());
     window.addEventListener('keydown', (event) => {
       if (Dialog.name !== 'youtube') return;
+      if (Dialog.state.gameActive !== null) return;
       if ([37, 38, 39, 40, 32].some((v) => v === event.keyCode)) event.preventDefault();
 
       switch (event.keyCode) {
@@ -207,7 +209,7 @@ class YouTube {
     this.data.player.addEventListener('onStateChange', (event) => {
       if (this.events.state) this.events.state(event);
       const state = this.data.player.getPlayerState();
-      if(state === 1) Card.hide(false);
+      if (state === 1) Card.hide(false);
     });
   }
 

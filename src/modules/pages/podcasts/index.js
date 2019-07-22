@@ -226,6 +226,7 @@ class Podcasts {
 
     window.addEventListener('keydown', (event) => {
       if (Dialog.name !== 'podcasts') return;
+      if (Dialog.state.gameActive !== null) return;
       if ([37, 38, 39, 40, 32].some((v) => v === event.keyCode)) event.preventDefault();
 
       switch (event.keyCode) {
@@ -250,7 +251,7 @@ class Podcasts {
 
     Player.on.next = () => this.moveLine('next');
     Player.on.previous = () => this.moveLine('previous');
-    Player.on.play = ()=> Card.hide(false);
+    Player.on.play = () => Card.hide(false);
     Player.on.playing = () => {
       const name = this.state.currentName;
       const nodesMap = this.views[name].references.get('line');
