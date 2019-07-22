@@ -4,14 +4,14 @@ import './../game.scss';
 import './navigation.scss';
 import './config.scss';
 import './crossword.scss';
-import './hint.scss';
+import './buttons.scss';
 
 const { Slider, Scroller } = $commons;
 const { $randomItem, $templater, $loopParents, $loopBetween } = $utils;
 const { $words } = $data;
 const { $iconCheckIn, $iconCheckOut, $iconConfig, $iconGameCrossword, $iconPrevious, $iconNext, $iconStar,
   $iconMinimize, $iconWarning, $iconGameFinish, $iconQuestionMark, $iconGameTranslate, $iconOccurrence,
-  $iconGameDefinition, $iconGamePronunciation, $iconGameImage, $iconClose, $iconVolume } = $icons;
+  $iconGameDefinition, $iconGamePronunciation, $iconGameImage, $iconClose, $iconVolume, $iconKeyboard } = $icons;
 
 class Words {
   constructor({ words }) {
@@ -153,10 +153,11 @@ class Words {
 }
 
 class Game {
-  constructor(virtual, grid, hint, crossword) {
+  constructor(virtual, grid, hint, keyboard, crossword) {
     this.virtual = virtual;
     this.grid = grid;
     this.hint = hint;
+    this.keyboard = keyboard;
     this.crossword = crossword;
     this.scroller = new Scroller({
       container: this.grid.dom.get('container'),
@@ -200,6 +201,15 @@ class Game {
         }
       });
     });
+
+    this.keyboard.on.keydown = (data) => {
+      if (data.keyCode === 8) this.word.backspace();
+      else if (data.keyCode === 46) this.word.delete();
+      else this.word.type(data, () => this.hint.switch('toggle'));
+    };
+
+    this.keyboard.on.open = () => this.hint.switch('close');
+    this.hint.on.open = () => this.keyboard.switch('close');
   }
 
   restart() {
@@ -281,6 +291,136 @@ class Game {
   }
 }
 
+class VirtualKeyboard {
+  constructor() {
+    this.state = { opened: false };
+    this._on = {
+      _keydown: null,
+      _open: null,
+      get keydown() {
+        return this._keydown;
+      },
+      set keydown(fn) {
+        this._keydown = fn;
+      },
+      get open() {
+        return this._open;
+      },
+      set open(fn) {
+        this._open = fn;
+      }
+    };
+    this._buildMaps();
+    this._buildView();
+    this._addListeners();
+  }
+
+  get on() {
+    return this._on;
+  }
+
+  get view() {
+    return this.dom.get('container');
+  }
+
+  get letters() {
+    return [
+      { key: 'q', keyCode: 81, row: 0, index: 0 },
+      { key: 'w', keyCode: 87, row: 0, index: 1 },
+      { key: 'e', keyCode: 69, row: 0, index: 2 },
+      { key: 'r', keyCode: 82, row: 0, index: 3 },
+      { key: 't', keyCode: 84, row: 0, index: 4 },
+      { key: 'y', keyCode: 89, row: 0, index: 5 },
+      { key: 'u', keyCode: 85, row: 0, index: 6 },
+      { key: 'i', keyCode: 73, row: 0, index: 7 },
+      { key: 'o', keyCode: 79, row: 0, index: 8 },
+      { key: 'p', keyCode: 80, row: 0, index: 9 },
+      { key: '⌫', keyCode: 8, row: 0, index: 10, classList: ['special'] },
+      { key: 'a', keyCode: 65, row: 1, index: 0 },
+      { key: 's', keyCode: 83, row: 1, index: 1 },
+      { key: 'd', keyCode: 68, row: 1, index: 2 },
+      { key: 'f', keyCode: 70, row: 1, index: 3 },
+      { key: 'g', keyCode: 71, row: 1, index: 4 },
+      { key: 'h', keyCode: 72, row: 1, index: 5 },
+      { key: 'j', keyCode: 74, row: 1, index: 6 },
+      { key: 'k', keyCode: 75, row: 1, index: 7 },
+      { key: 'l', keyCode: 76, row: 1, index: 8 },
+      { key: '␡', keyCode: 46, row: 1, index: 9, classList: ['special'] },
+      { key: 'z', keyCode: 90, row: 2, index: 0 },
+      { key: 'x', keyCode: 88, row: 2, index: 1 },
+      { key: 'c', keyCode: 67, row: 2, index: 2 },
+      { key: 'v', keyCode: 86, row: 2, index: 3 },
+      { key: 'b', keyCode: 66, row: 2, index: 4 },
+      { key: 'n', keyCode: 78, row: 2, index: 5 },
+      { key: 'm', keyCode: 77, row: 2, index: 6 },
+    ];
+  }
+
+  _buildMaps() {
+    this.rows = new Map();
+    this.codes = new Map();
+    this.letters.forEach((o) => {
+      if (!this.rows.has(o.row)) this.rows.set(o.row, new Map());
+      this.rows.get(o.row).set(o.index, o);
+      this.codes.set(o.keyCode, o);
+    });
+  }
+
+  _buildView() {
+    const { references, classes } = $templater(({ ref, child, classes, list }) =>/*html*/`
+      <ul ${ref('container')} ${classes('container')} class="keyboard-box">
+        <li ${ref('button')} class="keyboard-button">
+          <div>
+            <ul class="sprite">
+              <li class="open">${child($iconKeyboard())}</li>
+              <li class="close">${child($iconClose())}</li>
+            </ul>
+          </div>
+        </li>
+        <li ${ref('dialog')} class="keyboard-dialog">
+          ${list(this.rows, (letters) =>
+            /*html*/`<ul class="row">
+              ${list(letters, ({ key, keyCode, classList }) =>
+              /*html*/`<li data-key="${keyCode}" ${classList ? classes(`key.${keyCode}`, classList) : ''}><span>${key}</span></li>`)}
+            </ul>`)}
+        </li>
+      </ul>
+    `);
+    this.dom = references;
+    this.classes = classes;
+  }
+
+  _addListeners() {
+    this.dom.get('button').addEventListener('click', () => this.switch('toggle'));
+    this.dom.get('dialog').addEventListener('click', (event) => {
+      $loopParents(event.target, (parent, stop) => {
+        if (parent.hasAttribute('data-key')) {
+          const key = parent.getAttribute('data-key');
+          const data = this.codes.get(Number(key));
+          if (this.on.keydown) this.on.keydown(data);
+          stop();
+        }
+        if (parent === this.dom.get('dialog')) stop();
+      });
+    });
+  }
+
+  switch(action) {
+    const classes = this.classes.get('container');
+    switch (action) {
+      case 'open':
+        this.state.opened = true;
+        if (this.on.open) this.on.open();
+        return classes.add('displayed').wait(10).add('visible');
+      case 'close':
+        this.state.opened = false;
+        return classes.remove('visible').wait(480).remove('displayed');
+      case 'toggle':
+        return this.switch(classes.has('displayed') ? 'close' : 'open');
+    }
+  }
+
+}
 
 class Hint {
   constructor(crossword) {
@@ -294,10 +434,25 @@ class Hint {
       autoplay: false,
       opened: false
     };
+
+    this._on = {
+      _open: null,
+      get open() {
+        return this._open;
+      },
+      set open(fn) {
+        this._open = fn;
+      }
+    };
+
     this._buildView();
     this._buildMedia();
     this._addListeners();
     this._addPlayerListeners();
+  }
+
+  get on() {
+    return this._on;
   }
 
   set active(name) {
@@ -329,6 +484,7 @@ class Hint {
     switch (action) {
       case 'open':
         this.state.opened = true;
+        if (this.on.open) this.on.open();
         return classes.add('displayed').wait(10).add('visible');
       case 'close':
         this.state.opened = false;
@@ -532,9 +688,10 @@ class Hint {
 
 
 class Grid {
-  constructor(virtual, hint) {
+  constructor(virtual, hint, keyboard) {
     this.virtual = virtual;
     this.hint = hint;
+    this.keyboard = keyboard;
     this._buildCrosswordView();
     this._addElementsReferences();
   }
@@ -558,18 +715,15 @@ class Grid {
     });
   }
 
-  meaning() {
-
-  }
-
   _buildCrosswordView() {
     const container = $templater(({ ref, child, classes }) =>/*html*/`
       <div ${ref('content')}>
-        <div ${ref('container')} tabindex="0">
+        <div ${ref('container')} tabindex="0" class="crossword">
           ${child(this._crossword())}
         </div>
-        <div>
+        <div class="buttons">
           ${child(this.hint.view)}
+          ${child(this.keyboard.view)}
         </div>
       </div>
     `);
@@ -792,7 +946,7 @@ class Word {
     const typedLetter = code >= 65 && code <= 90;
     const typedSpace = code === 32;
     if (!typedLetter && !typedSpace) return;
-    else event.preventDefault();
+    else if (event.preventDefault) event.preventDefault();
     if (this.state.pending || this.state.resolved) return typedSpace ? allowHint() : null;
     const { usedFromQueue, usedSpace } = this._hasQueuedLetter(letter, code);
     if (!usedSpace && typedSpace) allowHint();
@@ -1678,8 +1832,9 @@ class CrosswordView {
   _createNewInstances() {
     this.virtual = new VirtualGrid({ crossword: this, words: this.data.currentWordsMap, number: this.data.wordsNumber, clues: this.data.permitedClueTypes });
     this.hint = new Hint(this);
-    this.grid = new Grid(this.virtual, this.hint);
-    this.game = new Game(this.virtual, this.grid, this.hint, this);
+    this.keyboard = new VirtualKeyboard();
+    this.grid = new Grid(this.virtual, this.hint, this.keyboard);
+    this.game = new Game(this.virtual, this.grid, this.hint, this.keyboard, this);
     this.star = new StarHint(this.virtual, this.dom, this.classes, this.data.wordsNumber);
   }
 

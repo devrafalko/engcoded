@@ -17,6 +17,7 @@ import $iconGameImage from './icon-game-image';
 import $iconGamePronunciation from './icon-game-pronunciation';
 import $iconGameTest from './icon-game-test';
 import $iconGameTranslate from './icon-game-translate';
+import $iconKeyboard from './icon-keyboard';
 import $iconMinimize from './icon-minimize';
 import $iconMute from './icon-mute';
 import $iconNext from './icon-next';
@@ -39,4 +40,4 @@ import $iconTextSize from './icon-text-size';
 import $iconVolume from './icon-volume';
 import $iconWordList from './icon-word-list';
 
-export { $iconAlignCenter, $iconAlignLeft, $iconCardDefinition, $iconCardImage, $iconCardWord, $iconCheckIn, $iconCheckOut, $iconClose, $iconCrosswordHint, $iconConfig, $iconFastForward, $iconGameCrossword, $iconGameHearing, $iconGameDefinition, $iconGameFinish, $iconGameImage, $iconGamePronunciation, $iconGameTest, $iconGameTranslate, $iconMinimize, $iconMute, $iconNext, $iconNextWord, $iconOccurrence, $iconPalette, $iconPause, $iconPlayBuffer, $iconPlay, $iconPrevious, $iconPreviousWord, $iconQuestionMark, $iconRewind, $iconSpeed, $iconSpy, $iconStar, $iconTextPlay, $iconWarning, $iconTextSize, $iconVolume, $iconWordList };
+export { $iconAlignCenter, $iconAlignLeft, $iconCardDefinition, $iconCardImage, $iconCardWord, $iconCheckIn, $iconCheckOut, $iconClose, $iconCrosswordHint, $iconConfig, $iconFastForward, $iconGameCrossword, $iconGameHearing, $iconGameDefinition, $iconGameFinish, $iconGameImage, $iconGamePronunciation, $iconGameTest, $iconGameTranslate, $iconKeyboard, $iconMinimize, $iconMute, $iconNext, $iconNextWord, $iconOccurrence, $iconPalette, $iconPause, $iconPlayBuffer, $iconPlay, $iconPrevious, $iconPreviousWord, $iconQuestionMark, $iconRewind, $iconSpeed, $iconSpy, $iconStar, $iconTextPlay, $iconWarning, $iconTextSize, $iconVolume, $iconWordList };
