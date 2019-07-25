@@ -153,14 +153,10 @@ class Words {
 }
 
 class Game {
-  constructor(virtual, grid, hint, keyboard, crossword) {
-    this.virtual = virtual;
-    this.grid = grid;
-    this.hint = hint;
-    this.keyboard = keyboard;
+  constructor(crossword) {
     this.crossword = crossword;
     this.scroller = new Scroller({
-      container: this.grid.dom.get('container'),
+      container: this.crossword.ref.grid.dom.get('container'),
       scrollTime: 800,
       fps: 32,
       offset: .1,
@@ -186,52 +182,52 @@ class Game {
   }
 
   get word() {
-    return this.virtual.word.get(this.index || 0);
+    return this.crossword.ref.virtual.word.get(this.index || 0);
   }
 
   _addListeners() {
-    const table = this.grid.dom.get('table');
+    const table = this.crossword.ref.grid.dom.get('table');
 
     table.addEventListener('click', (event) => {
       $loopParents(event.target, (parent, stop) => {
         if (parent === table) return stop();
         if (parent.tagName === 'TD') {
-          if (this.virtual.cell.has(parent)) this.chooseWord(this.virtual.cell.get(parent));
+          if (this.crossword.ref.virtual.cell.has(parent)) this.chooseWord(this.crossword.ref.virtual.cell.get(parent));
           return stop();
         }
       });
     });
 
-    this.keyboard.on.keydown = (data) => {
+    this.crossword.ref.keyboard.on.keydown = (data) => {
       if (data.keyCode === 8) this.word.backspace();
       else if (data.keyCode === 46) this.word.delete();
-      else this.word.type(data, () => this.hint.switch('toggle'));
+      else this.word.type(data, () => this.crossword.ref.hint.switch('toggle'));
     };
 
-    this.keyboard.on.open = () => this.hint.switch('close');
-    this.hint.on.open = () => this.keyboard.switch('close');
+    this.crossword.ref.keyboard.on.open = () => this.crossword.ref.hint.switch('close');
+    this.crossword.ref.hint.on.open = () => this.crossword.ref.keyboard.switch('close');
   }
 
   restart() {
     this.word.active = true;
     setTimeout(() => this.scrollView(), 100);
-    this.hint.update(this.word);
-    this.hint.switch('open');
+    this.crossword.ref.hint.update(this.word);
+    this.crossword.ref.hint.switch('open');
   }
 
   switchWord(shift) {
-    const size = this.virtual.word.size - 1;
+    const size = this.crossword.ref.virtual.word.size - 1;
     const loopSide = shift > 0 ? [0, size] : [size, 0];
     $loopBetween(...loopSide, this.index, (next, stop) => {
-      let word = this.virtual.word.get(next);
+      let word = this.crossword.ref.virtual.word.get(next);
       if (!word.state.resolved || this.crossword.state.finished) {
         if (this.index === next) return;
         this.word.active = false;
         this.index = next;
         this.word.active = true;
         this.scrollView();
-        this.hint.update(this.word);
-        this.hint.switch('open');
+        this.crossword.ref.hint.update(this.word);
+        this.crossword.ref.hint.switch('open');
         return stop();
       }
     });
@@ -248,20 +244,20 @@ class Game {
       this.word.active = false;
       this.index = word.index;
       this.word.active = true;
-      this.hint.update(this.word);
+      this.crossword.ref.hint.update(this.word);
       break;
     }
 
-    if (thesame && words.length === 1) this.hint.switch('toggle');
-    else this.hint.switch('open');
+    if (thesame && words.length === 1) this.crossword.ref.hint.switch('toggle');
+    else this.crossword.ref.hint.switch('open');
   }
 
   gameOver() {
     if (this.crossword.state.finished) return;
-    this.virtual.word.forEach((word) => {
+    this.crossword.ref.virtual.word.forEach((word) => {
       if (!word.state.resolved) word.fix();
     });
-    this.crossword.hint.switchOccurrence(true);
+    this.crossword.ref.hint.switchOccurrence(true);
   }
 
   scrollView() {
@@ -290,6 +286,9 @@ class Game {
     }
   }
 }
+
+
+
 
 class VirtualKeyboard {
   constructor() {
@@ -419,7 +418,6 @@ class VirtualKeyboard {
         return this.switch(classes.has('displayed') ? 'close' : 'open');
     }
   }
-
 }
 
 class Hint {
@@ -555,7 +553,7 @@ class Hint {
     if (!this.state.currentWord.state.resolved) return;
     event.preventDefault();
     this.crossword.close();
-    this.crossword.dialog.seekOccurrence(this.state.currentWord.record.id);
+    this.crossword.ref.dialog.seekOccurrence(this.state.currentWord.record.id);
   }
 
   _toggleAutoplay() {
@@ -685,26 +683,20 @@ class Hint {
   }
 }
 
-
-
-
-
 class Grid {
-  constructor(virtual, hint, keyboard) {
-    this.virtual = virtual;
-    this.hint = hint;
-    this.keyboard = keyboard;
+  constructor(crossword) {
+    this.crossword = crossword;
     this._buildCrosswordView();
     this._addElementsReferences();
   }
 
   _addElementsReferences() {
-    this.virtual.word.forEach((word) => {
+    this.crossword.ref.virtual.word.forEach((word) => {
       let clueCell = this.getCellByCoords(word.clue.x, word.clue.y, 'clue');
       let clueClasses = this.getClassesByCoords(word.clue.x, word.clue.y, 'clue');
       word.clue.cell = clueCell;
       word.clue.classes = clueClasses;
-      this.virtual.addCell(clueCell, word);
+      this.crossword.ref.virtual.addCell(clueCell, word);
       word.letters.forEach((letter) => {
         let letterCell = this.getCellByCoords(letter.x, letter.y, 'letter');
         let letterInput = this.getCellByCoords(letter.x, letter.y, 'input');
@@ -712,7 +704,7 @@ class Grid {
         letter.classes = letterClasses;
         letter.input = letterInput;
         letter.cell = letterCell;
-        this.virtual.addCell(letterCell, word);
+        this.crossword.ref.virtual.addCell(letterCell, word);
       });
     });
   }
@@ -724,8 +716,8 @@ class Grid {
           ${child(this._crossword())}
         </div>
         <div class="buttons">
-          ${child(this.hint.view)}
-          ${child(this.keyboard.view)}
+          ${child(this.crossword.ref.hint.view)}
+          ${child(this.crossword.ref.keyboard.view)}
         </div>
       </div>
     `);
@@ -745,7 +737,7 @@ class Grid {
     return $templater(({ loop, ref, child, classes }) =>/*html*/`
       <table ${ref('table')} id="crossword-table">
         <tbody>
-          ${loop(this.virtual.rows.size, (y) =>/*html*/`
+          ${loop(this.crossword.ref.virtual.rows.size, (y) =>/*html*/`
             ${child(this._row(y))}
           `)}
         </tbody>
@@ -756,7 +748,7 @@ class Grid {
   _row(y) {
     return $templater(({ child, loop }) =>/*html*/`
     <tr>
-      ${loop(this.virtual.columns.size, (x) => /*html*/`
+      ${loop(this.crossword.ref.virtual.columns.size, (x) => /*html*/`
         ${child(this._cell(x, y))}
       `)}
     </tr>
@@ -764,10 +756,10 @@ class Grid {
   }
 
   _cell(x, y) {
-    let column = this.virtual.edges.left + x;
-    let row = this.virtual.edges.top + y;
-    let letter = this.virtual.hasLetter(column, row);
-    let keyword = this.virtual.hasKeyword(column, row);
+    let column = this.crossword.ref.virtual.edges.left + x;
+    let row = this.crossword.ref.virtual.edges.top + y;
+    let letter = this.crossword.ref.virtual.hasLetter(column, row);
+    let keyword = this.crossword.ref.virtual.hasKeyword(column, row);
 
     const cell = $templater(({ ref, when, child, classes }) =>/*html*/`
       ${when(keyword, () =>/*html*/`
@@ -847,12 +839,11 @@ class Grid {
 }
 
 class Word {
-  constructor({ x, y, side, record, index, virtual, crossword, words }) {
+  constructor({ x, y, side, record, index, crossword, words }) {
+    this.crossword = crossword;
     this._data = { x, y, side, record, letters: [], string: '', queuedLetters: [], cells: new Map() };
     this.index = index;
-    this.virtual = virtual;
     this.words = words;
-    this.crossword = crossword;
     this.state = {
       resolved: false,
       current: null,
@@ -965,7 +956,7 @@ class Word {
   }
 
   _letterDisactive(letter) {
-    const words = this.virtual.cell.get(letter.cell);
+    const words = this.crossword.ref.virtual.cell.get(letter.cell);
     const crossed = words.filter((word) => word !== this)[0];
     if (crossed && crossed.active && crossed.letter.cell === letter.cell) return;
     letter.classes.remove('active');
@@ -1058,7 +1049,7 @@ class Word {
     this.state.resolved = true;
     this.state.pending = true;
     this.current = this.first;
-    this.crossword.game.updateResolved();
+    this.crossword.ref.game.updateResolved();
 
     while (true) {
       if (this.letter) this.letter.fixed = true;
@@ -1076,7 +1067,7 @@ class Word {
     if (!valid) return;
     this.fix();
     this.words.guessWord(this.record);
-    this.crossword.hint.switchOccurrence(true);
+    this.crossword.ref.hint.switchOccurrence(true);
   }
 
   _createClueData() {
@@ -1108,7 +1099,6 @@ class Word {
 
   _build(_x, _y, side, data) {
     const words = data.record.crossword;
-    const virtual = this.virtual;
     const letterData = (x, y, fixed, letter, index) => {
       const _private = { word: this, cell: null, fixed, filled: false };
       return {
@@ -1124,11 +1114,11 @@ class Word {
           if (_private.fixed === true) this.fixed = true;
         },
         get fixed() {
-          return this.cell && virtual.fixed.has(this.cell) ? true : _private.fixed;
+          return this.cell && _private.word.crossword.ref.virtual.fixed.has(this.cell) ? true : _private.fixed;
         },
         set fixed(v) {
           if (this.cell && v) {
-            virtual.fixed.add(this.cell);
+            _private.word.crossword.ref.virtual.fixed.add(this.cell);
             _private.word._queueFixed(this);
           } else {
             _private.fixed = v;
@@ -1136,7 +1126,7 @@ class Word {
         },
         set filled(letter) {
           if (!letter) {
-            const words = _private.word.virtual.cell.get(this.cell);
+            const words = _private.word.crossword.ref.virtual.cell.get(this.cell);
             const crossed = words.filter((word) => word !== _private.word)[0];
             _private.filled = false;
             if(crossed && crossed._data.cells.get(this.cell).filled) return;
@@ -1172,22 +1162,13 @@ class Word {
       data.string += letter;
       index++;
     }
-
   }
-
-
 }
 
-
-
-
-
-
-
 class VirtualGrid {
-  constructor({ crossword, words, number, clues }) {
-    this.words = words;
+  constructor(crossword, { words, number, clues }) {
     this.crossword = crossword;
+    this.words = words;
     this.data = { number, clues };
 
     this.columns = new Map();
@@ -1418,7 +1399,7 @@ class VirtualGrid {
   }
 
   _createWord(x, y, side, record) {
-    const instance = new Word({ x, y, side, record, index: this.word.size, virtual: this, crossword: this.crossword, words: this.words });
+    const instance = new Word({ x, y, side, record, index: this.word.size, crossword: this.crossword, words: this.words });
     this.word.set(this.word.size, instance);
     return instance;
   }
@@ -1498,14 +1479,13 @@ class VirtualGrid {
 
 }
 
-
 class StarHint {
-  constructor(virtual, dom, classes, wordsNumber) {
-    this.virtual = virtual;
+  constructor(crossword, {dom, classes, number}) {
+    this.crossword = crossword;
     this.dom = dom;
     this.classes = classes;
     this.data = {
-      wordsNumber,
+      wordsNumber: number,
       allowedNumber: { number: 1, per: 5 },
       total: null,
       left: null
@@ -1552,7 +1532,7 @@ class StarHint {
     this.classes.get('cursor-star').remove('visible').wait(250).remove('displayed').remove('allowed');
     const cell = this.state.allowedCell;
     if (cell !== null) {
-      const words = this.virtual.cell.get(cell);
+      const words = this.crossword.ref.virtual.cell.get(cell);
       for (let x = 0; x < words.length; x++) {
         let word = words[x];
         let letterData = word.getLetterData(cell);
@@ -1588,7 +1568,7 @@ class StarHint {
   _seekCell(target, callback) {
     $loopParents(target, (parent, stop) => {
       if (parent.tagName === 'TD') {
-        callback(this.virtual.cell.get(parent) || null, parent);
+        callback(this.crossword.ref.virtual.cell.get(parent) || null, parent);
         stop();
       }
     });
@@ -1597,7 +1577,7 @@ class StarHint {
 
 class CrosswordView {
   constructor(dialog, words) {
-    this.dialog = dialog;
+    this.ref = { dialog };
     this.data = {
       wordsMap: new Words({ words }),
       wordMaps: new Map(),
@@ -1820,17 +1800,17 @@ class CrosswordView {
   }
 
   _createNewInstances() {
-    this.virtual = new VirtualGrid({ crossword: this, words: this.data.wordsMap, number: this.data.wordsNumber, clues: this.data.permitedClueTypes });
-    this.hint = new Hint(this);
-    this.keyboard = new VirtualKeyboard();
-    this.grid = new Grid(this.virtual, this.hint, this.keyboard);
-    this.game = new Game(this.virtual, this.grid, this.hint, this.keyboard, this);
-    this.star = new StarHint(this.virtual, this.dom, this.classes, this.data.wordsNumber);
+    this.ref.virtual = new VirtualGrid(this, { words: this.data.wordsMap, number: this.data.wordsNumber, clues: this.data.permitedClueTypes });
+    this.ref.hint = new Hint(this);
+    this.ref.keyboard = new VirtualKeyboard();
+    this.ref.grid = new Grid(this);
+    this.ref.game = new Game(this);
+    this.ref.star = new StarHint(this, {dom:this.dom, classes:this.classes, number:this.data.wordsNumber});
   }
 
   _appendCrossword() {
     const crosswordPage = this.dom.get('page').get('crossword');
-    const content = this.grid.dom.get('content');
+    const content = this.ref.grid.dom.get('content');
     crosswordPage.innerHTML = '';
     crosswordPage.appendChild(content);
   }
@@ -1888,23 +1868,23 @@ class CrosswordView {
   _addKeywordListeners() {
     window.addEventListener('keydown', (event) => {
       if (this.state.activePage !== 'crossword' || !this.state.opened) return;
-      this.grid.dom.get('container').focus();
-      if (event.keyCode === 13 && event.ctrlKey) this.hint.perform();
-      if (event.keyCode === 70 && event.ctrlKey) this.hint.seekOccurrence(event);
+      this.ref.grid.dom.get('container').focus();
+      if (event.keyCode === 13 && event.ctrlKey) this.ref.hint.perform();
+      if (event.keyCode === 70 && event.ctrlKey) this.ref.hint.seekOccurrence(event);
       if (event.ctrlKey === true) return;
-      if (event.keyCode === 13) this.game.switchWord(1);
-      if (event.keyCode === 8) this.game.word.backspace();
-      if (event.keyCode === 46) this.game.word.delete();
-      if (event.keyCode === 27) this.hint.switch('close');
-      this.game.word.type(event, () => this.hint.switch('toggle'));
+      if (event.keyCode === 13) this.ref.game.switchWord(1);
+      if (event.keyCode === 8) this.ref.game.word.backspace();
+      if (event.keyCode === 46) this.ref.game.word.delete();
+      if (event.keyCode === 27) this.ref.hint.switch('close');
+      this.ref.game.word.type(event, () => this.ref.hint.switch('toggle'));
     });
   }
 
   _addGameListeners() {
     const button = this.dom.get('button');
-    button.get('previous').addEventListener('click', () => this.game.switchWord(-1));
-    button.get('next').addEventListener('click', () => this.game.switchWord(1));
-    button.get('game-over').addEventListener('click', () => this.game.gameOver());
+    button.get('previous').addEventListener('click', () => this.ref.game.switchWord(-1));
+    button.get('next').addEventListener('click', () => this.ref.game.switchWord(1));
+    button.get('game-over').addEventListener('click', () => this.ref.game.gameOver());
   }
 
   _switchCrosswordPage(name) {
