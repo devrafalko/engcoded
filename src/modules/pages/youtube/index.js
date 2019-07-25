@@ -48,9 +48,9 @@ class YouTube {
       typeProperties(module, types, ({ message }) => {
         throw new TypeError(`Invalid '${name}' youtube movie: ${message}`);
       });
-      this.data.movies[name] = module;
+      this.data.movies[module.id] = module;
     });
-    for (let name in this.data.movies) this.countWordsNumber(this.data.movies[name]);
+    for (let id in this.data.movies) this.countWordsNumber(this.data.movies[id]);
   }
 
   countWordsNumber(movie) {
@@ -175,7 +175,7 @@ class YouTube {
       container: this.dom.container,
       content: this.views[movieName].template,
       cardArea: this.views[movieName].references.get('subtitles'),
-      words: this.instances[movieName],
+      contentData: this.instances[movieName],
       viewSubtitles: true,
       onStopSpy: () => this.instances[movieName].scroller.break(),
       onClose: () => {

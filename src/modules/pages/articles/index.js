@@ -8,8 +8,7 @@ const { Items, Dialog } = $commons;
 const { $templater } = $utils;
 
 class Articles {
-  constructor(data) {
-    const { articles, page, navigation } = data;
+  constructor({ articles, page, navigation }) {
     this.dom = { page, container: navigation.pages };
     this.navigation = navigation;
     this.data = {};
@@ -37,7 +36,7 @@ class Articles {
       typeProperties(module, types, ({ message }) => {
         throw new TypeError(`Invalid '${name}' article: ${message}`);
       });
-      this.data.articles[name] = module;
+      this.data.articles[module.id] = module;
     });
   }
 
@@ -53,15 +52,15 @@ class Articles {
     this.dom.page.appendChild(items.view);
   }
 
-  openArticle(articleName) {
-    if (!this.instances[articleName]) this.renderWordsMap(articleName);
-    if (!this.views[articleName]) this.renderArticle(articleName);
+  openArticle(articleId) {
+    if (!this.instances[articleId]) this.renderWordsMap(articleId);
+    if (!this.views[articleId]) this.renderArticle(articleId);
     Dialog.load({
       name: 'articles',
       container: this.dom.container,
-      content: this.views[articleName].template,
-      cardArea: this.views[articleName].references.get('scrollable'),
-      words: this.instances[articleName],
+      content: this.views[articleId].template,
+      cardArea: this.views[articleId].references.get('scrollable'),
+      contentData: this.instances[articleId],
       viewSubtitles: false
     });
   }

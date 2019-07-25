@@ -1,7 +1,7 @@
 @import "./../../../styles/rules";
 @import "./../../../styles/responsive";
 
-.game-container.crossword .config-page {
+.game-container > .crossword .config-page {
   overflow: auto;
   padding: 12px;
   section {
@@ -14,7 +14,7 @@
   }
 }
 
-.game-container.crossword .config-page section.settings {
+.game-container > .crossword .config-page section.settings {
   font-family: "Open Sans", sans-serif;
   font-size: 16px;
 
@@ -70,7 +70,7 @@
   }
 }
 
-.game-container.crossword .config-page section.warnings .warning {
+.game-container > .crossword .config-page section.warnings .warning {
   text-align: center;
   display: none;
 
@@ -98,7 +98,7 @@
   }
 }
 
-.game-container.crossword .config-page section.shortcuts {
+.game-container > .crossword .config-page section.shortcuts {
   text-align: center;
 
   & > ul {

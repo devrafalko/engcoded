@@ -24,22 +24,28 @@ $grid-hide-point: 443px;
   }
 }
 
-.game-container.crossword > .navigation-panel {
+.game-container > .crossword {
+  height: 100%;
+  width: 100%;
+}
+
+.game-container > .crossword > .navigation-panel {
   z-index: 1;
 }
 
-.game-container.crossword .navigation-panel .controls * {
+.game-container > .crossword .navigation-panel .controls * {
   color: #2fe0e0;
 }
 
-.game-container.crossword
+.game-container
+  > .crossword
   > .navigation-panel
   .controls.navigation
   .toggle-menu {
   display: none;
 }
 
-.dialog-box .game-container.crossword .navigation-panel {
+.dialog-box .game-container > .crossword .navigation-panel {
   &[data-page="config"] {
     .controls.game {
       .buttons.game,
@@ -73,7 +79,7 @@ $grid-hide-point: 443px;
   }
 }
 
-.game-container.crossword > .navigation-panel .controls.game .buttons.game {
+.game-container > .crossword > .navigation-panel .controls.game .buttons.game {
   .button-star {
     margin-right: 0px;
     &,
@@ -131,7 +137,7 @@ $grid-hide-point: 443px;
   }
 }
 
-.game-container.crossword > .navigation-panel .controls.game .buttons.info {
+.game-container > .crossword > .navigation-panel .controls.game .buttons.info {
   vertical-align: top;
   li {
     color: #01b9b9;
@@ -142,7 +148,8 @@ $grid-hide-point: 443px;
   }
 }
 
-.game-container.crossword
+.game-container
+  > .crossword
   > .navigation-panel
   .controls.game
   .buttons.info
@@ -170,7 +177,11 @@ $grid-hide-point: 443px;
   }
 }
 
-.game-container.crossword > .navigation-panel .controls.game .buttons.control {
+.game-container
+  > .crossword
+  > .navigation-panel
+  .controls.game
+  .buttons.control {
   .icon {
     animation-direction: alternate;
     animation-duration: 0.2s;
@@ -186,7 +197,7 @@ $grid-hide-point: 443px;
   }
 }
 
-.game-container.crossword > .navigation-panel .controls.game {
+.game-container > .crossword > .navigation-panel .controls.game {
   padding: 0px 4px;
 
   & > .buttons > li {
@@ -249,7 +260,7 @@ $grid-hide-point: 443px;
   }
 }
 
-.game-container.crossword > .game-pages {
+.game-container > .crossword > .game-pages {
   height: 100%;
   position: relative;
   z-index: 0;

@@ -34,7 +34,7 @@ class VoiceTest {
 
   buildView() {
     const { references, classes } = $templater(({ ref, child, classes }) =>/*html*/`
-      <div ${ref('container')} ${classes('container')} class="game-container hidden">
+      <div ${ref('container')} ${classes('container')} class="pronunciation hidden">
         <nav ${ref('panel')} class="navigation-panel">
           <div class="controls game"></div>
           <div class="controls navigation">
@@ -55,11 +55,9 @@ class VoiceTest {
 
   open() {
     if (this.on.open) this.on.open();
-    this.classes.get('container').remove('hidden');
   }
 
   close() {
-    this.classes.get('container').add('hidden');
     if (this.on.close) this.on.close();
   }
 

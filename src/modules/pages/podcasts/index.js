@@ -42,9 +42,9 @@ class Podcasts {
       typeProperties(module, types, ({ message }) => {
         throw new TypeError(`Invalid '${name}' podcast: ${message}`);
       });
-      this.data.podcasts[name] = module;
+      this.data.podcasts[module.id] = module;
     });
-    for (let name in this.data.podcasts) this.countWordsNumber(this.data.podcasts[name]);
+    for (let id in this.data.podcasts) this.countWordsNumber(this.data.podcasts[id]);
   }
 
   countWordsNumber(podcast) {
@@ -110,7 +110,7 @@ class Podcasts {
       container: this.dom.container,
       content: this.views[name].template,
       cardArea: this.views[name].references.get('subtitles'),
-      words: this.instances[name],
+      contentData: this.instances[name],
       viewSubtitles: true,
       onStopSpy: () => this.instances[name].scroller.break(),
       onClose: () => {

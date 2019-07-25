@@ -58,14 +58,14 @@ class Card {
     }
   }
 
-  refresh({ container, scroll, index, words }) {
+  refresh({ container, scroll, index, contentData }) {
     if (this.state.currentIndex === index) {
       this.hide(false);
       return;
     }
 
-    if (!words.wordsMap.has(index)) return;
-    const { id, meaning: meanings } = words.wordsMap.get(index);
+    if (!contentData.wordsMap.has(index)) return;
+    const { id, meaning: meanings } = contentData.wordsMap.get(index);
 
     if (!this.data.words.has(id)) return;
     const { word, definition, meaning, audio, img } = this.data.words.get(id);
@@ -89,14 +89,14 @@ class Card {
       if (empty && this.state.active === 'image') this._switchCard('word');
     });
 
-    const occurrences = words.idMap.get(id);
+    const occurrences = contentData.idMap.get(id);
     this.classes.get('section').get('control')[occurrences.length > 1 ? 'add' : 'remove']('multiple');
 
     this.state.currentIndex = index;
     this.state.currentContainer = container;
-    this.state.currentWords = words;
+    this.state.currentContentData = contentData;
 
-    const element = this.state.currentWords.occurrenceMap.get(index)[0];
+    const element = this.state.currentContentData.occurrenceMap.get(index)[0];
     if (scroll === false) return this.show(index, container);
     this.scroller.container = this.state.currentContainer;
     if (this.events.onSwitch) this.events.onSwitch();
@@ -151,7 +151,7 @@ class Card {
   }
 
   show(index, container) {
-    const elements = this.state.currentWords.occurrenceMap.get(index);
+    const elements = this.state.currentContentData.occurrenceMap.get(index);
     const element = elements[0];
     const view = this.dom.get('view');
     const classes = this.classes.get('view');
@@ -218,7 +218,7 @@ class Card {
     this.state.opened = false;
     if (this.state.currentIndex !== null) {
       if ($switch === false && this.events.onClose) this.events.onClose();
-      const elements = this.state.currentWords.occurrenceMap.get(this.state.currentIndex);
+      const elements = this.state.currentContentData.occurrenceMap.get(this.state.currentIndex);
       elements.forEach(element => element.classList.remove('active'));
       if ($switch !== true) this.state.currentIndex = null;
     }
@@ -243,8 +243,8 @@ class Card {
   }
 
   _switchOccurrence(side) {
-    const { id } = this.state.currentWords.wordsMap.get(this.state.currentIndex);
-    const ocurrances = this.state.currentWords.idMap.get(id);
+    const { id } = this.state.currentContentData.wordsMap.get(this.state.currentIndex);
+    const ocurrances = this.state.currentContentData.idMap.get(id);
     if (ocurrances.length === 1) return;
     const current = ocurrances.findIndex(({ index }) => index === this.state.currentIndex);
     let next = side === 'next' ? current + 1 : current - 1;
@@ -255,7 +255,7 @@ class Card {
       container: this.state.currentContainer,
       scroll: true,
       index: ocurrances[next].index,
-      words: this.state.currentWords
+      contentData: this.state.currentContentData
     })
 
   }

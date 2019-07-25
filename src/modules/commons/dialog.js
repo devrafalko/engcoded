@@ -12,17 +12,10 @@ const { $iconGameCrossword, $iconGameHearing, $iconGameTest, $iconWordList, $ico
 class Dialog {
   constructor() {
     this.data = { controllers: {} };
-    this.games = {
-      presentation: new Presentation(),
-      pronunciation: new Pronunciation(),
-      test: new Test(),
-      crossword: new Crossword(this)
-    };
     this.state = { fontSize: null, opened: false, currentContentElements: {}, navigationOpened: false, gameActive: null };
     this.events = { onClose: null, beforeClose: null, onStopSpy: null };
     this._renderView();
     this._addListeners();
-    this._addGamesListeners();
   }
 
   get fonts() {
@@ -56,14 +49,14 @@ class Dialog {
     classes[value ? 'add' : 'remove']('displayed');
   }
 
-  load({ name, container, content, words, cardArea, loaded, onClose, beforeClose, onStopSpy, viewSubtitles = true }) {
+  load({ name, container, content, contentData, cardArea, loaded, onClose, beforeClose, onStopSpy, viewSubtitles = true }) {
     const dialog = this.dom.get('dialog-box');
-    if (this.state.currentContentElements.content !== content) {
+    if (this.state.currentContentData !== contentData) {
       dialog.setAttribute('data-dialog', name);
       this.contentContainer.innerHTML = '';
       this.contentContainer.appendChild(content);
-      this._findWordElements(content, words);
-      this.data.words = words;
+      this._findWordElements(content, contentData);
+      this.state.currentContentData = contentData;
       this.state.currentContentElements.cardArea = cardArea;
       this.state.currentContentElements.container = container;
       this.state.currentContentElements.content = content;
@@ -82,10 +75,11 @@ class Dialog {
     const dialog = this.dom.get('dialog-box');
     if (!this.opened) return;
     if (this.events.beforeClose) this.events.beforeClose(dialog);
+    if (this.state.gameActive) this.state.gameActive.close();
+    Card.hide(false);
     this.state.currentContentElements.container.removeChild(dialog);
     this.state.opened = false;
     this.state.name = null;
-    Card.hide(false);
     if (this.events.onClose) this.events.onClose(dialog);
   }
 
@@ -103,27 +97,83 @@ class Dialog {
   _addListeners() {
     const button = this.dom.get('button');
     const buttonClasses = this.classes.get('button');
+    const container = this.dom.get('game-container');
+    const containerClasses = this.classes.get('game-container');
     const game = button.get('game');
+
     game.get('presentation').addEventListener('click', () => {
+      const contentData = this.state.currentContentData;
       toggleNavigation.call(this, 'close');
       Card.hide(false);
-      this.games.presentation.open();
+      if (!contentData.presentation) {
+        contentData.presentation = new Presentation(this, contentData.wordsMap);
+        contentData.presentation.on.close = () => {
+          this.state.gameActive = null;
+          containerClasses.add('hidden');
+        };
+      }
+      contentData.presentation.open();
+      this.state.gameActive = contentData.presentation;
+      container.innerHTML = '';
+      container.appendChild(contentData.presentation.view);
+      containerClasses.remove('hidden');
     });
+
     game.get('word-test').addEventListener('click', () => {
+      const contentData = this.state.currentContentData;
       toggleNavigation.call(this, 'close');
       Card.hide(false);
-      this.games.test.open();
+      if (!contentData.test) {
+        contentData.test = new Test(this, contentData.wordsMap);
+        contentData.test.on.close = () => {
+          this.state.gameActive = null;
+          containerClasses.add('hidden');
+        };
+      }
+      contentData.test.open();
+      this.state.gameActive = contentData.test;
+      container.innerHTML = '';
+      container.appendChild(contentData.test.view);
+      containerClasses.remove('hidden');
     });
+
     game.get('voice-test').addEventListener('click', () => {
+      const contentData = this.state.currentContentData;
       toggleNavigation.call(this, 'close');
       Card.hide(false);
-      this.games.pronunciation.open();
+
+      if (!contentData.pronunciation) {
+        contentData.pronunciation = new Pronunciation(this, contentData.wordsMap);
+        contentData.pronunciation.on.close = () => {
+          this.state.gameActive = null;
+          containerClasses.add('hidden');
+        };
+      }
+      contentData.pronunciation.open();
+      this.state.gameActive = contentData.pronunciation;
+      container.innerHTML = '';
+      container.appendChild(contentData.pronunciation.view);
+      containerClasses.remove('hidden');
     });
+
     game.get('crossword').addEventListener('click', () => {
+      const contentData = this.state.currentContentData;
       toggleNavigation.call(this, 'close');
       Card.hide(false);
-      this.games.crossword.open(this.data.words.wordsMap);
+      if (!contentData.crossword) {
+        contentData.crossword = new Crossword(this, contentData.wordsMap);
+        contentData.crossword.on.close = () => {
+          this.state.gameActive = null;
+          containerClasses.add('hidden');
+        };
+      }
+      contentData.crossword.open();
+      this.state.gameActive = contentData.crossword;
+      container.innerHTML = '';
+      container.appendChild(contentData.crossword.view);
+      containerClasses.remove('hidden');
     });
+
     button.get('color-text').addEventListener('click', () => colorText.call(this));
     button.get('close').addEventListener('click', () => this.close());
     button.get('text-small').addEventListener('click', () => fontSize.call(this, 'md-small', buttonClasses.get('text-small')));
@@ -141,7 +191,7 @@ class Dialog {
           container: this.state.currentContentElements.cardArea,
           scroll: false,
           index: Number(event.target.getAttribute('data-word')),
-          words: this.data.words
+          contentData: this.state.currentContentData
         });
       }
     });
@@ -204,23 +254,12 @@ class Dialog {
     }
   }
 
-  _addGamesListeners() {
-    this.games.crossword.on.open = () => this.state.gameActive = this.games.crossword;
-    this.games.crossword.on.close = () => this.state.gameActive = null;
-    this.games.pronunciation.on.open = () => this.state.gameActive = this.games.pronunciation;
-    this.games.pronunciation.on.close = () => this.state.gameActive = null;
-    this.games.test.on.open = () => this.state.gameActive = this.games.test;
-    this.games.test.on.close = () => this.state.gameActive = null;
-    this.games.presentation.on.open = () => this.state.gameActive = this.games.presentation;
-    this.games.presentation.on.close = () => this.state.gameActive = null;
-  }
-
   seekOccurrence(id) {
     Card.refresh({
       container: this.state.currentContentElements.cardArea,
       scroll: true,
-      index: this.data.words.idMap.get(id)[0].index,
-      words: this.data.words
+      index: this.state.currentContentData.idMap.get(id)[0].index,
+      contentData: this.state.currentContentData
     });
   }
 
@@ -275,12 +314,8 @@ class Dialog {
               </ul>
             </div>
           </nav>
-          <div ${ref('content-container')} ${classes('content-container')} class="content-container">
-          </div>
-          ${child(this.games.crossword.view)}
-          ${child(this.games.presentation.view)}
-          ${child(this.games.test.view)}
-          ${child(this.games.pronunciation.view)}
+          <div ${ref('content-container')} ${classes('content-container')} class="content-container"></div>
+          <div ${ref('game-container')} ${classes('game-container', ['hidden'])} class="game-container"></div>
         </div>
       `;
     });

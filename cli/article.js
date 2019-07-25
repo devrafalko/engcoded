@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const uniq = require('uniqid');
 
 createFile({
   src: process.argv[2],
@@ -18,7 +19,7 @@ function createFile({ src, title, url }) {
     else {
       fs.writeFile(filePath, jsTemplate(title, url), 'utf8', (err) => {
         if (err) console.error('Error: The article file could not be created.');
-        else  console.log('Article template file create.');
+        else console.log('Article template file create.');
       });
     }
   });
@@ -29,6 +30,9 @@ function jsTemplate(title, url) {
 import { w, list, header } from './../utils/utils.js';
 
 export default {
+  title: '',
+  id: '${uniq()}',
+  thumbnail: '',
   header: \`${title}\`,
   url: '${url}',
   text: [

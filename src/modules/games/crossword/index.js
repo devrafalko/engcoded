@@ -483,12 +483,12 @@ class Hint {
     const classes = this.classes.get('container');
     switch (action) {
       case 'open':
-        if(this.state.opened === true) return;
+        if (this.state.opened === true) return;
         this.state.opened = true;
         if (this.on.open) this.on.open();
         return classes.clear().add('displayed').wait(10).add('visible');
       case 'close':
-        if(this.state.opened === false) return;
+        if (this.state.opened === false) return;
         this.state.opened = false;
         return classes.clear().remove('visible').wait(480).remove('displayed');
       case 'toggle':
@@ -1608,9 +1608,10 @@ class StarHint {
 }
 
 class CrosswordView {
-  constructor(dialog) {
+  constructor(dialog, words) {
     this.dialog = dialog;
     this.data = {
+      wordsMap: new Words({ words }),
       wordMaps: new Map(),
       permitedClueTypes: new Set(),
       wordsMinNumber: 5,
@@ -1647,6 +1648,7 @@ class CrosswordView {
     this._addListeners();
     this._addGameListeners();
     this._addKeywordListeners();
+    this._permitClue(this.classes.get('button').get('switch').get('meaning'), 'meaning');
   }
 
   get view() {
@@ -1657,21 +1659,14 @@ class CrosswordView {
     return this._on;
   }
 
-  open(words) {
+  open() {
     this.state.opened = true;
     if (this.on.open) this.on.open();
-    this.classes.get('container').remove('hidden');
     if (this.state.activePage === null) this._switchCrosswordPage('config');
-    if (this.data.wordMaps.has(words)) return this.data.currentWordsMap = this.data.wordMaps.get(words);
-    this.data.wordMaps.set(words, new Words({ words }));
-    this.data.currentWordsMap = this.data.wordMaps.get(words);
-    this._permitClue(this.classes.get('button').get('switch').get('meaning'), 'meaning');
   }
 
   close() {
     this._toggleNavigation('close');
-    this.classes.get('container').add('hidden');
-    this.data.currentWordsMap = null;
     this.state.opened = false;
     if (this.on.close) this.on.close();
   }
@@ -1685,7 +1680,7 @@ class CrosswordView {
 
   _buildView() {
     const { references, classes } = $templater(({ ref, child, classes }) =>/*html*/`
-      <div ${ref('container')} ${classes('container')} class="game-container crossword hidden">
+      <div ${ref('container')} ${classes('container')} class="crossword">
         <nav ${ref('panel')} ${classes('panel')} class="navigation-panel">
           <div class="controls game">
             <ul class="buttons pages">
@@ -1837,7 +1832,7 @@ class CrosswordView {
   }
 
   _createNewInstances() {
-    this.virtual = new VirtualGrid({ crossword: this, words: this.data.currentWordsMap, number: this.data.wordsNumber, clues: this.data.permitedClueTypes });
+    this.virtual = new VirtualGrid({ crossword: this, words: this.data.wordsMap, number: this.data.wordsNumber, clues: this.data.permitedClueTypes });
     this.hint = new Hint(this);
     this.keyboard = new VirtualKeyboard();
     this.grid = new Grid(this.virtual, this.hint, this.keyboard);
@@ -1948,8 +1943,8 @@ class CrosswordView {
     if (has && this.data.permitedClueTypes.size === 1) return;
     classes[has ? 'remove' : 'add']('on');
     this.data.permitedClueTypes[has ? 'delete' : 'add'](name);
-    this.data.currentWordsMap.filter(this.data.permitedClueTypes);
-    this.data.totalWordsNumber = this.data.currentWordsMap.size;
+    this.data.wordsMap.filter(this.data.permitedClueTypes);
+    this.data.totalWordsNumber = this.data.wordsMap.size;
     this.dom.get('output-total-words').innerHTML = this.data.totalWordsNumber;
     this._updateCrosswordWordsNumber();
   }
@@ -1957,7 +1952,7 @@ class CrosswordView {
   _updateCrosswordWordsNumber(value = 0) {
     const newValue = this.data.wordsNumber + value;
     const output = this.dom.get('output-used-words');
-    const all = this.data.currentWordsMap.size;
+    const all = this.data.wordsMap.size;
     const lowest = Math.min(all, this.data.wordsMaxNumber);
     const warning = this.classes.get('warning').get('insufficient-words');
     warning.remove('visible');
