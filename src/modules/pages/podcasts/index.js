@@ -59,42 +59,41 @@ class Podcasts {
     const items = new Items({
       id: 'podcasts-table',
       items: this.data.podcasts,
-      open: (podcastName) => {
+      open: (podcastId) => {
         this.navigation.toggle('close');
-        this.state.currentName = podcastName;
-        this.openPodcast(podcastName);
+        this.state.currentId = podcastId;
+        this.openPodcast(podcastId);
       }
     });
-
     this.dom.page.appendChild(items.view);
   }
 
-  openPodcast(name) {
-    if (!this.instances[name]) {
-      this.instances[name] = {};
-      this.renderMaps(name);
+  openPodcast(id) {
+    if (!this.instances[id]) {
+      this.instances[id] = {};
+      this.renderMaps(id);
     }
-    if (!this.views[name]) {
-      this.renderView(name);
-      this.initScroller(name);
-      this.renderLinesMap(name);
-      this.addSubtitlesListeners(name);
+    if (!this.views[id]) {
+      this.renderView(id);
+      this.initScroller(id);
+      this.renderLinesMap(id);
+      this.addSubtitlesListeners(id);
     }
 
-    const container = this.views[name].references.get('player-container');
-    const { source } = this.data.podcasts[name];
+    const container = this.views[id].references.get('player-container');
+    const { source } = this.data.podcasts[id];
     container.innerHTML = '';
     container.appendChild(Player.dom.player);
     Player.load(source);
 
     Card.onSwitch = () => {
-      this.instances[name].scroller.break();
+      this.instances[id].scroller.break();
       if (Player.playing) this.state.playAfterClose = true;
       Player.pause();
     };
 
     Card.onOpen = () => {
-      this.instances[name].scroller.break();
+      this.instances[id].scroller.break();
       if (Player.playing) this.state.playAfterClose = true;
       Player.pause();
     };
@@ -108,14 +107,14 @@ class Podcasts {
     Dialog.load({
       name: 'podcasts',
       container: this.dom.container,
-      content: this.views[name].template,
-      cardArea: this.views[name].references.get('subtitles'),
-      contentData: this.instances[name],
+      content: this.views[id].template,
+      cardArea: this.views[id].references.get('subtitles'),
+      contentData: this.instances[id],
       viewSubtitles: true,
-      onStopSpy: () => this.instances[name].scroller.break(),
+      onStopSpy: () => this.instances[id].scroller.break(),
       onClose: () => {
         Player.reset();
-        this.state.currentName = null;
+        this.state.currentId = null;
         Card.onSwitch = null;
         Card.onOpen = null;
         Card.onClose = null;
@@ -123,9 +122,9 @@ class Podcasts {
     });
   }
 
-  renderMaps(name) {
-    const instance = this.instances[name];
-    const podcast = this.data.podcasts[name];
+  renderMaps(id) {
+    const instance = this.instances[id];
+    const podcast = this.data.podcasts[id];
     instance.wordsMap = new Map();
     instance.idMap = new Map();
     instance.subtitlesMap = new Map();
@@ -162,9 +161,9 @@ class Podcasts {
     });
   }
 
-  renderView(name) {
-    const podcast = this.data.podcasts[name];
-    const instance = this.instances[name];
+  renderView(id) {
+    const podcast = this.data.podcasts[id];
+    const instance = this.instances[id];
     const data = $templater(({ ref, list, child }) =>/*html*/`
       <div class="podcasts-container">
         <section ${ref('player-container')} class="player-container"></section>
@@ -180,33 +179,33 @@ class Podcasts {
         </section>
       </div>
     `);
-    this.views[name] = data;
+    this.views[id] = data;
   }
 
-  initScroller(name) {
-    this.instances[name].scroller = new Scroller({
-      container: this.views[name].references.get('subtitles'),
+  initScroller(id) {
+    this.instances[id].scroller = new Scroller({
+      container: this.views[id].references.get('subtitles'),
       scrollTime: 3000,
       offset: 0.1,
       fps: 60
     });
   }
 
-  renderLinesMap(name) {
+  renderLinesMap(id) {
     const elements = new Map();
     const lines = new Map();
-    const refs = this.views[name].references;
+    const refs = this.views[id].references;
     refs.get('jump').forEach((node, index) => elements.set(node, Number(index)));
     refs.get('line').forEach((node, index) => lines.set(node, Number(index)));
-    this.instances[name].elementsMap = elements;
-    this.instances[name].linesMap = lines;
+    this.instances[id].elementsMap = elements;
+    this.instances[id].linesMap = lines;
   }
 
-  addSubtitlesListeners(name) {
-    const { references } = this.views[name];
+  addSubtitlesListeners(id) {
+    const { references } = this.views[id];
     const list = references.get('list');
-    const jumps = this.instances[name].elementsMap;
-    const subtitles = this.instances[name].subtitlesMap;
+    const jumps = this.instances[id].elementsMap;
+    const subtitles = this.instances[id].subtitlesMap;
     list.addEventListener('click', (event) => {
       let index = null;
       $loopParents(event.target, (descendant, stop) => {
@@ -253,7 +252,7 @@ class Podcasts {
     Player.on.previous = () => this.moveLine('previous');
     Player.on.play = () => Card.hide(false);
     Player.on.playing = () => {
-      const name = this.state.currentName;
+      const name = this.state.currentId;
       const nodesMap = this.views[name].references.get('line');
       const { secondsMap, subtitlesMap } = this.instances[name];
       const seconds = Math.floor(Player.time);
@@ -297,7 +296,7 @@ class Podcasts {
   }
 
   moveLine(direction) {
-    const name = this.state.currentName;
+    const name = this.state.currentId;
     const currentLine = this.state.activeSubtitlesElement;
     if (!currentLine) return;
     let index = this.instances[name].linesMap.get(currentLine);

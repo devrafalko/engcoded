@@ -73,10 +73,10 @@ class YouTube {
     const items = new Items({
       id: 'movies-table',
       items: this.data.movies,
-      open: (movieName) => {
+      open: (movieId) => {
         this.navigation.toggle('close');
-        this.state.currentMovieName = movieName;
-        this.openMovie(movieName);
+        this.state.currentMovieId = movieId;
+        this.openMovie(movieId);
       }
     });
 
@@ -112,13 +112,13 @@ class YouTube {
   }
 
   moveLine(direction) {
-    const movieName = this.state.currentMovieName;
+    const movieId = this.state.currentMovieId;
     const currentLine = this.state.activeSubtitlesElement;
     if (!currentLine) return;
-    let index = this.instances[movieName].linesMap.get(currentLine);
+    let index = this.instances[movieId].linesMap.get(currentLine);
     direction === 'next' ? index++ : index--;
     if (typeof index !== 'number') return;
-    const lineData = this.instances[movieName].subtitlesMap.get(index);
+    const lineData = this.instances[movieId].subtitlesMap.get(index);
     if (typeof lineData !== 'object') return;
     const time = lineData.time.totalFloatSeconds;
     this.seekTo(time);
@@ -152,42 +152,42 @@ class YouTube {
   resizeIframe() {
     if (Dialog.name === 'youtube') {
       const dialog = Dialog.contentContainer;
-      const zip = this.views[this.state.currentMovieName].references.get('zip');
+      const zip = this.views[this.state.currentMovieId].references.get('zip');
       const movieHeight = (zip.getBoundingClientRect().y - 0) - dialog.getBoundingClientRect().y;
       this.data.player.setSize('100%', movieHeight);
     }
   }
 
-  openMovie(movieName) {
-    if (!this.instances[movieName]) {
-      this.instances[movieName] = {};
-      this.renderMaps(movieName);
+  openMovie(movieId) {
+    if (!this.instances[movieId]) {
+      this.instances[movieId] = {};
+      this.renderMaps(movieId);
     }
-    if (!this.views[movieName]) {
-      this.renderMovie(movieName);
-      this.initScroller(movieName);
-      this.renderLinesMap(movieName);
-      this.addSubtitlesListeners(movieName);
+    if (!this.views[movieId]) {
+      this.renderMovie(movieId);
+      this.initScroller(movieId);
+      this.renderLinesMap(movieId);
+      this.addSubtitlesListeners(movieId);
     }
 
     Dialog.load({
       name: 'youtube',
       container: this.dom.container,
-      content: this.views[movieName].template,
-      cardArea: this.views[movieName].references.get('subtitles'),
-      contentData: this.instances[movieName],
+      content: this.views[movieId].template,
+      cardArea: this.views[movieId].references.get('subtitles'),
+      contentData: this.instances[movieId],
       viewSubtitles: true,
-      onStopSpy: () => this.instances[movieName].scroller.break(),
+      onStopSpy: () => this.instances[movieId].scroller.break(),
       onClose: () => {
         Timer.stop();
-        this.state.currentMovieName = null;
+        this.state.currentMovieId = null;
         Card.onSwitch = null;
         Card.onOpen = null;
         Card.onClose = null;
       },
     });
     this.initYoutubeApi();
-    this.loadYoutube(movieName);
+    this.loadYoutube(movieId);
   }
 
   initYoutubeApi() {
@@ -213,17 +213,17 @@ class YouTube {
     });
   }
 
-  loadYoutube(movieName) {
-    const refs = this.views[movieName].references;
-    const classes = this.views[movieName].classes;
+  loadYoutube(movieId) {
+    const refs = this.views[movieId].references;
+    const classes = this.views[movieId].classes;
     const container = refs.get('youtube');
     const zip = classes.get('zip');
     zip.add('hidden');
 
     this.events.ready = () => {
-      this.data.player.cueVideoById(this.data.movies[movieName].id);
+      this.data.player.cueVideoById(this.data.movies[movieId].id);
       zip.remove('hidden');
-      if (!this.instances[movieName].zipHandler) this.addZipHandler(movieName);
+      if (!this.instances[movieId].zipHandler) this.addZipHandler(movieId);
       else this.resizeIframe();
     }
 
@@ -233,13 +233,13 @@ class YouTube {
     }
 
     Card.onSwitch = () => {
-      this.instances[movieName].scroller.break();
+      this.instances[movieId].scroller.break();
       if (this.data.player.getPlayerState() === 1) this.state.playAfterClose = true;
       this.data.player.pauseVideo();
     };
 
     Card.onOpen = () => {
-      this.instances[movieName].scroller.break();
+      this.instances[movieId].scroller.break();
       if (this.data.player.getPlayerState() === 1) this.state.playAfterClose = true;
       this.data.player.pauseVideo();
     };
@@ -255,9 +255,9 @@ class YouTube {
     container.appendChild(this.dom.youtube);
   }
 
-  renderMaps(movieName) {
-    const instance = this.instances[movieName];
-    const movie = this.data.movies[movieName];
+  renderMaps(movieId) {
+    const instance = this.instances[movieId];
+    const movie = this.data.movies[movieId];
     instance.idMap = new Map();
     instance.wordsMap = new Map();
     instance.subtitlesMap = new Map();
@@ -294,9 +294,9 @@ class YouTube {
     });
   }
 
-  addZipHandler(movieName) {
-    const refs = this.views[movieName].references;
-    const classes = this.views[movieName].classes;
+  addZipHandler(movieId) {
+    const refs = this.views[movieId].references;
+    const classes = this.views[movieId].classes;
     const zip = refs.get('zip');
     const movie = refs.get('movie');
     const mask = classes.get('mask');
@@ -325,7 +325,7 @@ class YouTube {
 
     zip.addEventListener('mousedown', mouseDown);
     this.moveZip(zipDimensions.y, 0, dialog, zipDimensions, movie, subtitles);
-    this.instances[movieName].zipHandler = true;
+    this.instances[movieId].zipHandler = true;
   }
 
   moveZip(position, shift, dialog, zip, movie, subtitles) {
@@ -340,9 +340,9 @@ class YouTube {
     this.data.player.setSize('100%', movieHeight);
   }
 
-  renderMovie(movieName) {
-    const movie = this.data.movies[movieName];
-    const instance = this.instances[movieName];
+  renderMovie(movieId) {
+    const movie = this.data.movies[movieId];
+    const instance = this.instances[movieId];
     const data = $templater(({ ref, list, child, classes }) =>/*html*/`
       <div class="youtube-container">
         <section ${ref('movie')} class="movie-box">
@@ -362,33 +362,33 @@ class YouTube {
         </section>
       </div>
     `);
-    this.views[movieName] = data;
+    this.views[movieId] = data;
   }
 
-  initScroller(movieName) {
-    this.instances[movieName].scroller = new Scroller({
-      container: this.views[movieName].references.get('subtitles'),
+  initScroller(movieId) {
+    this.instances[movieId].scroller = new Scroller({
+      container: this.views[movieId].references.get('subtitles'),
       scrollTime: 3000,
       offset: 0.1,
       fps: 60
     });
   }
 
-  renderLinesMap(movieName) {
+  renderLinesMap(movieId) {
     const elements = new Map();
     const lines = new Map();
-    const refs = this.views[movieName].references;
+    const refs = this.views[movieId].references;
     refs.get('jump').forEach((node, index) => elements.set(node, Number(index)));
     refs.get('line').forEach((node, index) => lines.set(node, Number(index)));
-    this.instances[movieName].elementsMap = elements;
-    this.instances[movieName].linesMap = lines;
+    this.instances[movieId].elementsMap = elements;
+    this.instances[movieId].linesMap = lines;
   }
 
-  addSubtitlesListeners(movieName) {
-    const { references } = this.views[movieName];
+  addSubtitlesListeners(movieId) {
+    const { references } = this.views[movieId];
     const list = references.get('list');
-    const jumps = this.instances[movieName].elementsMap;
-    const subtitles = this.instances[movieName].subtitlesMap;
+    const jumps = this.instances[movieId].elementsMap;
+    const subtitles = this.instances[movieId].subtitlesMap;
     list.addEventListener('click', (event) => {
       let index = null;
       $loopParents(event.target, (descendant, stop) => {
@@ -402,8 +402,6 @@ class YouTube {
       const time = subtitles.get(index).time.totalFloatSeconds;
       this.seekTo(time);
     }, false);
-
-
   }
 
   seekTo(time = this.state.seekQueue) {
@@ -419,7 +417,6 @@ class YouTube {
     }
   }
 
-
   onMoviePause() {
     Timer.stop();
     this.highlightSubtitlesLine(null);
@@ -427,9 +424,9 @@ class YouTube {
 
   onMoviePlay() {
     this.seekTo();
-    const name = this.state.currentMovieName;
-    const { secondsMap, subtitlesMap } = this.instances[name];
-    const nodesMap = this.views[name].references.get('line');
+    const id = this.state.currentMovieId;
+    const { secondsMap, subtitlesMap } = this.instances[id];
+    const nodesMap = this.views[id].references.get('line');
     const currentTime = this.data.player.getCurrentTime();
     Timer.start(currentTime, ({ seconds, exact }) => {
       const index = secondsMap.get(seconds);
@@ -438,7 +435,7 @@ class YouTube {
         let lineElement = nodesMap.get(String(index));
         if (this.state.activeSubtitlesElement === lineElement) return;
         this.highlightSubtitlesLine(lineElement);
-        this.scrollScubtitles(lineElement, name);
+        this.scrollScubtitles(lineElement, id);
       } else {
         for (let msLineIndex = 0; msLineIndex < index.length; msLineIndex++) {
           const msLine = subtitlesMap.get(index[msLineIndex]).time.totalFloatSeconds;
@@ -446,7 +443,7 @@ class YouTube {
             const lineElement = nodesMap.get(String(msLineIndex));
             if (this.state.activeSubtitlesElement === lineElement) return;
             this.highlightSubtitlesLine(lineElement);
-            this.scrollScubtitles(lineElement, name);
+            this.scrollScubtitles(lineElement, id);
           }
         }
       }
@@ -459,9 +456,9 @@ class YouTube {
     if (element) this.state.activeSubtitlesElement.setAttribute('data-current', 'true');
   }
 
-  scrollScubtitles(element, movieName) {
+  scrollScubtitles(element, movieId) {
     if (!Dialog.state.spySubtitles) return;
-    this.instances[movieName].scroller.scroll(element);
+    this.instances[movieId].scroller.scroll(element);
   }
 
 }

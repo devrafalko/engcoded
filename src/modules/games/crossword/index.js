@@ -1139,19 +1139,7 @@ class Word {
             const words = _private.word.virtual.cell.get(this.cell);
             const crossed = words.filter((word) => word !== _private.word)[0];
             _private.filled = false;
-            /*
-              !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-              REPLACE THE LOOP WITH THE this._data.cells.get(cell)
-              !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            */
-            if (crossed && crossed.active) {
-              for (let { cell, filled } of crossed.letters) {
-                if (cell === this.cell) {
-                  if (filled) return;
-                  else break;
-                }
-              }
-            }
+            if(crossed && crossed._data.cells.get(this.cell).filled) return;
             this.input.innerHTML = '';
           } else {
             _private.filled = true;

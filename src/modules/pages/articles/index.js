@@ -44,9 +44,9 @@ class Articles {
     const items = new Items({
       id: 'articles-table',
       items: this.data.articles,
-      open: (articleName) => {
+      open: (articleId) => {
         this.navigation.toggle('close');
-        this.openArticle(articleName);
+        this.openArticle(articleId);
       }
     });
     this.dom.page.appendChild(items.view);
@@ -65,10 +65,10 @@ class Articles {
     });
   }
 
-  renderWordsMap(articleName) {
-    this.instances[articleName] = {};
-    const instance = this.instances[articleName];
-    const article = this.data.articles[articleName];
+  renderWordsMap(articleId) {
+    this.instances[articleId] = {};
+    const instance = this.instances[articleId];
+    const article = this.data.articles[articleId];
     instance.wordsMap = new Map();
     instance.idMap = new Map();
     article.words.forEach((item) => {
@@ -78,8 +78,8 @@ class Articles {
     });
   }
 
-  renderArticle(articleName) {
-    const article = this.data.articles[articleName];
+  renderArticle(articleId) {
+    const article = this.data.articles[articleId];
     const data = $templater(({ ref, list }) =>/*html*/`
       <div ${ref('scrollable')} class="article-scroll">
         <section ${ref('article')} class="article-content text-content">
@@ -90,7 +90,7 @@ class Articles {
         </section>
       </div>
     `);
-    this.views[articleName] = data;
+    this.views[articleId] = data;
   }
 }
 
