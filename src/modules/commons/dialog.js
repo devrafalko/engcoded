@@ -18,7 +18,7 @@ class Dialog {
       test: new Test(),
       crossword: new Crossword(this)
     };
-    this.state = { fontSize: null, opened: false, currentContentElements: {}, navigationOpened: false, gameActive: false };
+    this.state = { fontSize: null, opened: false, currentContentElements: {}, navigationOpened: false, gameActive: null };
     this.events = { onClose: null, beforeClose: null, onStopSpy: null };
     this._renderView();
     this._addListeners();

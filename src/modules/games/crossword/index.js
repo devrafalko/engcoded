@@ -483,12 +483,14 @@ class Hint {
     const classes = this.classes.get('container');
     switch (action) {
       case 'open':
+        if(this.state.opened === true) return;
         this.state.opened = true;
         if (this.on.open) this.on.open();
-        return classes.add('displayed').wait(10).add('visible');
+        return classes.clear().add('displayed').wait(10).add('visible');
       case 'close':
+        if(this.state.opened === false) return;
         this.state.opened = false;
-        return classes.remove('visible').wait(480).remove('displayed');
+        return classes.clear().remove('visible').wait(480).remove('displayed');
       case 'toggle':
         return this.switch(classes.has('displayed') ? 'close' : 'open');
     }
@@ -1794,6 +1796,11 @@ class CrosswordView {
                   <span class="key">Ctrl</span> + 
                   <span class="key">Enter</span>
                   <span class="action">Play pronunciation | Switch image</span>
+                </li>
+                <li>
+                  <span class="key">Ctrl</span> + 
+                  <span class="key">F</span>
+                  <span class="action">Find word in text</span>
                 </li>
                 <li>
                   <span class="key">↑</span>, 
