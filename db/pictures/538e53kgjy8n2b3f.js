@@ -1,4 +1,5 @@
 export default {
+  type: 'picture',
   id: '538e53kgjy8n2b3f',
   author: { name: 'Anna L', url: 'https://unsplash.com/@annavanna321' },
   link: { name: 'Unsplash', url: 'https://unsplash.com' },

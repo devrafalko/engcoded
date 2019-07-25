@@ -160,7 +160,7 @@ class YouTube {
 
   openMovie(movieId) {
     if (!this.instances[movieId]) {
-      this.instances[movieId] = {};
+      this.instances[movieId] = { games: {} };
       this.renderMaps(movieId);
     }
     if (!this.views[movieId]) {

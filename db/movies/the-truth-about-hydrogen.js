@@ -2,6 +2,7 @@ import { w, list } from './../utils/utils.js';
 
 export default {
   title: `The Truth about Hydrogen`,
+  type: 'movie',
   id: '538e53ocjyioiy0m',
   thumbnail: '538e570kjy1kn0ac',
   header: `The ${w('Truth', 0)} about ${w('Hydrogen', 1)}`,

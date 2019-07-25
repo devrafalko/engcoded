@@ -1,4 +1,5 @@
 export default {
+  type: 'picture',
   id: '538e53csjy7pcnm7',
   author: { name: 'rawpixel.com', url: 'https://www.pexels.com/@rawpixel' },
   link: { name: 'Pexels', url: 'https://www.pexels.com' },

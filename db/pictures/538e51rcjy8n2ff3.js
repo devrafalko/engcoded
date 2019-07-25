@@ -1,4 +1,5 @@
 export default {
+  type: 'picture',
   id: '538e51rcjy8n2ff3',
   author: { name: 'Allie Smith', url: 'https://unsplash.com/@creativegangsters' },
   link: { name: 'Unsplash', url: 'https://unsplash.com' },

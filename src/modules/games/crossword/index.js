@@ -18,11 +18,10 @@ class Words {
     this.words = words;
     this.map = {
       all: new Map(),
-      strings: new Map(),
       globalUsed: new Set()
     };
     this._buildAllWordsMap(words);
-    this._buildStringsMap();
+    this._buildCrosswordLetters();
   }
 
   get size() {
@@ -55,21 +54,39 @@ class Words {
     });
   }
 
-  _buildStringsMap() {
+  _buildCrosswordLetters() {
+    this.map.strings = new Map();
+    this.map.fixed = new Map();
+
     this.map.all.forEach((record) => {
-      let { crossword } = record;
-      this.map.strings.set(record, reduce(crossword));
+      let parsed = parse(record.crossword);
+      this.map.strings.set(record, parsed.string);
+      this.map.fixed.set(record, parsed.total);
     });
-    function reduce(arr) {
-      let total = '';
-      for (let i = 0; i < arr.length; i++) {
-        let string = typeof arr[i] === 'string';
-        let word = string ? arr[i] : arr[i][0];
-        let last = i === arr.length - 1;
-        total += word;
-        total += last ? '' : ' ';
+
+    function parse(word, total = [], string = '') {
+      if (!word.length) return { total, string };
+
+      const letters = /^[A-Za-z]+/.exec(word);
+      if (letters && letters.length) {
+        total.push({ letters: letters[0] });
+        string += letters[0];
+        return parse(word.slice(letters[0].length), total, string);
       }
-      return total;
+
+      const escape = /^\{(.+)\}/.exec(word);
+      if (escape && escape.length) {
+        total.push({ fixed: escape[1] });
+        string += escape[1];
+        return parse(word.slice(escape[0].length), total, string);
+      }
+
+      const characters = /^[^A-Za-z{}]+/.exec(word);
+      if (characters && characters.length) {
+        total.push({ fixed: characters[0] });
+        string += characters[0];
+        return parse(word.slice(characters[0].length), total, string);
+      }
     }
   }
 
@@ -855,7 +872,7 @@ class Word {
       fixedPending: null
     };
     this._createClueData();
-    this._build(x, y, side, this._data);
+    this._build(x, y, side);
   }
 
   get toString() {
@@ -1097,8 +1114,9 @@ class Word {
     }, 48)
   }
 
-  _build(_x, _y, side, data) {
-    const words = data.record.crossword;
+  _build(_x, _y, side) {
+    const data = this._data;
+    const words = this.words.map.fixed.get(data.record);
     const letterData = (x, y, fixed, letter, index) => {
       const _private = { word: this, cell: null, fixed, filled: false };
       return {
@@ -1129,7 +1147,7 @@ class Word {
             const words = _private.word.crossword.ref.virtual.cell.get(this.cell);
             const crossed = words.filter((word) => word !== _private.word)[0];
             _private.filled = false;
-            if(crossed && crossed._data.cells.get(this.cell).filled) return;
+            if (crossed && crossed._data.cells.get(this.cell).filled) return;
             this.input.innerHTML = '';
           } else {
             _private.filled = true;
@@ -1148,12 +1166,11 @@ class Word {
 
     const h = side === 'horizontal';
     let index = 0;
-    for (let i = 0; i < words.length; i++) {
-      let fixed = type(words[i], Array);
-      let word = fixed ? words[i][0] : words[i];
-      for (let letter of word) next(letter, fixed);
-      if (i < words.length - 1) next(' ', true);
-    }
+
+    words.forEach(({ fixed, letters }) => {
+      const isFixed = typeof fixed === 'string';
+      for (let letter of isFixed ? fixed : letters) next(letter, isFixed);
+    });
 
     function next(letter, fixed) {
       let x = h ? _x + index : _x;
@@ -1480,7 +1497,7 @@ class VirtualGrid {
 }
 
 class StarHint {
-  constructor(crossword, {dom, classes, number}) {
+  constructor(crossword, { dom, classes, number }) {
     this.crossword = crossword;
     this.dom = dom;
     this.classes = classes;
@@ -1805,7 +1822,7 @@ class CrosswordView {
     this.ref.keyboard = new VirtualKeyboard();
     this.ref.grid = new Grid(this);
     this.ref.game = new Game(this);
-    this.ref.star = new StarHint(this, {dom:this.dom, classes:this.classes, number:this.data.wordsNumber});
+    this.ref.star = new StarHint(this, { dom: this.dom, classes: this.classes, number: this.data.wordsNumber });
   }
 
   _appendCrossword() {

@@ -1,4 +1,5 @@
 export default {
+  type: 'picture',
   id: '538e55u4jy8mktct',
   author: { name: 'Toa Heftiba', url: 'https://unsplash.com/@heftiba' },
   link: { name: 'Unsplash', url: 'https://unsplash.com' },

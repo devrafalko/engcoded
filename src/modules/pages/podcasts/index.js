@@ -70,7 +70,7 @@ class Podcasts {
 
   openPodcast(id) {
     if (!this.instances[id]) {
-      this.instances[id] = {};
+      this.instances[id] = { games: {} };
       this.renderMaps(id);
     }
     if (!this.views[id]) {

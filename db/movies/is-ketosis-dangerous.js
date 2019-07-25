@@ -2,6 +2,7 @@ import { w, list } from './../utils/utils.js';
 
 export default {
   title: `Is Ketosis Dangerous? (Science of Fasting & Low Carb Keto)`,
+  type: 'movie',
   id: '538e52qojyioj45w',
   thumbnail: '538e55r4jy1knh08',
   header: `Is ${w('Ketosis', 0)} ${w('Dangerous', 1)}? (${w('Science', 2)} of ${w('Fasting', 3)} & ${w('Low Carb', 4)} ${w('Keto', 5)})`,

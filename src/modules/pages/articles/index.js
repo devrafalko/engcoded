@@ -4,7 +4,7 @@ import typeProperties from 'typeof-properties';
 import './../commons.scss';
 import './articles.scss';
 
-const { Items, Dialog } = $commons;
+const { Items, Dialog, Words } = $commons;
 const { $templater } = $utils;
 
 class Articles {
@@ -53,7 +53,7 @@ class Articles {
   }
 
   openArticle(articleId) {
-    if (!this.instances[articleId]) this.renderWordsMap(articleId);
+    if (!this.instances[articleId]) this.renderContentData(articleId);
     if (!this.views[articleId]) this.renderArticle(articleId);
     Dialog.load({
       name: 'articles',
@@ -65,12 +65,17 @@ class Articles {
     });
   }
 
-  renderWordsMap(articleId) {
-    this.instances[articleId] = {};
+  renderContentData(articleId) {
+    this.instances[articleId] = { games: {} };
     const instance = this.instances[articleId];
     const article = this.data.articles[articleId];
     instance.wordsMap = new Map();
     instance.idMap = new Map();
+
+    
+    instance.words = new Words(article.words);
+
+
     article.words.forEach((item) => {
       if (!instance.idMap.has(item.id)) instance.idMap.set(item.id, []);
       instance.idMap.get(item.id).push(item);

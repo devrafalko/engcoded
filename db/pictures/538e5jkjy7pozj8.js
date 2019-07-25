@@ -1,4 +1,5 @@
 export default {
+  type: 'picture',
   id: '538e5jkjy7pozj8',
   author: { name: 'Tina Dawson', url: 'https://unsplash.com/@leyameera' },
   link: { name: 'Unsplash', url: 'https://unsplash.com' },

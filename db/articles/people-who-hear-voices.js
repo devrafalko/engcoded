@@ -2,6 +2,7 @@ import { w, paragraph } from './../utils/utils.js';
 
 export default {
   title: 'People who hear voices in their head can also pick up on hidden speech',
+  type: 'article',
   id: '538e53s0jyiohwoo',
   thumbnail: '538e53j4jy1ko9zj',
   header: `${w('People', 0)} who ${w('hear', 1)} ${w('voices', 2)} in their head can also ${w('pick up on', 3)} hidden ${w('speech', 4)}`,

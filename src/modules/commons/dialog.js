@@ -102,75 +102,75 @@ class Dialog {
     const game = button.get('game');
 
     game.get('presentation').addEventListener('click', () => {
-      const contentData = this.state.currentContentData;
+      const data = this.state.currentContentData;
       toggleNavigation.call(this, 'close');
       Card.hide(false);
-      if (!contentData.presentation) {
-        contentData.presentation = new Presentation(this, contentData.wordsMap);
-        contentData.presentation.on.close = () => {
+      if (!data.games.presentation) {
+        data.games.presentation = new Presentation(this, data.wordsMap);
+        data.games.presentation.on.close = () => {
           this.state.gameActive = null;
           containerClasses.add('hidden');
         };
       }
-      contentData.presentation.open();
-      this.state.gameActive = contentData.presentation;
+      data.games.presentation.open();
+      this.state.gameActive = data.games.presentation;
       container.innerHTML = '';
-      container.appendChild(contentData.presentation.view);
+      container.appendChild(data.games.presentation.view);
       containerClasses.remove('hidden');
     });
 
     game.get('word-test').addEventListener('click', () => {
-      const contentData = this.state.currentContentData;
+      const data = this.state.currentContentData;
       toggleNavigation.call(this, 'close');
       Card.hide(false);
-      if (!contentData.test) {
-        contentData.test = new Test(this, contentData.wordsMap);
-        contentData.test.on.close = () => {
+      if (!data.games.test) {
+        data.games.test = new Test(this, data.wordsMap);
+        data.games.test.on.close = () => {
           this.state.gameActive = null;
           containerClasses.add('hidden');
         };
       }
-      contentData.test.open();
-      this.state.gameActive = contentData.test;
+      data.games.test.open();
+      this.state.gameActive = data.games.test;
       container.innerHTML = '';
-      container.appendChild(contentData.test.view);
+      container.appendChild(data.games.test.view);
       containerClasses.remove('hidden');
     });
 
     game.get('voice-test').addEventListener('click', () => {
-      const contentData = this.state.currentContentData;
+      const data = this.state.currentContentData;
       toggleNavigation.call(this, 'close');
       Card.hide(false);
 
-      if (!contentData.pronunciation) {
-        contentData.pronunciation = new Pronunciation(this, contentData.wordsMap);
-        contentData.pronunciation.on.close = () => {
+      if (!data.games.pronunciation) {
+        data.games.pronunciation = new Pronunciation(this, data.wordsMap);
+        data.games.pronunciation.on.close = () => {
           this.state.gameActive = null;
           containerClasses.add('hidden');
         };
       }
-      contentData.pronunciation.open();
-      this.state.gameActive = contentData.pronunciation;
+      data.games.pronunciation.open();
+      this.state.gameActive = data.games.pronunciation;
       container.innerHTML = '';
-      container.appendChild(contentData.pronunciation.view);
+      container.appendChild(data.games.pronunciation.view);
       containerClasses.remove('hidden');
     });
 
     game.get('crossword').addEventListener('click', () => {
-      const contentData = this.state.currentContentData;
+      const data = this.state.currentContentData;
       toggleNavigation.call(this, 'close');
       Card.hide(false);
-      if (!contentData.crossword) {
-        contentData.crossword = new Crossword(this, contentData.wordsMap);
-        contentData.crossword.on.close = () => {
+      if (!data.games.crossword) {
+        data.games.crossword = new Crossword(this, data.wordsMap);
+        data.games.crossword.on.close = () => {
           this.state.gameActive = null;
           containerClasses.add('hidden');
         };
       }
-      contentData.crossword.open();
-      this.state.gameActive = contentData.crossword;
+      data.games.crossword.open();
+      this.state.gameActive = data.games.crossword;
       container.innerHTML = '';
-      container.appendChild(contentData.crossword.view);
+      container.appendChild(data.games.crossword.view);
       containerClasses.remove('hidden');
     });
 

@@ -31,6 +31,7 @@ import { w, list, header } from './../utils/utils.js';
 
 export default {
   title: '',
+  type: 'article',
   id: '${uniq()}',
   thumbnail: '',
   header: \`${title}\`,

@@ -1,4 +1,5 @@
 export default {
+  type: 'picture',
   id: '538e56vkjy7ov1zk',
   author: { name: 'Mike Bird', url: 'https://www.pexels.com/@mikebirdy' },
   link: { name: 'Pexels', url: 'https://www.pexels.com' },

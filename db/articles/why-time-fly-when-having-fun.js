@@ -3,6 +3,7 @@ import { w, paragraph } from './../utils/utils.js';
 
 export default {
   title: "Why does time fly when you're having fun?",
+  type: 'article',
   id: '538e57j8jyiojgle',
   thumbnail: '538e52ggjy1ko092',
   header: `Why does ${w('time', 0)} ${w('fly', 1)} when you're ${w('having fun', 2)}?`,

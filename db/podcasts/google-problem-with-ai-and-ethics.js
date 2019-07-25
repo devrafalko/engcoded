@@ -2,6 +2,7 @@ import { w, list } from './../utils/utils.js';
 
 export default {
   title: `Google's problem with AI and ethics`,
+  type: 'podcast',
   id: '538e56jgjyioijou',
   thumbnail: '538e5y0jy1kmha3',
   header: `Google's ${w('problem', 0)} with AI and ${w('ethics', 1)}`,

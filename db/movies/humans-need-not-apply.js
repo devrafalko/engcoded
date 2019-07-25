@@ -2,6 +2,7 @@ import { w, list } from './../utils/utils.js';
 
 export default {
   title: `Humans Need Not Apply`,
+  type: 'movie',
   id: '538e54zsjyioja4i',
   thumbnail: '538e56q0jy1knrd8',
   header: `${w('Humans', 0)} ${w('Need Not', 1)} ${w('Apply', 2)}`,

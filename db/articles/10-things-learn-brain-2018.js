@@ -3,6 +3,7 @@ import { w, header, paragraph } from './../utils/utils.js';
 
 export default {
   title: '10 things we learned about the brain in 2018',
+  type: 'article',
   id: '538e56z4jyiohhz1',
   thumbnail: '538e51vcjy1koik0',
   header: `10 ${w('things', 0)} we ${w('learned', 1)} about the ${w('brain', 2)} in 2018`,
