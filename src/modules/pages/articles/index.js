@@ -69,18 +69,7 @@ class Articles {
     this.instances[articleId] = { games: {} };
     const instance = this.instances[articleId];
     const article = this.data.articles[articleId];
-    instance.wordsMap = new Map();
-    instance.idMap = new Map();
-
-    
     instance.words = new Words(article.words);
-
-
-    article.words.forEach((item) => {
-      if (!instance.idMap.has(item.id)) instance.idMap.set(item.id, []);
-      instance.idMap.get(item.id).push(item);
-      instance.wordsMap.set(item.index, item);
-    });
   }
 
   renderArticle(articleId) {

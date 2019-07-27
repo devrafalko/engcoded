@@ -4,7 +4,7 @@ import typeProperties from 'typeof-properties';
 import './../commons.scss';
 import './youtube.scss';
 
-const { Items, Dialog, Card, Timer, Scroller } = $commons;
+const { Items, Dialog, Card, Timer, Scroller, Words } = $commons;
 const { $templater, $loopParents } = $utils;
 const { $iconTextPlay } = $icons;
 
@@ -258,15 +258,9 @@ class YouTube {
   renderMaps(movieId) {
     const instance = this.instances[movieId];
     const movie = this.data.movies[movieId];
-    instance.idMap = new Map();
-    instance.wordsMap = new Map();
     instance.subtitlesMap = new Map();
     instance.secondsMap = new Map();
-    movie.words.forEach((item) => {
-      if (!instance.idMap.has(item.id)) instance.idMap.set(item.id, []);
-      instance.idMap.get(item.id).push(item);
-      instance.wordsMap.set(item.index, item);
-    });
+    instance.words = new Words(movie.words);
 
     let index = 0;
     let totalDuration;

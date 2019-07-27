@@ -8,166 +8,9 @@ import './buttons.scss';
 
 const { Slider, Scroller } = $commons;
 const { $randomItem, $templater, $loopParents, $loopBetween } = $utils;
-const { $words } = $data;
 const { $iconCheckIn, $iconCheckOut, $iconConfig, $iconGameCrossword, $iconPrevious, $iconNext, $iconStar,
   $iconMinimize, $iconWarning, $iconGameFinish, $iconQuestionMark, $iconGameTranslate, $iconOccurrence,
   $iconGameDefinition, $iconGamePronunciation, $iconGameImage, $iconClose, $iconVolume, $iconKeyboard } = $icons;
-
-class Words {
-  constructor({ words }) {
-    this.words = words;
-    this.map = {
-      all: new Map(),
-      globalUsed: new Set()
-    };
-    this._buildAllWordsMap(words);
-    this._buildCrosswordLetters();
-  }
-
-  get size() {
-    return this.map.filtered.size;
-  }
-
-  get _alphabet() {
-    return ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', ' '];
-  }
-
-  get _random() {
-    const map = this.map.filteredUnused.size > 0 ? this.map.filteredUnused : this.map.filtered;
-    return $randomItem([...map.keys()]);
-  }
-
-  _buildAlphabetMap() {
-    this.map.alphabet = new Map();
-    for (let x of this._alphabet) {
-      this.map.alphabet.set(x, { expression: new RegExp(x), data: [] });
-      for (let y of this._alphabet) this.map.alphabet.set(x + y, { expression: new RegExp(`${x}.*${y}`), data: [] });
-    }
-  }
-
-  _buildAllWordsMap(wordsList) {
-    wordsList.forEach(({ id }) => {
-      if (!$words.has(id) || this.map.all.has(id)) return;
-      let record = $words.get(id);
-      record.id = id;
-      this.map.all.set(id, record);
-    });
-  }
-
-  _buildCrosswordLetters() {
-    this.map.strings = new Map();
-    this.map.fixed = new Map();
-
-    this.map.all.forEach((record) => {
-      let parsed = parse(record.crossword);
-      this.map.strings.set(record, parsed.string);
-      this.map.fixed.set(record, parsed.total);
-    });
-
-    function parse(word, total = [], string = '') {
-      if (!word.length) return { total, string };
-
-      const letters = /^[A-Za-z]+/.exec(word);
-      if (letters && letters.length) {
-        total.push({ letters: letters[0] });
-        string += letters[0];
-        return parse(word.slice(letters[0].length), total, string);
-      }
-
-      const escape = /^\{(.+)\}/.exec(word);
-      if (escape && escape.length) {
-        total.push({ fixed: escape[1] });
-        string += escape[1];
-        return parse(word.slice(escape[0].length), total, string);
-      }
-
-      const characters = /^[^A-Za-z{}]+/.exec(word);
-      if (characters && characters.length) {
-        total.push({ fixed: characters[0] });
-        string += characters[0];
-        return parse(word.slice(characters[0].length), total, string);
-      }
-    }
-  }
-
-  filter(clues) {
-    this.map.alphabet = null;
-    this.map.filtered = new Set();
-    this.map.filteredUnused = new Set();
-    this.map.all.forEach((record) => {
-      if (clues.has('meaning') || clues.has('definition') && record.definition || clues.has('img') && record.img || clues.has('audio') && record.audio) {
-        this.map.filtered.add(record);
-        if (!this.map.globalUsed.has(record)) this.map.filteredUnused.add(record);
-      }
-    });
-  }
-
-  build() {
-    if (type(this.map.alphabet, Map)) return;
-    this._buildAlphabetMap();
-    for (let record of this.map.filtered) {
-      let word = this.map.strings.get(record);
-      this.map.alphabet.forEach(({ expression, data }) => {
-        if (word.match(expression)) data.push(record);
-      });
-    }
-  }
-
-  has({ before = Infinity, after = Infinity, characters, localUsed }) {
-    before = before < 0 ? 0 : before;
-    after = after < 0 ? 0 : after;
-    const start = before === 0 ? '^(.{0})' : before === Infinity ? '^(.*)' : `^(.{0,${before}})`;
-    const end = after === 0 ? '(.{0})$' : after === Infinity ? '(.*)$' : `(.{0,${after}})$`;
-    let middle = '';
-    let firstLetters = '';
-
-    for (let item of characters) {
-      if (typeof item === 'number') middle += `.{${item}}`
-      if (typeof item === 'string') {
-        let isLetter = /[a-z ]/.test(item);
-        middle += isLetter ? item : '\\' + item;
-        firstLetters += item;
-      }
-    }
-
-    const expression = new RegExp(start + `(${middle})` + end);
-    const seekLetters = firstLetters.slice(0, 2).toLowerCase();
-    const words = { free: null, used: null };
-
-    if (!this.map.alphabet.has(seekLetters)) return words;
-    const { data } = this.map.alphabet.get(seekLetters);
-
-    data.forEach((record) => {
-      let word = this.map.strings.get(record);
-      let match = word.match(expression);
-      if (match === null) return;
-      if (localUsed.has(record)) return;
-      let matchData = {
-        record,
-        size: match[0].length,
-        before: match[1].length,
-        middle: match[2].length,
-        after: match[3].length
-      };
-      if (this.map.globalUsed.has(record)) {
-        if ((!words.used || matchData.size > words.used.size)) words.used = matchData;
-      } else {
-        if (!words.free || matchData.size > words.free.size) words.free = matchData;
-      }
-    })
-
-    return words;
-  }
-
-  useWord(record) {
-    this.map.filteredUnused.delete(record);
-  }
-
-  guessWord(record) {
-    this.map.globalUsed.add(record);
-  }
-
-}
 
 class Game {
   constructor(crossword) {
@@ -303,9 +146,6 @@ class Game {
     }
   }
 }
-
-
-
 
 class VirtualKeyboard {
   constructor() {
@@ -727,7 +567,7 @@ class Grid {
   }
 
   _buildCrosswordView() {
-    const container = $templater(({ ref, child, classes }) =>/*html*/`
+    const { references, classes } = $templater(({ ref, child }) =>/*html*/`
       <div ${ref('content')}>
         <div ${ref('container')} tabindex="0" class="crossword">
           ${child(this._crossword())}
@@ -738,8 +578,8 @@ class Grid {
         </div>
       </div>
     `);
-    this.dom = container.references;
-    this.classes = container.classes;
+    this.dom = references;
+    this.classes = classes;
   }
 
   getCellByCoords(x, y, name) {
@@ -751,7 +591,7 @@ class Grid {
   }
 
   _crossword() {
-    return $templater(({ loop, ref, child, classes }) =>/*html*/`
+    return $templater(({ loop, ref, child }) =>/*html*/`
       <table ${ref('table')} id="crossword-table">
         <tbody>
           ${loop(this.crossword.ref.virtual.rows.size, (y) =>/*html*/`
@@ -856,11 +696,10 @@ class Grid {
 }
 
 class Word {
-  constructor({ x, y, side, record, index, crossword, words }) {
+  constructor(crossword, { x, y, side, id, index }) {
     this.crossword = crossword;
-    this._data = { x, y, side, record, letters: [], string: '', queuedLetters: [], cells: new Map() };
+    this._data = { x, y, side, id, letters: [], string: '', queuedLetters: [], cells: new Map() };
     this.index = index;
-    this.words = words;
     this.state = {
       resolved: false,
       current: null,
@@ -897,8 +736,12 @@ class Word {
     return this._data.clue;
   }
 
+  get id() {
+    return this._data.id;
+  }
+
   get record() {
-    return this._data.record;
+    return this.crossword.ref.words.records.get(this._data.id);
   }
 
   get side() {
@@ -937,7 +780,7 @@ class Word {
   }
 
   get first() {
-    for (let { fixed, letter, index } of this.letters) {
+    for (let { fixed, index } of this.letters) {
       if (fixed === false) return index;
     }
     return null;
@@ -1083,7 +926,7 @@ class Word {
     const valid = this.letters.every(({ typed, letter, fixed }) => fixed ? true : typed.toLowerCase() === letter.toLowerCase());
     if (!valid) return;
     this.fix();
-    this.words.guessWord(this.record);
+    this.crossword.ref.words.solve(this._data.id, 'crossword');
     this.crossword.ref.hint.switchOccurrence(true);
   }
 
@@ -1116,7 +959,7 @@ class Word {
 
   _build(_x, _y, side) {
     const data = this._data;
-    const words = this.words.map.fixed.get(data.record);
+    const words = this.crossword.ref.words.fixed.get(data.id);
     const letterData = (x, y, fixed, letter, index) => {
       const _private = { word: this, cell: null, fixed, filled: false };
       return {
@@ -1183,11 +1026,9 @@ class Word {
 }
 
 class VirtualGrid {
-  constructor(crossword, { words, number, clues }) {
+  constructor(crossword, { number, clues, words }) {
     this.crossword = crossword;
-    this.words = words;
-    this.data = { number, clues };
-
+    this.data = { number, clues, words };
     this.columns = new Map();
     this.rows = new Map();
     this.edges = this._edges;
@@ -1214,10 +1055,9 @@ class VirtualGrid {
   }
 
   _buildVirtualCrossword() {
-    this.words.build();
-    const record = this.words._random;
+    const id = this.crossword.ref.words.random(this.data.words, 'crossword');
     const side = $randomItem(['vertical', 'horizontal']);
-    this._addWord(0, 0, side, record);
+    this._addWord(0, 0, side, id);
     let previous = this.used.size;
     while (this.used.size < this.data.number) {
       this._nextWord();
@@ -1232,31 +1072,34 @@ class VirtualGrid {
   }
 
   _buildCluesMap() {
+    const words = this.crossword.ref.words;
     const permittedClues = this.data.clues;
-    const wordInstances = createRecords(this.word);
+    const wordInstances = sortByCluesNumber(this.word);
     const clueMap = createClueMap();
     for (let word of wordInstances) {
-      let chosenClueName = nextClue(word.record);
+      let chosenClueName = nextClue(word.id);
       word.clue.type = chosenClueName;
       clueMap.get(chosenClueName).records++;
     }
 
-    function createRecords(map) {
-      const records = [...map.values()];
-      records.sort((a, b) => countClues(a.record) - countClues(b.record));
-      return records;
+    function sortByCluesNumber(collection) {
+      const words = [...collection.values()];
+      words.sort((a, b) => countClues(a.id) - countClues(b.id));
+      return words;
     }
 
-    function countClues(record) {
+    function countClues(id) {
       let iter = 0;
-      permittedClues.forEach((clueName) => iter = record[clueName] ? iter + 1 : iter);
+      words.clues.forEach((set, key) => {
+        if (permittedClues.has(key) && set.has(id)) iter++;
+      });
       return iter;
     }
 
-    function nextClue(record) {
+    function nextClue(id) {
       let chosen = null, lowest = Infinity;
       clueMap.forEach(({ size, records }, name) => {
-        if (!record[name]) return;
+        if (!words.clues.get(name).has(id)) return;
         if (records < lowest) {
           chosen = name;
           lowest = records;
@@ -1264,23 +1107,23 @@ class VirtualGrid {
         if (records === lowest && size < clueMap.get(chosen).size) chosen = name;
       });
       return chosen;
-    };
+    }
 
     function createClueMap() {
       const map = new Map();
       for (let word of wordInstances) {
-        permittedClues.forEach((clueName) => {
-          if (!word.record[clueName]) return;
-          if (!map.has(clueName)) map.set(clueName, { size: 0, records: 0 });
-          map.get(clueName).size++;
+        permittedClues.forEach((name) => {
+          if (!words.clues.get(name).has(word.id)) return;
+          if (!map.has(name)) map.set(name, { size: 0, records: 0 });
+          map.get(name).size++;
         });
       }
       return map;
     }
   }
 
-  _addWord(x, y, side, record) {
-    const word = this._createWord(x, y, side, record);
+  _addWord(x, y, side, id) {
+    const word = this._createWord(x, y, side, id);
     const horizontal = side === 'horizontal';
     const dynamicLines = horizontal ? this.columns : this.rows;
     const dynamicCoord = horizontal ? x : y;
@@ -1295,8 +1138,7 @@ class VirtualGrid {
     staticLine.keyword.set(dynamicCoord - 1, word);
     this._updateEdges(x, y, side, word.size);
 
-    this.used.add(record);
-    this.words.useWord(record);
+    this.used.add(id);
 
     function opposite(side) {
       let sides = ['horizontal', 'vertical'];
@@ -1415,68 +1257,55 @@ class VirtualGrid {
     return column || row || null;
   }
 
-  _createWord(x, y, side, record) {
-    const instance = new Word({ x, y, side, record, index: this.word.size, crossword: this.crossword, words: this.words });
+  _createWord(x, y, side, id) {
+    const instance = new Word(this.crossword, { x, y, side, id, index: this.word.size });
     this.word.set(this.word.size, instance);
     return instance;
   }
 
   _nextWord() {
-    let bestFree = null;
-    let bestBusy = null;
-
+    let bestLine = null;
     this._loopLines((line) => {
-      if (this.used.has(line.match.record)) this._seekMatches(line);
-      if (line.type === 'free') {
-        if (!bestFree || line.match.crosses > bestFree.match.crosses) bestFree = line;
-      } else if (line.type === 'used') {
-        if (!bestBusy || line.match.crosses > bestBusy.match.crosses) bestBusy = line;
-      }
+      if (this.used.has(line.match.id)) this._seekMatches(line);
+      if (line.match.id !== null && (bestLine === null || line.match.crosses > bestLine.match.crosses)) bestLine = line;
     });
 
-    const bestLine = bestFree || bestBusy;
     const x = bestLine.side === 'horizontal' ? bestLine.match.index : bestLine.index;
     const y = bestLine.side === 'vertical' ? bestLine.match.index : bestLine.index;
     const side = bestLine.side;
-    const record = bestLine.match.record;
-    this._addWord(x, y, side, record);
+    const id = bestLine.match.id;
+    this._addWord(x, y, side, id);
   }
 
   _seekMatches(line) {
-    let _free = null;
-    let _used = null;
+    const words = this.crossword.ref.words;
+    let _chosen = null;
     let _index = null;
     let _crosses = 0;
 
     for (let { before, after, index, characters } of line.expressions) {
-      let usedLevel = false;
       let foundMatch = false;
       for (let x = characters.length; x >= 1; x -= 2) {
         let shift = 0;
         for (let y = 0; y + x <= characters.length; y += 2) {
           shift += y === 0 ? 0 : characters[y - 1] + 1;
-          let matches = this.words.has({
-            localUsed: this.used,
+
+          let match = words.match({
+            collection: this.data.words,
+            excludes: this.used,
             before: y === 0 ? before : characters[y - 1] - 1,
             after: y + x === characters.length ? after : characters[y + x] - 1,
             characters: characters.slice(y, y + x)
           });
-          if (matches.free && (_free === null || matches.free.size > _free.size)) {
-            _index = index + shift - matches.free.before;
-            _free = matches.free;
-            _crosses = characters.length - (characters.length - 1) / 2;
-            foundMatch = true;
-          }
-          if (_free !== null || usedLevel) continue;
-          if (matches.used && (_used === null || matches.used.size > _used.size)) {
-            _index = index + shift - matches.used.before;
-            _used = matches.used;
+
+          if (match && (_chosen === null || match.size > _chosen.size)) {
+            _index = index + shift - match.before;
+            _chosen = match;
             _crosses = characters.length - (characters.length - 1) / 2;
             foundMatch = true;
           }
         }
-        if (_free !== null) break;
-        if (_used !== null) usedLevel = true;
+        if (_chosen !== null) break;
       }
       if (!foundMatch) {
         let size = 1;
@@ -1484,9 +1313,12 @@ class VirtualGrid {
         for (let i = 0; i < size; i++) line.busy.set(index + i, false);
       }
     }
-    const chosenRecord = _free ? _free.record : _used ? _used.record : null;
-    line.match = { record: chosenRecord, index: _index, crosses: _crosses };
-    line.type = _free ? 'free' : _used ? 'used' : null;
+
+    line.match = {
+      id: _chosen ? _chosen.id : null,
+      index: _index,
+      crosses: _crosses
+    };
   }
 
   _loopLines(callback) {
@@ -1592,12 +1424,10 @@ class StarHint {
   }
 }
 
-class CrosswordView {
+class Crossword {
   constructor(dialog, words) {
-    this.ref = { dialog };
+    this.ref = { dialog, words };
     this.data = {
-      wordsMap: new Words({ words }),
-      wordMaps: new Map(),
       permitedClueTypes: new Set(),
       wordsMinNumber: 5,
       wordsMaxNumber: 50,
@@ -1817,7 +1647,7 @@ class CrosswordView {
   }
 
   _createNewInstances() {
-    this.ref.virtual = new VirtualGrid(this, { words: this.data.wordsMap, number: this.data.wordsNumber, clues: this.data.permitedClueTypes });
+    this.ref.virtual = new VirtualGrid(this, { number: this.data.wordsNumber, clues: this.data.permitedClueTypes, words: this.data.filtered });
     this.ref.hint = new Hint(this);
     this.ref.keyboard = new VirtualKeyboard();
     this.ref.grid = new Grid(this);
@@ -1928,8 +1758,8 @@ class CrosswordView {
     if (has && this.data.permitedClueTypes.size === 1) return;
     classes[has ? 'remove' : 'add']('on');
     this.data.permitedClueTypes[has ? 'delete' : 'add'](name);
-    this.data.wordsMap.filter(this.data.permitedClueTypes);
-    this.data.totalWordsNumber = this.data.wordsMap.size;
+    this.data.filtered = this.ref.words.filterClues(this.data.permitedClueTypes);
+    this.data.totalWordsNumber = this.data.filtered.size;
     this.dom.get('output-total-words').innerHTML = this.data.totalWordsNumber;
     this._updateCrosswordWordsNumber();
   }
@@ -1937,7 +1767,7 @@ class CrosswordView {
   _updateCrosswordWordsNumber(value = 0) {
     const newValue = this.data.wordsNumber + value;
     const output = this.dom.get('output-used-words');
-    const all = this.data.wordsMap.size;
+    const all = this.ref.words.size;
     const lowest = Math.min(all, this.data.wordsMaxNumber);
     const warning = this.classes.get('warning').get('insufficient-words');
     warning.remove('visible');
@@ -1982,4 +1812,4 @@ class CrosswordView {
 
 }
 
-export default CrosswordView;
+export default Crossword;

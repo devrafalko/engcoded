@@ -64,8 +64,8 @@ class Card {
       return;
     }
 
-    if (!contentData.wordsMap.has(index)) return;
-    const { id, meaning: meanings } = contentData.wordsMap.get(index);
+    if (!contentData.words.indeces.has(index)) return;
+    const { id, meaning: meanings } = contentData.words.indeces.get(index);
 
     if (!this.data.words.has(id)) return;
     const { word, definition, meaning, audio, img } = this.data.words.get(id);
@@ -89,7 +89,7 @@ class Card {
       if (empty && this.state.active === 'image') this._switchCard('word');
     });
 
-    const occurrences = contentData.idMap.get(id);
+    const occurrences = contentData.words.identifiers.get(id);
     this.classes.get('section').get('control')[occurrences.length > 1 ? 'add' : 'remove']('multiple');
 
     this.state.currentIndex = index;
@@ -243,10 +243,10 @@ class Card {
   }
 
   _switchOccurrence(side) {
-    const { id } = this.state.currentContentData.wordsMap.get(this.state.currentIndex);
-    const ocurrances = this.state.currentContentData.idMap.get(id);
+    const { id } = this.state.currentContentData.words.indeces.get(this.state.currentIndex);
+    const ocurrances = this.state.currentContentData.words.identifiers.get(id);
     if (ocurrances.length === 1) return;
-    const current = ocurrances.findIndex(({ index }) => index === this.state.currentIndex);
+    const current = ocurrances.findIndex((index) => index === this.state.currentIndex);
     let next = side === 'next' ? current + 1 : current - 1;
     if (next < 0) next = ocurrances.length - 1;
     if (next === ocurrances.length) next = 0;
@@ -254,7 +254,7 @@ class Card {
     this.refresh({
       container: this.state.currentContainer,
       scroll: true,
-      index: ocurrances[next].index,
+      index: ocurrances[next],
       contentData: this.state.currentContentData
     })
 

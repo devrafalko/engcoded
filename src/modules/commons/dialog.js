@@ -7,7 +7,8 @@ import Test from './../games/test/index';
 
 const { Card } = $commons;
 const { $templater } = $utils;
-const { $iconGameCrossword, $iconGameHearing, $iconGameTest, $iconWordList, $iconAlignLeft, $iconAlignCenter, $iconSpy, $iconPalette, $iconTextSize, $iconClose } = $icons;
+const { $iconGameCrossword, $iconGameHearing, $iconGameTest, $iconWordList, $iconAlignLeft, 
+  $iconAlignCenter, $iconSpy, $iconPalette, $iconTextSize, $iconClose } = $icons;
 
 class Dialog {
   constructor() {
@@ -106,7 +107,7 @@ class Dialog {
       toggleNavigation.call(this, 'close');
       Card.hide(false);
       if (!data.games.presentation) {
-        data.games.presentation = new Presentation(this, data.wordsMap);
+        data.games.presentation = new Presentation(this, data.words);
         data.games.presentation.on.close = () => {
           this.state.gameActive = null;
           containerClasses.add('hidden');
@@ -124,7 +125,7 @@ class Dialog {
       toggleNavigation.call(this, 'close');
       Card.hide(false);
       if (!data.games.test) {
-        data.games.test = new Test(this, data.wordsMap);
+        data.games.test = new Test(this, data.words);
         data.games.test.on.close = () => {
           this.state.gameActive = null;
           containerClasses.add('hidden');
@@ -143,7 +144,7 @@ class Dialog {
       Card.hide(false);
 
       if (!data.games.pronunciation) {
-        data.games.pronunciation = new Pronunciation(this, data.wordsMap);
+        data.games.pronunciation = new Pronunciation(this, data.words);
         data.games.pronunciation.on.close = () => {
           this.state.gameActive = null;
           containerClasses.add('hidden');
@@ -161,7 +162,7 @@ class Dialog {
       toggleNavigation.call(this, 'close');
       Card.hide(false);
       if (!data.games.crossword) {
-        data.games.crossword = new Crossword(this, data.wordsMap);
+        data.games.crossword = new Crossword(this, data.words);
         data.games.crossword.on.close = () => {
           this.state.gameActive = null;
           containerClasses.add('hidden');
@@ -258,7 +259,7 @@ class Dialog {
     Card.refresh({
       container: this.state.currentContentElements.cardArea,
       scroll: true,
-      index: this.state.currentContentData.idMap.get(id)[0].index,
+      index: this.state.currentContentData.words.identifiers.get(id)[0],
       contentData: this.state.currentContentData
     });
   }
