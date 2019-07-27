@@ -531,6 +531,7 @@ button.setting-button {
   font-family: "PT Sans", sans-serif;
   font-size: 20px;
   font-variant: small-caps;
+  margin: 6px 0px;
   outline: none;
   overflow: hidden;
   transition-property: border, box-shadow;
@@ -973,52 +974,57 @@ h2 {
   100% {
     transform: rotate(-30deg); } }
 
-.game-container.crossword > .navigation-panel {
+.game-container > .crossword {
+  height: 100%;
+  width: 100%; }
+
+.game-container > .crossword > .navigation-panel {
   z-index: 1; }
 
-.game-container.crossword .navigation-panel .controls * {
+.game-container > .crossword .navigation-panel .controls * {
   color: #2fe0e0; }
 
-.game-container.crossword
+.game-container
+> .crossword
 > .navigation-panel
 .controls.navigation
 .toggle-menu {
   display: none; }
 
-.dialog-box .game-container.crossword .navigation-panel[data-page="config"] .controls.game .buttons.game,
-.dialog-box .game-container.crossword .navigation-panel[data-page="config"] .controls.game .buttons.info,
-.dialog-box .game-container.crossword .navigation-panel[data-page="config"] .controls.game .buttons.control {
+.dialog-box .game-container > .crossword .navigation-panel[data-page="config"] .controls.game .buttons.game,
+.dialog-box .game-container > .crossword .navigation-panel[data-page="config"] .controls.game .buttons.info,
+.dialog-box .game-container > .crossword .navigation-panel[data-page="config"] .controls.game .buttons.control {
   display: none; }
 
 @media (max-width: 443px) {
-  .dialog-box .game-container.crossword .navigation-panel[data-page="crossword"] {
+  .dialog-box .game-container > .crossword .navigation-panel[data-page="crossword"] {
     padding-top: 34px; }
-    .dialog-box .game-container.crossword .navigation-panel[data-page="crossword"] .toggle-menu {
+    .dialog-box .game-container > .crossword .navigation-panel[data-page="crossword"] .toggle-menu {
       display: block; }
-    .dialog-box .game-container.crossword .navigation-panel[data-page="crossword"] .controls.game {
+    .dialog-box .game-container > .crossword .navigation-panel[data-page="crossword"] .controls.game {
       height: auto; }
-      .dialog-box .game-container.crossword .navigation-panel[data-page="crossword"] .controls.game .buttons.pages,
-      .dialog-box .game-container.crossword .navigation-panel[data-page="crossword"] .controls.game .buttons.game,
-      .dialog-box .game-container.crossword .navigation-panel[data-page="crossword"] .controls.game .buttons.info,
-      .dialog-box .game-container.crossword .navigation-panel[data-page="crossword"] .controls.game .buttons.control {
+      .dialog-box .game-container > .crossword .navigation-panel[data-page="crossword"] .controls.game .buttons.pages,
+      .dialog-box .game-container > .crossword .navigation-panel[data-page="crossword"] .controls.game .buttons.game,
+      .dialog-box .game-container > .crossword .navigation-panel[data-page="crossword"] .controls.game .buttons.info,
+      .dialog-box .game-container > .crossword .navigation-panel[data-page="crossword"] .controls.game .buttons.control {
         margin-left: 0px;
         height: 34px;
         display: block; } }
 
-.game-container.crossword > .navigation-panel .controls.game .buttons.game .button-star {
+.game-container > .crossword > .navigation-panel .controls.game .buttons.game .button-star {
   margin-right: 0px; }
-  .game-container.crossword > .navigation-panel .controls.game .buttons.game .button-star,
-  .game-container.crossword > .navigation-panel .controls.game .buttons.game .button-star > .icon {
+  .game-container > .crossword > .navigation-panel .controls.game .buttons.game .button-star,
+  .game-container > .crossword > .navigation-panel .controls.game .buttons.game .button-star > .icon {
     cursor: grab; }
 
-.game-container.crossword > .navigation-panel .controls.game .buttons.game .count-container {
+.game-container > .crossword > .navigation-panel .controls.game .buttons.game .count-container {
   margin: 0px;
   cursor: default;
   font-size: 16px;
   vertical-align: top;
   width: 22px; }
 
-.game-container.crossword > .navigation-panel .controls.game .buttons.game .cursor-star {
+.game-container > .crossword > .navigation-panel .controls.game .buttons.game .cursor-star {
   display: none;
   height: 22px;
   opacity: 0;
@@ -1029,34 +1035,35 @@ h2 {
   transition-timing-function: ease-in-out, ease-in-out, cubic-bezier(1, 0.01, 0.04, 2), cubic-bezier(1, 0.01, 0.04, 2);
   width: 22px;
   z-index: 4; }
-  .game-container.crossword > .navigation-panel .controls.game .buttons.game .cursor-star.visible {
+  .game-container > .crossword > .navigation-panel .controls.game .buttons.game .cursor-star.visible {
     opacity: 1;
     transform: rotate(0deg); }
-  .game-container.crossword > .navigation-panel .controls.game .buttons.game .cursor-star.displayed {
+  .game-container > .crossword > .navigation-panel .controls.game .buttons.game .cursor-star.displayed {
     display: block; }
-  .game-container.crossword > .navigation-panel .controls.game .buttons.game .cursor-star .icon {
+  .game-container > .crossword > .navigation-panel .controls.game .buttons.game .cursor-star .icon {
     fill: #868686;
     stroke: #868686;
     transition-duration: 0.1s, 0.1s;
     transition-property: fill, stroke;
     transition-timing-function: ease-in-out, ease-in-out; }
-  .game-container.crossword > .navigation-panel .controls.game .buttons.game .cursor-star.allowed {
+  .game-container > .crossword > .navigation-panel .controls.game .buttons.game .cursor-star.allowed {
     height: 36px;
     width: 36px; }
-    .game-container.crossword > .navigation-panel .controls.game .buttons.game .cursor-star.allowed .icon {
+    .game-container > .crossword > .navigation-panel .controls.game .buttons.game .cursor-star.allowed .icon {
       fill: #01b9b9;
       stroke: #01b9b9; }
 
-.game-container.crossword > .navigation-panel .controls.game .buttons.info {
+.game-container > .crossword > .navigation-panel .controls.game .buttons.info {
   vertical-align: top; }
-  .game-container.crossword > .navigation-panel .controls.game .buttons.info li {
+  .game-container > .crossword > .navigation-panel .controls.game .buttons.info li {
     color: #01b9b9;
     cursor: default;
     font-size: 16px;
     vertical-align: middle;
     width: auto; }
 
-.game-container.crossword
+.game-container
+> .crossword
 > .navigation-panel
 .controls.game
 .buttons.info
@@ -1065,13 +1072,15 @@ h2 {
   font-size: 18px;
   text-align: left;
   width: 36px; }
-  .game-container.crossword
+  .game-container
+> .crossword
 > .navigation-panel
 .controls.game
 .buttons.info
 .output.score {
     text-align: right; }
-  .game-container.crossword
+  .game-container
+> .crossword
 > .navigation-panel
 .controls.game
 .buttons.info
@@ -1081,7 +1090,8 @@ h2 {
     animation-iteration-count: 6;
     animation-name: resolved;
     animation-timing-function: ease-in-out; }
-  .game-container.crossword
+  .game-container
+> .crossword
 > .navigation-panel
 .controls.game
 .buttons.info
@@ -1089,7 +1099,11 @@ h2 {
     animation-delay: 0.2s;
     animation-iteration-count: 10; }
 
-.game-container.crossword > .navigation-panel .controls.game .buttons.control .icon {
+.game-container
+> .crossword
+> .navigation-panel
+.controls.game
+.buttons.control .icon {
   animation-direction: alternate;
   animation-duration: 0.2s;
   animation-iteration-count: infinite;
@@ -1098,53 +1112,57 @@ h2 {
   animation-play-state: paused;
   animation-timing-function: ease-in-out; }
 
-.game-container.crossword > .navigation-panel .controls.game .buttons.control > li:hover .icon {
+.game-container
+> .crossword
+> .navigation-panel
+.controls.game
+.buttons.control > li:hover .icon {
   animation-play-state: running; }
 
-.game-container.crossword > .navigation-panel .controls.game {
+.game-container > .crossword > .navigation-panel .controls.game {
   padding: 0px 4px; }
-  .game-container.crossword > .navigation-panel .controls.game > .buttons > li {
+  .game-container > .crossword > .navigation-panel .controls.game > .buttons > li {
     width: 26px; }
-  .game-container.crossword > .navigation-panel .controls.game .buttons.pages,
-  .game-container.crossword > .navigation-panel .controls.game .buttons.game,
-  .game-container.crossword > .navigation-panel .controls.game .buttons.info,
-  .game-container.crossword > .navigation-panel .controls.game .buttons.control {
+  .game-container > .crossword > .navigation-panel .controls.game .buttons.pages,
+  .game-container > .crossword > .navigation-panel .controls.game .buttons.game,
+  .game-container > .crossword > .navigation-panel .controls.game .buttons.info,
+  .game-container > .crossword > .navigation-panel .controls.game .buttons.control {
     display: inline-block; }
-  .game-container.crossword > .navigation-panel .controls.game .buttons.game {
+  .game-container > .crossword > .navigation-panel .controls.game .buttons.game {
     margin-left: 12px; }
-  .game-container.crossword > .navigation-panel .controls.game .buttons.info {
+  .game-container > .crossword > .navigation-panel .controls.game .buttons.info {
     margin-left: 0px; }
-  .game-container.crossword > .navigation-panel .controls.game .buttons.info li {
+  .game-container > .crossword > .navigation-panel .controls.game .buttons.info li {
     line-height: 34px; }
-  .game-container.crossword > .navigation-panel .controls.game .buttons.control {
+  .game-container > .crossword > .navigation-panel .controls.game .buttons.control {
     margin-left: 0px; }
   @media (min-width: 480px) and (min-height: 480px) {
-    .game-container.crossword > .navigation-panel .controls.game {
+    .game-container > .crossword > .navigation-panel .controls.game {
       padding: 0px 8px; }
-      .game-container.crossword > .navigation-panel .controls.game .buttons.info li {
+      .game-container > .crossword > .navigation-panel .controls.game .buttons.info li {
         line-height: 42px; } }
   @media (min-width: 768px) and (min-height: 768px) {
-    .game-container.crossword > .navigation-panel .controls.game {
+    .game-container > .crossword > .navigation-panel .controls.game {
       padding: 0px 12px; }
-      .game-container.crossword > .navigation-panel .controls.game > .buttons > li {
+      .game-container > .crossword > .navigation-panel .controls.game > .buttons > li {
         width: 30px; }
-      .game-container.crossword > .navigation-panel .controls.game .buttons.game {
+      .game-container > .crossword > .navigation-panel .controls.game .buttons.game {
         margin-left: 44px; }
-      .game-container.crossword > .navigation-panel .controls.game .buttons.info {
+      .game-container > .crossword > .navigation-panel .controls.game .buttons.info {
         margin-left: 22px; }
-      .game-container.crossword > .navigation-panel .controls.game .buttons.info li {
+      .game-container > .crossword > .navigation-panel .controls.game .buttons.info li {
         line-height: 52px; }
-      .game-container.crossword > .navigation-panel .controls.game .buttons.control {
+      .game-container > .crossword > .navigation-panel .controls.game .buttons.control {
         margin-left: 42px; } }
 
-.game-container.crossword > .game-pages {
+.game-container > .crossword > .game-pages {
   height: 100%;
   position: relative;
   z-index: 0; }
-  .game-container.crossword > .game-pages > li {
+  .game-container > .crossword > .game-pages > li {
     display: block;
     height: 100%; }
-  .game-container.crossword > .game-pages > li.hidden {
+  .game-container > .crossword > .game-pages > li.hidden {
     display: none; }
 .subtitles-container {
   scrollbar-color: #39aac2 white;
@@ -1240,66 +1258,66 @@ h2 {
 @media screen and (min-width: 993px) {
   .text-content {
     width: 947px; } }
-.game-container.crossword .config-page section.warnings .warning > .prompt .icon {
+.game-container > .crossword .config-page section.warnings .warning > .prompt .icon {
   bottom: -0%;
   margin: auto;
   position: absolute;
   top: -0%; }
 
-.game-container.crossword .config-page {
+.game-container > .crossword .config-page {
   overflow: auto;
   padding: 12px; }
-  .game-container.crossword .config-page section {
+  .game-container > .crossword .config-page section {
     text-align: center;
     margin: 22px 0px; }
-    .game-container.crossword .config-page section > div {
+    .game-container > .crossword .config-page section > div {
       display: inline-block;
       text-align: center; }
 
-.game-container.crossword .config-page section.settings {
+.game-container > .crossword .config-page section.settings {
   font-family: "Open Sans", sans-serif;
   font-size: 16px; }
   @media (min-width: 480px) and (min-height: 480px) {
-    .game-container.crossword .config-page section.settings {
+    .game-container > .crossword .config-page section.settings {
       font-size: 17px; } }
   @media (min-width: 768px) and (min-height: 768px) {
-    .game-container.crossword .config-page section.settings {
+    .game-container > .crossword .config-page section.settings {
       font-size: 18px; } }
-  .game-container.crossword .config-page section.settings > div {
+  .game-container > .crossword .config-page section.settings > div {
     border-bottom: solid 1px #00abbe;
     padding-bottom: 22px;
     text-align: left; }
-  .game-container.crossword .config-page section.settings p {
+  .game-container > .crossword .config-page section.settings p {
     margin: 6px; }
-  .game-container.crossword .config-page section.settings .selection-list {
+  .game-container > .crossword .config-page section.settings .selection-list {
     padding-left: 16px; }
-    .game-container.crossword .config-page section.settings .selection-list > li {
+    .game-container > .crossword .config-page section.settings .selection-list > li {
       margin: 6px; }
-    .game-container.crossword .config-page section.settings .selection-list > li > span {
+    .game-container > .crossword .config-page section.settings .selection-list > li > span {
       vertical-align: top; }
-  .game-container.crossword .config-page section.settings .setting-buttons {
+  .game-container > .crossword .config-page section.settings .setting-buttons {
     display: inline-block;
     margin-bottom: 8px;
     vertical-align: top; }
-  .game-container.crossword .config-page section.settings button.setting-button {
+  .game-container > .crossword .config-page section.settings button.setting-button {
     font-size: 18px;
     min-width: 30px;
     vertical-align: top; }
-    .game-container.crossword .config-page section.settings button.setting-button span {
+    .game-container > .crossword .config-page section.settings button.setting-button span {
       padding: 2px 3px; }
-  .game-container.crossword .config-page section.settings .output {
+  .game-container > .crossword .config-page section.settings .output {
     display: inline-block;
     font-size: 24px;
     font-weight: bold;
     margin: 0px 8px;
     min-width: 35px; }
 
-.game-container.crossword .config-page section.warnings .warning {
+.game-container > .crossword .config-page section.warnings .warning {
   text-align: center;
   display: none; }
-  .game-container.crossword .config-page section.warnings .warning.visible {
+  .game-container > .crossword .config-page section.warnings .warning.visible {
     display: block; }
-  .game-container.crossword .config-page section.warnings .warning > .prompt {
+  .game-container > .crossword .config-page section.warnings .warning > .prompt {
     border: solid 1px #f1664d;
     display: inline-block;
     font-family: "PT Sans", sans-serif;
@@ -1308,19 +1326,19 @@ h2 {
     padding: 8px;
     padding-left: 30px;
     position: relative; }
-    .game-container.crossword .config-page section.warnings .warning > .prompt .icon {
+    .game-container > .crossword .config-page section.warnings .warning > .prompt .icon {
       left: 4px; }
-  .game-container.crossword .config-page section.warnings .warning > .controls {
+  .game-container > .crossword .config-page section.warnings .warning > .controls {
     margin: 8px 0px; }
 
-.game-container.crossword .config-page section.shortcuts {
+.game-container > .crossword .config-page section.shortcuts {
   text-align: center; }
-  .game-container.crossword .config-page section.shortcuts > ul {
+  .game-container > .crossword .config-page section.shortcuts > ul {
     display: inline-block;
     text-align: left; }
-  .game-container.crossword .config-page section.shortcuts > ul > li {
+  .game-container > .crossword .config-page section.shortcuts > ul > li {
     margin: 8px 0px; }
-  .game-container.crossword .config-page section.shortcuts .key {
+  .game-container > .crossword .config-page section.shortcuts .key {
     border: solid 1px grey;
     border-radius: 4px;
     color: #929292;
@@ -1331,7 +1349,7 @@ h2 {
     padding: 4px;
     min-width: 26px;
     text-align: center; }
-  .game-container.crossword .config-page section.shortcuts .action {
+  .game-container > .crossword .config-page section.shortcuts .action {
     color: #929292;
     font-family: "Roboto", sans-serif;
     font-size: 17px;
@@ -1545,48 +1563,6 @@ svg.spinner circle {
   stroke-linecap: round;
   stroke-width: 10px;
   transform-origin: 50% 50%; }
-.dialog-box[data-dialog="articles"] .content-container .article-scroll {
-  scrollbar-color: #39aac2 white;
-  scrollbar-width: thin; }
-  .dialog-box[data-dialog="articles"] .content-container .article-scroll::-webkit-scrollbar {
-    background: white;
-    height: 14px;
-    width: 14px; }
-
-@media screen and (max-width: 992px) {
-  .dialog-box[data-dialog="articles"] .content-container .article-scroll::-webkit-scrollbar {
-    height: 10px;
-    width: 10px; } }
-  .dialog-box[data-dialog="articles"] .content-container .article-scroll::-webkit-scrollbar-corner {
-    background-color: white; }
-  .dialog-box[data-dialog="articles"] .content-container .article-scroll::-webkit-scrollbar-thumb {
-    background: #39aac2;
-    border-radius: 6px;
-    box-shadow: 0px 0px 3px 0px rgba(255, 255, 255, 0.3) inset; }
-    .dialog-box[data-dialog="articles"] .content-container .article-scroll::-webkit-scrollbar-thumb:hover {
-      box-shadow: 0px 0px 4px 2px rgba(255, 255, 255, 0.3) inset; }
-
-.dialog-box[data-dialog="articles"] .content-container .article-scroll {
-  height: 100%;
-  overflow-y: auto;
-  overflow-x: auto;
-  position: relative;
-  width: 100%; }
-
-.dialog-box .content-container .article-content h1,
-.dialog-box .content-container .article-content h2,
-.dialog-box .content-container .article-content p {
-  text-align: justify; }
-
-.dialog-box .content-container .article-content h1 {
-  margin-bottom: 16px; }
-
-.dialog-box .content-container .article-content h2 {
-  margin-top: 12px;
-  margin-bottom: 6px; }
-
-.dialog-box .content-container .article-content p {
-  text-indent: 1em; }
 .hint-box .hint-button > div,
 .keyboard-box .keyboard-button > div, .hint-box .hint-dialog .find-occurrence > div {
   bottom: -0%;
@@ -1912,6 +1888,48 @@ svg.spinner circle {
         height: 28px;
         margin: 0px 2px;
         width: 28px; } }
+.dialog-box[data-dialog="articles"] .content-container .article-scroll {
+  scrollbar-color: #39aac2 white;
+  scrollbar-width: thin; }
+  .dialog-box[data-dialog="articles"] .content-container .article-scroll::-webkit-scrollbar {
+    background: white;
+    height: 14px;
+    width: 14px; }
+
+@media screen and (max-width: 992px) {
+  .dialog-box[data-dialog="articles"] .content-container .article-scroll::-webkit-scrollbar {
+    height: 10px;
+    width: 10px; } }
+  .dialog-box[data-dialog="articles"] .content-container .article-scroll::-webkit-scrollbar-corner {
+    background-color: white; }
+  .dialog-box[data-dialog="articles"] .content-container .article-scroll::-webkit-scrollbar-thumb {
+    background: #39aac2;
+    border-radius: 6px;
+    box-shadow: 0px 0px 3px 0px rgba(255, 255, 255, 0.3) inset; }
+    .dialog-box[data-dialog="articles"] .content-container .article-scroll::-webkit-scrollbar-thumb:hover {
+      box-shadow: 0px 0px 4px 2px rgba(255, 255, 255, 0.3) inset; }
+
+.dialog-box[data-dialog="articles"] .content-container .article-scroll {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: auto;
+  position: relative;
+  width: 100%; }
+
+.dialog-box .content-container .article-content h1,
+.dialog-box .content-container .article-content h2,
+.dialog-box .content-container .article-content p {
+  text-align: justify; }
+
+.dialog-box .content-container .article-content h1 {
+  margin-bottom: 16px; }
+
+.dialog-box .content-container .article-content h2 {
+  margin-top: 12px;
+  margin-bottom: 6px; }
+
+.dialog-box .content-container .article-content p {
+  text-indent: 1em; }
 .player-container {
   margin-bottom: 12px; }
 
