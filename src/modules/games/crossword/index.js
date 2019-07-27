@@ -617,7 +617,6 @@ class Grid {
     let row = this.crossword.ref.virtual.edges.top + y;
     let letter = this.crossword.ref.virtual.hasLetter(column, row);
     let keyword = this.crossword.ref.virtual.hasKeyword(column, row);
-
     const cell = $templater(({ ref, when, child, classes }) =>/*html*/`
       ${when(keyword, () =>/*html*/`
         <td class="clue-cell ${keyword.side}" ${ref(`clue.${column}.${row}`)} ${classes(`clue.${column}.${row}`)}>
@@ -1064,7 +1063,7 @@ class VirtualGrid {
       if (this.used.size === previous) {
         console.warn('COULD NOT CREATE A GRID');
         break;
-        //it should take another attempt;
+        //it should take another few attempts;
       } else {
         previous = this.used.size;
       }
@@ -1269,7 +1268,7 @@ class VirtualGrid {
       if (this.used.has(line.match.id)) this._seekMatches(line);
       if (line.match.id !== null && (bestLine === null || line.match.crosses > bestLine.match.crosses)) bestLine = line;
     });
-
+    if(bestLine === null) return;
     const x = bestLine.side === 'horizontal' ? bestLine.match.index : bestLine.index;
     const y = bestLine.side === 'vertical' ? bestLine.match.index : bestLine.index;
     const side = bestLine.side;
@@ -1293,7 +1292,7 @@ class VirtualGrid {
           let match = words.match({
             collection: this.data.words,
             excludes: this.used,
-            before: y === 0 ? before : characters[y - 1] - 1,
+            before: y === 0 ? before - 1 : characters[y - 1] - 1,
             after: y + x === characters.length ? after : characters[y + x] - 1,
             characters: characters.slice(y, y + x)
           });
@@ -1313,7 +1312,6 @@ class VirtualGrid {
         for (let i = 0; i < size; i++) line.busy.set(index + i, false);
       }
     }
-
     line.match = {
       id: _chosen ? _chosen.id : null,
       index: _index,
