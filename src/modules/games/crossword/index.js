@@ -13,7 +13,7 @@ const { $iconCheckIn, $iconCheckOut, $iconConfig, $iconGameCrossword, $iconPrevi
   $iconGameDefinition, $iconGamePronunciation, $iconGameImage, $iconClose, $iconVolume, $iconKeyboard } = $icons;
 
 class Game {
-  constructor(crossword) {
+  constructor(crossword, { totalNumber }) {
     this.crossword = crossword;
     this.scroller = new Scroller({
       container: this.crossword.ref.grid.dom.get('container'),
@@ -23,10 +23,10 @@ class Game {
       horizontally: true,
       vertically: true
     });
-    this.data = {};
+    this.data = { totalNumber };
     this.state = {
       currentIndex: null,
-      resolvedNumber: 0
+      resolvedNumber: 0,
     };
     this._addListeners();
     this.restart();
@@ -129,8 +129,7 @@ class Game {
     const total = this.crossword.dom.get('total');
     this.state.resolvedNumber = 0;
     score.innerHTML = this.state.resolvedNumber;
-    this.state.totalNumber = this.crossword.data.wordsNumber;
-    total.innerHTML = this.state.totalNumber;
+    total.innerHTML = this.data.totalNumber;
   }
 
   updateResolved() {
@@ -140,7 +139,7 @@ class Game {
     this.state.resolvedNumber++;
     scoreElement.innerHTML = this.state.resolvedNumber;
     scoreClasses.add('resolved').wait(1200).remove('resolved');
-    if (this.state.resolvedNumber === this.state.totalNumber) {
+    if (this.state.resolvedNumber === this.data.totalNumber) {
       totalClasses.add('resolved').wait(2200).remove('resolved');
       this.crossword.state.finished = true;
     }
@@ -1025,18 +1024,32 @@ class Word {
 }
 
 class VirtualGrid {
-  constructor(crossword, { number, clues, words }) {
+  constructor(crossword, { number, clues, words, min, totalAttempts }) {
     this.crossword = crossword;
-    this.data = { number, clues, words };
-    this.columns = new Map();
-    this.rows = new Map();
-    this.edges = this._edges;
-    this.word = new Map();
-    this.cell = new Map();
-    this.fixed = new Set();
-    this.used = new Set();
-    this._buildVirtualCrossword();
-    this._buildCluesMap();
+    this.data = { number, clues, words, attempt: 0, min, totalAttempts };
+    this.on = {
+      _warning: null,
+      _fail: null,
+      _success: null,
+      get warning() {
+        return this._warning;
+      },
+      set warning(fn) {
+        this._warning = fn;
+      },
+      get fail() {
+        return this._fail;
+      },
+      set fail(fn) {
+        this._fail = fn;
+      },
+      get success() {
+        return this._success;
+      },
+      set success(fn) {
+        this._success = fn;
+      }
+    };
   }
 
   get _edges() {
@@ -1048,26 +1061,52 @@ class VirtualGrid {
     };
   }
 
+  create() {
+    this._resetCrossword();
+    this._buildVirtualCrossword();
+  }
+
   addCell(cell, word) {
     if (!this.cell.has(cell)) this.cell.set(cell, []);
     this.cell.get(cell).push(word);
   }
 
+  _resetCrossword() {
+    this.columns = new Map();
+    this.rows = new Map();
+    this.edges = this._edges;
+    this.word = new Map();
+    this.cell = new Map();
+    this.fixed = new Set();
+    this.used = new Set();
+  }
+
   _buildVirtualCrossword() {
     const id = this.crossword.ref.words.random(this.data.words, 'crossword');
     const side = $randomItem(['vertical', 'horizontal']);
+    this.data.attempt++;
     this._addWord(0, 0, side, id);
     let previous = this.used.size;
     while (this.used.size < this.data.number) {
       this._nextWord();
       if (this.used.size === previous) {
-        console.warn('COULD NOT CREATE A GRID');
-        break;
-        //it should take another few attempts;
-      } else {
-        previous = this.used.size;
-      }
+        if (this.data.attempt === this.data.totalAttempts) {
+          if (this.used.size < this.data.min) {
+            if (this.on.fail) this.on.fail(this.used);
+          } else {
+            this._buildCluesMap();
+            if (this.on.warning) this.on.warning(this.used);
+          }
+          this.data.attempt = 0;
+          return;
+        } else {
+          this.create();
+          return;
+        }
+      } else previous = this.used.size;
     }
+    this._buildCluesMap();
+    if (this.on.success) this.on.success(this.used);
   }
 
   _buildCluesMap() {
@@ -1205,7 +1244,7 @@ class VirtualGrid {
     for (let coord = edges[0]; coord <= edges[1]; coord++) {
       if (line.busy.has(coord)) {
         if (line.busy.get(coord) && line.letters.has(coord)) addLetter(coord);
-        else if(!line.busy.get(coord) && line.letters.has(coord)) addBreak(true);
+        else if (!line.busy.get(coord) && line.letters.has(coord)) addBreak(true);
         else addBreak(false);
       }
       else if (line.letters.has(coord)) addLetter(coord);
@@ -1223,13 +1262,13 @@ class VirtualGrid {
 
     function addBreak(limitSpaces) {
       if (currentExpression) {
-        const spaces = limitSpaces ? spacesIterator - 1:spacesIterator;
+        const spaces = limitSpaces ? spacesIterator - 1 : spacesIterator;
         currentExpression.after = spaces;
         expressions.push(currentExpression);
         currentExpression = null;
       }
       limitedSpace = true;
-      spacesIterator = limitSpaces ? -1:0;
+      spacesIterator = limitSpaces ? -1 : 0;
     };
 
     function addLetter(coord) {
@@ -1270,7 +1309,7 @@ class VirtualGrid {
       if (this.used.has(line.match.id)) this._seekMatches(line);
       if (line.match.id !== null && (bestLine === null || line.match.crosses > bestLine.match.crosses)) bestLine = line;
     });
-    if(bestLine === null) return;
+    if (bestLine === null) return;
     const x = bestLine.side === 'horizontal' ? bestLine.match.index : bestLine.index;
     const y = bestLine.side === 'vertical' ? bestLine.match.index : bestLine.index;
     const side = bestLine.side;
@@ -1326,12 +1365,12 @@ class VirtualGrid {
 }
 
 class StarHint {
-  constructor(crossword, { dom, classes, number }) {
+  constructor(crossword, { dom, classes, totalNumber }) {
     this.crossword = crossword;
     this.dom = dom;
     this.classes = classes;
     this.data = {
-      wordsNumber: number,
+      wordsNumber: totalNumber,
       allowedNumber: { number: 1, per: 5 },
       total: null,
       left: null
@@ -1426,6 +1465,7 @@ class Crossword {
     this.ref = { dialog, words };
     this.data = {
       permitedClueTypes: new Set(),
+      attempts: 10,
       wordsMinNumber: 5,
       wordsMaxNumber: 50,
       wordsNumber: 10
@@ -1573,8 +1613,8 @@ class Crossword {
                     The already generated crossword will be deleted, are you sure?
                   </p>
                   <div class="controls">
-                    <button ${ref('button.confirm')} class="setting-button"><span>Yes, give me new crossword!</span></button>
-                    <button ${ref('button.reject')} class="setting-button"><span>No, let me finish it up!</span></button>
+                    <button ${ref('button.confirm.remove-crossword')} class="setting-button"><span>Yes, give me new crossword!</span></button>
+                    <button ${ref('button.reject.remove-crossword')} class="setting-button"><span>No, let me finish it up!</span></button>
                   </div>
                 </li>
                 <li ${ref('warning.insufficient-words')} ${classes('warning.insufficient-words')} class="warning">
@@ -1582,6 +1622,29 @@ class Crossword {
                     ${child($iconWarning())}
                     At least ${this.data.wordsMinNumber} words are needed to build the crossword.
                   </p>
+                </li>
+                <li ${ref('warning.generate-fail')} ${classes('warning.generate-fail')} class="warning">
+                  <p class="prompt">
+                    ${child($iconWarning())}
+                    After ${this.data.attempts} attemps, the crossword could not be generated.
+                    Too many words do not match and could not be crossed in any way.
+                  </p>
+                  <div class="controls">
+                    <button ${ref('button.confirm.generate-fail')} class="setting-button"><span>Ok!</span></button>
+                    <button ${ref('button.reject.generate-fail')} class="setting-button"><span>Try again!</span></button>
+                  </div>
+                </li>
+                <li ${ref('warning.less-words')} ${classes('warning.less-words')} class="warning">
+                  <p class="prompt">
+                    ${child($iconWarning())}
+                    After ${this.data.attempts} attemps, the crossword could not be generated 
+                    with the chosen number of words. Some of the words do not match and could not be crossed in any way. 
+                    In the end the crossword has been generated with <span ${ref('crossing-words-output')}></span> words.
+                  </p>
+                  <div class="controls">
+                    <button ${ref('button.confirm.less-words')} class="setting-button"><span>Ok!</span></button>
+                    <button ${ref('button.reject.less-words')} class="setting-button"><span>Try again!</span></button>
+                  </div>
                 </li>
               </ul>
             </section>
@@ -1628,28 +1691,68 @@ class Crossword {
   }
 
   generateCrossword() {
+    if (this.state.disabled) return;
     const warning = this.classes.get('warning').get('remove-crossword');
     const alreadyExisting = this.state.generated && !this.state.finished;
     warning[alreadyExisting ? 'add' : 'remove']('visible');
 
-    if (this.state.disabled) return;
-    if (alreadyExisting) return this._disableButtons('generate');
+    if (alreadyExisting) {
+      this._disableButtons('generate');
+      this.state.disabled = true;
+      return;
+    }
 
-    this.classes.get('button').get('crossword').remove('disabled');
-    this._createNewInstances();
-    this._appendCrossword();
-    this._switchCrosswordPage('crossword');
-    this.state.generated = true;
-    this.state.finished = false;
+    this._createVirtualGrid();
   }
 
-  _createNewInstances() {
-    this.ref.virtual = new VirtualGrid(this, { number: this.data.wordsNumber, clues: this.data.permitedClueTypes, words: this.data.filtered });
+  _createVirtualGrid() {
+    this.ref.virtual = new VirtualGrid(this, {
+      number: this.data.wordsNumber,
+      min: this.data.wordsMinNumber,
+      clues: this.data.permitedClueTypes,
+      words: this.data.filtered,
+      totalAttempts: this.data.attempts,
+    });
+
+    this.ref.virtual.on.warning = (used) => {
+      this.dom.get('crossing-words-output').innerHTML = used.size;
+      this.classes.get('warning').get('less-words').add('visible');
+      this.classes.get('button').get('crossword').remove('disabled');
+      this._disableButtons('generate');
+      this._createNewInstances(used.size);
+      this._appendCrossword();
+      this.state.disabled = true;
+      this.state.generated = true;
+      this.state.finished = false;
+    };
+
+    this.ref.virtual.on.fail = () => {
+      this.classes.get('warning').get('generate-fail').add('visible');
+      this.classes.get('button').get('crossword').add('disabled');
+      this._disableButtons('generate');
+      this.state.disabled = true;
+      this.state.generated = false;
+      this.state.finished = true;
+    };
+
+    this.ref.virtual.on.success = (used) => {
+      this.classes.get('button').get('crossword').remove('disabled');
+      this._createNewInstances(used.size);
+      this._appendCrossword();
+      this._switchCrosswordPage('crossword');
+      this.state.generated = true;
+      this.state.finished = false;
+    };
+
+    this.ref.virtual.create();
+  }
+
+  _createNewInstances(totalNumber) {
     this.ref.hint = new Hint(this);
     this.ref.keyboard = new VirtualKeyboard();
     this.ref.grid = new Grid(this);
-    this.ref.game = new Game(this);
-    this.ref.star = new StarHint(this, { dom: this.dom, classes: this.classes, number: this.data.wordsNumber });
+    this.ref.game = new Game(this, { totalNumber });
+    this.ref.star = new StarHint(this, { dom: this.dom, classes: this.classes, totalNumber });
   }
 
   _appendCrossword() {
@@ -1669,24 +1772,50 @@ class Crossword {
     button.get('max').addEventListener('click', () => this._updateCrosswordWordsNumber(Infinity));
     button.get('increase').addEventListener('click', () => this._updateCrosswordWordsNumber(1));
     button.get('decrease').addEventListener('click', () => this._updateCrosswordWordsNumber(-1));
+    button.get('toggle').addEventListener('click', () => this._toggleNavigation('toggle'));
+    window.addEventListener('resize', () => this._toggleNavigation('close'));
+
     button.get('switch').forEach((elem, name) => {
       elem.addEventListener('click', () => {
         this._permitClue(this.classes.get('button').get('switch').get(name), name);
       })
     });
-    button.get('confirm').addEventListener('click', () => {
+
+    button.get('confirm').get('remove-crossword').addEventListener('click', () => {
       this.state.finished = true;
-      this._enableButtons('generate');
+      warningAction.call(this, 'remove-crossword');
       this.generateCrossword();
     });
-    button.get('reject').addEventListener('click', () => {
-      this.classes.get('warning').get('remove-crossword').remove('visible');
-      this._enableButtons('generate');
+
+    button.get('reject').get('remove-crossword').addEventListener('click', () => {
+      warningAction.call(this, 'remove-crossword');
       this._switchCrosswordPage('crossword');
     });
 
-    button.get('toggle').addEventListener('click', () => this._toggleNavigation('toggle'));
-    window.addEventListener('resize', () => this._toggleNavigation('close'));
+    button.get('confirm').get('generate-fail').addEventListener('click', () => {
+      warningAction.call(this, 'generate-fail');
+    });
+
+    button.get('reject').get('generate-fail').addEventListener('click', () => {
+      warningAction.call(this, 'generate-fail');
+      this.generateCrossword();
+    });
+
+    button.get('confirm').get('less-words').addEventListener('click', () => {
+      warningAction.call(this, 'less-words');
+      this._switchCrosswordPage('crossword');
+    });
+
+    button.get('reject').get('less-words').addEventListener('click', () => {
+      warningAction.call(this, 'less-words');
+      this.generateCrossword();
+    });
+
+    function warningAction(name) {
+      this.classes.get('warning').get(name).remove('visible');
+      this._enableButtons('generate');
+      this.state.disabled = false;
+    }
   }
 
   _toggleNavigation(action) {
