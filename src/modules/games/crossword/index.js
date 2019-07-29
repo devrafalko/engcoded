@@ -1205,7 +1205,8 @@ class VirtualGrid {
     for (let coord = edges[0]; coord <= edges[1]; coord++) {
       if (line.busy.has(coord)) {
         if (line.busy.get(coord) && line.letters.has(coord)) addLetter(coord);
-        else addBreak();
+        else if(!line.busy.get(coord) && line.letters.has(coord)) addBreak(true);
+        else addBreak(false);
       }
       else if (line.letters.has(coord)) addLetter(coord);
       else addSpace();
@@ -1220,14 +1221,15 @@ class VirtualGrid {
     line.expressions = expressions;
     this._seekMatches(line);
 
-    function addBreak() {
+    function addBreak(limitSpaces) {
       if (currentExpression) {
-        currentExpression.after = spacesIterator;
+        const spaces = limitSpaces ? spacesIterator - 1:spacesIterator;
+        currentExpression.after = spaces;
         expressions.push(currentExpression);
         currentExpression = null;
       }
       limitedSpace = true;
-      spacesIterator = 0;
+      spacesIterator = limitSpaces ? -1:0;
     };
 
     function addLetter(coord) {
@@ -1281,22 +1283,19 @@ class VirtualGrid {
     let _chosen = null;
     let _index = null;
     let _crosses = 0;
-
     for (let { before, after, index, characters } of line.expressions) {
       let foundMatch = false;
       for (let x = characters.length; x >= 1; x -= 2) {
         let shift = 0;
         for (let y = 0; y + x <= characters.length; y += 2) {
           shift += y === 0 ? 0 : characters[y - 1] + 1;
-
           let match = words.match({
             collection: this.data.words,
             excludes: this.used,
-            before: y === 0 ? before - 1 : characters[y - 1] - 1,
+            before: y === 0 ? before : characters[y - 1] - 1,
             after: y + x === characters.length ? after : characters[y + x] - 1,
             characters: characters.slice(y, y + x)
           });
-
           if (match && (_chosen === null || match.size > _chosen.size)) {
             _index = index + shift - match.before;
             _chosen = match;
