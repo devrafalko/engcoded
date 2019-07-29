@@ -225,6 +225,21 @@ $hint-margin: 14px;
     margin: 4px 2px;
     padding: 2px 8px;
   }
+
+  [data-pronoun] {
+    color: #748682;
+    font-size: 15px;
+    font-style: italic;
+  }
+
+  [data-explanation] {
+    color: #039089;
+    display: inline-block;
+    font-size: 14px;
+    font-style: italic;
+    margin: 0px 4px;
+  }
+
 }
 
 .hint-box .hint-dialog .definition-list {
