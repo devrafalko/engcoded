@@ -52,6 +52,36 @@
   }
 }
 
+%hint-button {
+  @extend %vertical-center;
+  background-color: #00c3cc;
+  border-radius: 50%;
+  box-shadow: 2px 2px 4px rgba(122, 122, 122, 0.3);
+  cursor: pointer;
+  height: 100%;
+  left: -100%;
+  overflow: hidden;
+  right: -100%;
+  transition-duration: 0.25s;
+  transition-property: width, height, background-color, padding;
+  transition-timing-function: cubic-bezier(0.75, -0.15, 0, 2);
+  width: 100%;
+}
+
+@mixin placeholder($color: #cecece) {
+  &::-webkit-input-placeholder {
+    color: $color;
+  }
+
+  &:-ms-input-placeholder {
+    color: $color;
+  }
+
+  &::placeholder {
+    color: $color;
+  }
+}
+
 @mixin menu-button(
   $dots: 3,
   $time: 0.15s,

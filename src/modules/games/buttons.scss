@@ -16,6 +16,7 @@ button.setting-button {
   transition-duration: 0.1s;
   transition-timing-function: ease-in-out;
 
+  ul,
   span {
     border-bottom: solid 4px #00abbe;
     bottom: -4px;
@@ -29,18 +30,30 @@ button.setting-button {
     transition-timing-function: ease-in-out;
   }
 
+  span .icon,
+  ul .icon {
+    fill: #00abbe;
+    stroke: #00abbe;
+  }
+
   &.disabled {
     border: solid 1px #c9caca;
     cursor: not-allowed;
-    span {
+    span,
+    ul {
       color: #c9caca;
     }
   }
 
   &:not(.disabled):hover {
-    border: solid 1px #00b8b8;
     box-shadow: 0px 0px 3px #00abbe;
-    span {
+  }
+
+  &:not(.disabled):hover,
+  &:not(.disabled).on {
+    border: solid 1px #00b8b8;
+    span,
+    ul {
       bottom: 0px;
       color: #00b8b8;
     }

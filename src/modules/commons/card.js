@@ -306,7 +306,7 @@ class Card {
         </ul>
         <ul class="section translation">
           ${list(definitions, (key, word) =>/*html*/`
-            <span ${when(key, () => `data-keyword="true"`)} class="translation-tab">${word}</span>
+            <li ${when(key, () => `data-keyword="true"`)} class="translation-tab">${word}</li>
           `)}
         </ul>
       </div>`
