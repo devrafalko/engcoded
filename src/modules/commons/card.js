@@ -2,7 +2,7 @@ import type from 'of-type';
 import './card.scss';
 
 const { Slider, Scroller } = $commons;
-const { $templater, $loopParents } = $utils;
+const { $loopParents, $templater } = $utils;
 const { $images, $words } = $data;
 const { $iconCardDefinition, $iconCardImage, $iconCardWord, $iconClose, $iconVolume, $iconNextWord, $iconPreviousWord } = $icons;
 
@@ -152,60 +152,13 @@ class Card {
 
   show(index, container) {
     const elements = this.state.currentContentData.occurrenceMap.get(index);
-    const element = elements[0];
-    const view = this.dom.get('view');
+    const relative = elements[0];
+    const parent = relative.offsetParent;
+    const card = this.dom.get('view');
     const classes = this.classes.get('view');
-    if (!container.contains(view)) container.appendChild(view);
+    if (!container.contains(card)) container.appendChild(card);
     this._resetCardPosition();
-    const style = view.style;
-    const parent = element.offsetParent;
-    const wordTop = element.offsetTop;
-    const wordLeft = element.getBoundingClientRect().left - parent.getBoundingClientRect().left;
-    const wordWidth = element.offsetWidth;
-    const wordHeight = element.offsetHeight;
-    const containerWidth = parent.clientWidth;
-    const containerHeight = parent.clientHeight;
-    const containerScrollY = parent.scrollTop;
-    const containerScrollHeight = parent.scrollHeight;
-    const containerScrollX = parent.scrollLeft;
-    const cardWidth = view.offsetWidth;
-    const cardHeight = view.offsetHeight;
-
-    switch (true) {
-      case containerWidth - (wordLeft) >= cardWidth: /* fitRight */
-        style.left = (wordLeft + containerScrollX) + 'px';
-        style.right = null;
-        break;
-      case (wordLeft) + wordWidth >= cardWidth: /* fitLeft */
-        style.right = (containerWidth - wordLeft - wordWidth - containerScrollX) + 'px';
-        style.left = null;
-        break;
-      case containerWidth > cardWidth: /* fitCenterX */
-        style.margin = 'auto';
-        style.left = `calc(-100% + ${containerScrollX}px)`;
-        style.right = `calc(-100% - ${containerScrollX}px)`;
-        break;
-      default:
-        style.margin = 'auto';
-        style.left = `calc(0% + ${containerScrollX}px)`;
-        style.right = `calc(0% - ${containerScrollX}px)`;
-    }
-    switch (true) {
-      case containerHeight - wordTop - wordHeight + containerScrollY >= cardHeight: /* fitBottom */
-        style.top = (wordTop + wordHeight) + 'px';
-        break;
-      case wordTop - containerScrollY >= cardHeight: /* fitTop */
-        style.top = (wordTop - cardHeight) + 'px';
-        break;
-      case containerScrollHeight - wordTop - wordHeight >= cardHeight: /* fitBottomOutline */
-        style.top = (wordTop + wordHeight) + 'px';
-        break;
-      case wordTop >= cardHeight: /* fitTopOutline */
-        style.top = (wordTop - cardHeight) + 'px';
-        break;
-      default:
-        style.top = containerScrollY + 'px';
-    }
+    this._adjuster(parent, relative, card);
     classes.add('visible');
     elements.forEach(element => element.classList.add('active'));
     this.state.opened = true;
@@ -240,6 +193,57 @@ class Card {
       if (event.keyCode === 37) this._switchOccurrence('previous');
       if (event.keyCode === 27) this.hide(false);
     });
+  }
+
+  _adjuster(container, word, card) {
+    const style = card.style;
+    const wordTop = word.offsetTop;
+    const wordLeft = word.getBoundingClientRect().left - container.getBoundingClientRect().left;
+    const wordWidth = word.offsetWidth;
+    const wordHeight = word.offsetHeight;
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+    const containerScrollY = container.scrollTop;
+    const containerScrollHeight = container.scrollHeight;
+    const containerScrollX = container.scrollLeft;
+    const cardWidth = card.offsetWidth;
+    const cardHeight = card.offsetHeight;
+    switch (true) {
+      case containerWidth - (wordLeft) >= cardWidth: /* fitRight */
+        style.left = (wordLeft + containerScrollX) + 'px';
+        style.right = null;
+        break;
+      case (wordLeft) + wordWidth >= cardWidth: /* fitLeft */
+        style.right = (containerWidth - wordLeft - wordWidth - containerScrollX) + 'px';
+        style.left = null;
+        break;
+      case containerWidth > cardWidth: /* fitCenterX */
+        style.margin = 'auto';
+        style.left = `calc(-100% + ${containerScrollX}px)`;
+        style.right = `calc(-100% - ${containerScrollX}px)`;
+        break;
+      default:
+        style.margin = 'auto';
+        style.left = `calc(0% + ${containerScrollX}px)`;
+        style.right = `calc(0% - ${containerScrollX}px)`;
+    }
+
+    switch (true) {
+      case containerHeight - wordTop - wordHeight + containerScrollY >= cardHeight: // fitBottom
+        style.top = (wordTop + wordHeight) + 'px';
+        break;
+      case wordTop - containerScrollY >= cardHeight: // fitTop
+        style.top = (wordTop - cardHeight) + 'px';
+        break;
+      case containerScrollHeight - wordTop - wordHeight >= cardHeight: // fitBottomOutline
+        style.top = (wordTop + wordHeight) + 'px';
+        break;
+      case wordTop >= cardHeight: // fitTopOutline
+        style.top = (wordTop - cardHeight) + 'px';
+        break;
+      default:
+        style.top = containerScrollY + 'px';
+    }
   }
 
   _switchOccurrence(side) {

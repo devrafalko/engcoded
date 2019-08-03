@@ -113,11 +113,11 @@ class Dialog {
           containerClasses.add('hidden');
         };
       }
-      data.games.presentation.open();
       this.state.gameActive = data.games.presentation;
       container.innerHTML = '';
       container.appendChild(data.games.presentation.view);
       containerClasses.remove('hidden');
+      data.games.presentation.open();
     });
 
     game.get('word-test').addEventListener('click', () => {

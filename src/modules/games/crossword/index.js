@@ -1470,7 +1470,6 @@ class Crossword {
       wordsMaxNumber: 50,
       wordsNumber: 10
     };
-    this.dom = {};
     this.state = {
       generated: false,
       finished: false,

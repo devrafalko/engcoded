@@ -1,13 +1,45 @@
 import './navigation.scss';
 
-const { $templater } = $utils;
-const { $iconMinimize, $iconOccurrence, $iconShuffle, $iconSelect, $iconChevronRight, 
-  $iconChevronDoubleRight, $iconChevronLeft, $iconChevronDoubleLeft, $iconSpy, $iconSortAZ, 
-  $iconSortZA, $iconSort19, $iconSort91, $iconSortRandom, $iconChevronUp, $iconAlignLeft, 
+const { Scroller } = $commons;
+const { $loopParents, $templater } = $utils;
+const { $iconMinimize, $iconOccurrence, $iconShuffle, $iconSelect, $iconChevronRight,
+  $iconChevronDoubleRight, $iconChevronLeft, $iconChevronDoubleLeft, $iconSpy, $iconSortAZ,
+  $iconSortZA, $iconSort19, $iconSort91, $iconSortRandom, $iconChevronUp, $iconAlignLeft,
   $iconAlignRight, $iconAlignCenter } = $icons;
 
 class Presentation {
-  constructor() {
+  constructor(dialog, words) {
+    this.ref = { dialog, words };
+    this.data = {};
+    this.state = {
+      selectOpened: false,
+      pageTopButtonVisible: false,
+      currentScroll: { x: 0, y: 0 },
+      switches: {
+        align: {
+          options: ['right', 'left', 'center'],
+          current: 0,
+        },
+        sort: {
+          random: {
+            options: ['random', 'random'],
+            current: 0
+          },
+          word: {
+            options: ['random', 'asc', 'desc', 'az', 'za'],
+            current: 1,
+          },
+          type: {
+            options: ['random', 'az', 'za'],
+            current: 0,
+          },
+          repetition: {
+            options: ['random', 'asc', 'desc'],
+            current: 0,
+          },
+        }
+      }
+    };
     this._on = {
       _open: null,
       _close: null,
@@ -24,9 +56,11 @@ class Presentation {
         this._close = fn;
       },
     };
-
-    this.buildView();
-    this.addListeners();
+    this._setSelectedTypes();
+    this._buildView();
+    this._buildRowReferences();
+    this._addListeners();
+    this._addScroller();
   }
 
   get view() {
@@ -37,8 +71,45 @@ class Presentation {
     return this._on;
   }
 
-  buildView() {
-    const { references, classes } = $templater(({ ref, child, classes }) =>/*html*/`
+  get rows() {
+    return $templater(({ ref, child, list }) =>/*html*/`
+      ${list(this.ref.words.records, ({ word, type, meaning }, id) =>/*html*/`
+        <tr ${ref(`row.${id}`)}>
+          <td class="word">
+            <p>${word}</p>
+          </td>
+          <td class="translation">
+            <ul class="meaning-list">
+              ${list(meaning, (item) =>/*html*/`
+                <li>${item}</li>
+              `)}
+            </ul>
+          </td>
+          <td class="type">
+            <p>${type}</p>
+          </td>
+          <td class="repetition">
+            <p ${ref(`repetition.${id}`)}>0</p>
+          </td>
+          <td data-find class="find">
+            <span ${ref(`find.${id}`)}>${child($iconOccurrence())}</span>
+          </td>
+        </tr>
+      `)}
+    `);
+  }
+
+  open() {
+    if (this.on.open) this.on.open();
+    this._updateTableScroll();
+  }
+
+  close() {
+    if (this.on.close) this.on.close();
+  }
+
+  _buildView() {
+    const { references, classes } = $templater(({ ref, child, classes, list }) =>/*html*/`
       <div ${ref('container')} ${classes('container')} class="presentation">
         <nav ${ref('panel')} class="navigation-panel">
           <div class="controls game">
@@ -49,37 +120,23 @@ class Presentation {
                   <span class="icon-box">${child($iconOccurrence())}</span>
                 </div>
               </li>
-              <li class="select">
+              <li ${ref('button.select')} class="select">
                 <div>
-                  <div class="select-box">
+                  <div ${ref('select.header')} class="select-box">
                     <div class="header">
                       <span class="text-box">Word type</span>
                       <span class="icon-box">${child($iconSelect())}</span>
                     </div>
-                    <div class="list-box">
-                      <ul class="list">
-                        <li>
-                          <span class="text-box">Noun</span>
-                          <button class="switch-button on"><span></span></button>
+                  </div>
+                  <div ${ref('select.list')} ${classes('select.list')} class="list-box">
+                    <ul class="list">
+                      ${list(this.state.selectedTypes, (selected, name) =>/*html*/`
+                        <li data-type="${name}" ${ref(`select.item.${name}`)}>
+                          <span class="text-box">${name}</span>
+                          <button class="switch-button" ${classes(`button.word-type.${name}`, selected ? ['on'] : [])}><span></span></button>
                         </li>
-                        <li>
-                          <span class="text-box">Verb</span>
-                          <button class="switch-button on"><span></span></button>
-                        </li>
-                        <li>
-                          <span class="text-box">Phrasal Verb</span>
-                          <button class="switch-button on"><span></span></button>
-                        </li>
-                        <li>
-                          <span class="text-box">Adjective</span>
-                          <button class="switch-button on"><span></span></button>
-                        </li>
-                        <li>
-                          <span class="text-box">Conjunction</span>
-                          <button class="switch-button on"><span></span></button>
-                        </li>
-                      </ul>
-                    </div>
+                      `)}
+                    </ul>
                   </div>
                 </div>
               </li>
@@ -91,8 +148,8 @@ class Presentation {
             </ul>
           </div>
         </nav>
-        <div class="scrollable">
-          <nav class="navigation-table">
+        <div ${ref('scroll-box')} class="scrollable">
+          <nav ${ref('table-navigation')} class="navigation-table">
             <ul class="controls pages">
               <li>
                 <ul class="page-buttons">
@@ -123,22 +180,22 @@ class Presentation {
             </ul>
           </nav>
           <div class="table-box">
-            <table>
+            <table ${ref('table')} ${classes('table')}>
               <thead>
                 <tr>
                   <th class="head word">
                     <h1 class="header">Word</h1>
                     <div class="button-set">
-                      <button class="setting-button navig right">
+                      <button ${ref('button.word-align')} ${classes('button.word-align', [this.state.switches.align.options[this.state.switches.align.current]])} class="setting-button navig">
                         <ul>
                           <li data-side="left">${child($iconAlignLeft())}</li>
                           <li data-side="center">${child($iconAlignCenter())}</li>
                           <li data-side="right">${child($iconAlignRight())}</li>
                         </ul>
                       </button>
-                      <button class="setting-button navig"><span>${child($iconSpy())}</span></button>
-                      <button class="setting-button navig"><span>${child($iconShuffle())}</span></button>
-                      <button class="setting-button navig az">
+                      <button ${ref('button.hide-word')} class="setting-button navig"><span>${child($iconSpy())}</span></button>
+                      <button ${ref('button.sort.random')} ${classes('button.sort.random')} class="setting-button navig"><span>${child($iconShuffle())}</span></button>
+                      <button ${ref('button.sort.word')} ${classes('button.sort.word', [this.state.switches.sort.word.options[this.state.switches.sort.word.current]])} class="setting-button navig">
                         <ul>
                           <li data-sort="az">${child($iconSortAZ())}</li>
                           <li data-sort="za">${child($iconSortZA())}</li>
@@ -152,13 +209,13 @@ class Presentation {
                   <th class="head translation">
                     <h1 class="header">Translation</h1>
                     <div class="button-set">
-                      <button class="setting-button navig"><span>${child($iconSpy())}</span></button>
+                      <button ${ref('button.hide-translation')} class="setting-button navig"><span>${child($iconSpy())}</span></button>
                     </div>
                   </th>
                   <th class="head word-type">
                     <h1 class="header">Type</h1>
                     <div class="button-set">
-                      <button class="setting-button navig random">
+                      <button ${ref('button.sort.type')} ${classes('button.sort.type', [this.state.switches.sort.type.options[this.state.switches.sort.type.current]])} class="setting-button navig random">
                         <ul>
                           <li data-sort="az">${child($iconSortAZ())}</li>
                           <li data-sort="za">${child($iconSortZA())}</li>
@@ -170,7 +227,7 @@ class Presentation {
                   <th class="head repetitions">
                     <h1 class="header">Rep.</h1>
                     <div class="button-set">
-                      <button class="setting-button navig random">
+                      <button ${ref('button.sort.repetition')} ${classes('button.sort.repetition', [this.state.switches.sort.repetition.options[this.state.switches.sort.repetition.current]])} class="setting-button navig random">
                         <ul>
                           <li data-sort="asc">${child($iconSort19())}</li>
                           <li data-sort="desc">${child($iconSort91())}</li>
@@ -185,197 +242,244 @@ class Presentation {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td class="word">
-                    <p>have <span data-pronoun>sb</span> to thank <span data-pronoun>for sth</span> <span data-explanation>(ironic)</span></p>
-                  </td>
-                  <td class="translation">
-                    <ul class="meaning-list">
-                      <li>być <span data-pronoun>komuś</span> wdzięcznym <span data-pronoun>za coś</span></li>
-                      <li>podziękowania należą się <span data-pronoun>dla kogoś</span> <span data-pronoun>za coś</span></li>
-                      <li>dziękować <span data-pronoun>komuś</span> <span data-pronoun>za coś</span> <span data-explanation>(ironicznie)</span></li>
-                    </ul>
-                  </td>
-                  <td class="type">
-                    <p>phrase</p>
-                  </td>
-                  <td class="repetition">
-                    <p>3</p>
-                  </td>
-                  <td class="find">
-                    <span>${child($iconOccurrence())}</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="word">
-                    <p>click <span data-explanation>(onomatopoeic)</span></p>
-                  </td>
-                  <td class="translation">
-                    <ul class="meaning-list">
-                      <li>stuk</li>
-                      <li>trzask</li>
-                      <li>pstryknięcie</li>
-                      <li>mlaśnięcie</li>
-                    </ul>
-                  </td>
-                  <td class="type">
-                    <p>noun</p>
-                  </td>
-                  <td class="repetition">
-                    <p>12</p>
-                  </td>
-                  <td class="find">
-                    <span>${child($iconOccurrence())}</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="word">
-                    <p>learn</p>
-                  </td>
-                  <td class="translation">
-                    <ul class="meaning-list">
-                      <li>poznać</li>
-                      <li>odkryć</li>
-                      <li>dowiedzieć się</li>
-                    </ul>
-                  </td>
-                  <td class="type">
-                    <p>verb</p>
-                  </td>
-                  <td class="repetition">
-                    <p>5</p>
-                  </td>
-                  <td class="find">
-                    <span>${child($iconOccurrence())}</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="word">
-                    <p>experience</p>
-                  </td>
-                  <td class="translation">
-                    <ul class="meaning-list">
-                      <li>doświadczyć</li>
-                      <li>doznać</li>
-                      <li>poczuć</li>
-                      <li>przeżyć</li>
-                    </ul>
-                  </td>
-                  <td class="type">
-                    <p>verb</p>
-                  </td>
-                  <td class="repetition">
-                    <p>0</p>
-                  </td>
-                  <td class="find">
-                    <span>${child($iconOccurrence())}</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="word">
-                    <p>story</p>
-                  </td>
-                  <td class="translation">
-                    <ul class="meaning-list">
-                      <li>opowieść</li>
-                      <li>historia</li>
-                    </ul>
-                  </td>
-                  <td class="type">
-                    <p>noun</p>
-                  </td>
-                  <td class="repetition">
-                    <p>0</p>
-                  </td>
-                  <td class="find">
-                    <span>${child($iconOccurrence())}</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="word">
-                    <p>not only <span data-pronoun>[...]</span> but also <span data-pronoun>[...]</span></p>
-                  </td>
-                  <td class="translation">
-                    <ul class="meaning-list">
-                      <li>nie tylko... ale też...</li>
-                      <li>nie tylko... lecz także...</li>
-                      <li>nie dość... to jeszcze</li>
-                      <li>mało tego, że... to jeszcze...</li>
-                    </ul>
-                  </td>
-                  <td class="type">
-                    <p>phrase</p>
-                  </td>
-                  <td class="repetition">
-                    <p>0</p>
-                  </td>
-                  <td class="find">
-                    <span>${child($iconOccurrence())}</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="word">
-                    <p>brain</p>
-                  </td>
-                  <td class="translation">
-                    <ul class="meaning-list">
-                      <li>mózg</li>
-                    </ul>
-                  </td>
-                  <td class="type">
-                    <p>noun</p>
-                  </td>
-                  <td class="repetition">
-                    <p>13</p>
-                  </td>
-                  <td class="find">
-                    <span>${child($iconOccurrence())}</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="word">
-                    <p>expand</p>
-                  </td>
-                  <td class="translation">
-                    <ul class="meaning-list">
-                      <li>powiększać się</li>
-                      <li>zwiększać się</li>
-                      <li>rozrastać się</li>
-                    </ul>
-                  </td>
-                  <td class="type">
-                    <p>verb</p>
-                  </td>
-                  <td class="repetition">
-                    <p>11</p>
-                  </td>
-                  <td class="find">
-                    <span>${child($iconOccurrence())}</span>
-                  </td>
-                </tr>
+                ${child(this.rows)}
               </tbody>
             </table>
           </div>
         </div>
-        <div class="page-top">
+        <div ${ref('button.page-top')} ${classes('button.page-top')} class="page-top">
           <div>${child($iconChevronUp())}</div>
-        </div>        
+        </div>
       </div>
     `);
     this.dom = references;
     this.classes = classes;
   }
 
-  addListeners() {
-    this.dom.get('button').get('close').addEventListener('click', () => this.close());
+  _setSelectedTypes() {
+    this.state.selectedTypes = new Map();
+    this.state.selectedTypesNumber = 0;
+    this.ref.words.typeNames.forEach((name) => {
+      this.state.selectedTypes.set(name, true);
+      this.state.selectedTypesNumber++;
+    });
   }
 
-  open() {
-    if (this.on.open) this.on.open();
+  _switchWordAlign() {
+    const options = this.state.switches.align.options;
+    const current = this.state.switches.align.current;
+    const table = this.classes.get('table');
+    const classes = this.classes.get('button').get('word-align');
+    const next = current + 1 === options.length ? 0 : current + 1;
+
+    classes.remove(options[current]);
+    table.remove(options[current]);
+    this.state.switches.align.current = next;
+    classes.add(options[next]);
+    table.add(options[next]);
   }
 
-  close() {
-    if (this.on.close) this.on.close();
+  _switchSort(current) {
+    const classes = this.classes.get('button').get('sort');
+    const data = this.state.switches.sort;
+
+    for (let name of Object.getOwnPropertyNames(data)) {
+      let btn = data[name];
+      if (current !== name) {
+        classes.get(name).remove(btn.options[btn.current]).add(btn.options[0]);
+        btn.current = 0;
+      } else {
+        classes.get(name).remove(btn.options[btn.current]);
+        btn.current = btn.current + 1 === btn.options.length ? 1 : btn.current + 1;
+        classes.get(name).add(btn.options[btn.current]);
+      }
+    }
+  }
+
+  _buildRowReferences() {
+    this.data.rows = new Map();
+    this.dom.get('row').forEach((tr, id) => this.data.rows.set(tr, id));
+  }
+
+  _addListeners() {
+    const button = this.dom.get('button');
+    const sort = button.get('sort');
+    const select = button.get('select');
+    const list = this.dom.get('select').get('list');
+    const tableClasses = this.classes.get('table');
+    const tableElement = this.dom.get('table');
+    button.get('close').addEventListener('click', () => this.close());
+    button.get('hide-word').addEventListener('click', () => tableClasses.toggle('hide-word'));
+    button.get('hide-translation').addEventListener('click', () => tableClasses.toggle('hide-translation'));
+    button.get('word-align').addEventListener('click', () => this._switchWordAlign());
+    button.get('page-top').addEventListener('click', () => this._pageTop());
+    sort.get('random').addEventListener('click', () => this._switchSort('random'));
+    sort.get('word').addEventListener('click', () => this._switchSort('word'));
+    sort.get('type').addEventListener('click', () => this._switchSort('type'));
+    sort.get('repetition').addEventListener('click', () => this._switchSort('repetition'));
+    window.addEventListener('resize', () => this._fitSelectList());
+
+    tableElement.addEventListener('click', (event) => {
+      let findButtonClicked = false;
+      $loopParents(event.target, (element, stop) => {
+        if (element === tableElement) return stop();
+        if (element.hasAttribute('data-find')) findButtonClicked = true;
+        if (element.tagName === 'TR') {
+          if (!findButtonClicked) return stop();
+          if (this.data.rows.has(element)) {
+            const id = this.data.rows.get(element);
+            this._seekOccurrence(event, id);
+            return stop();
+          }
+        }
+      });
+    });
+
+    this.dom.get('scroll-box').addEventListener('scroll', (event) => {
+      this.state.currentScroll.x = event.target.scrollLeft;
+      this.state.currentScroll.y = event.target.scrollTop;
+      this._togglePageTopButton();
+    });
+
+    document.body.addEventListener('click', (event) => {
+      if ((!select.contains(event.target) && !this.state.selectOpened) || list.contains(event.target)) return;
+      this._toggleSelect(!select.contains(event.target) || this.state.selectOpened ? 'close' : 'open');
+    });
+
+    list.addEventListener('click', (event) => {
+      $loopParents(event.target, (element, stop) => {
+        if (element === list) return stop();
+        if (element.hasAttribute('data-type')) {
+          const name = element.getAttribute('data-type');
+          const classes = this.classes.get('button').get('word-type').get(name);
+          const on = classes.has('on');
+          if (this.state.selectedTypesNumber === 1 && on) return;
+          classes.toggle('on');
+          this.state.selectedTypes.set(name, !on);
+          if (!on) this.state.selectedTypesNumber++;
+          else this.state.selectedTypesNumber--;
+        }
+      });
+    });
+
+  }
+
+  _addScroller() {
+    this.scroller = new Scroller({
+      container: this.dom.get('scroll-box'),
+      scrollTime: 800,
+      fps: 32,
+      offset: 1,
+      horizontally: true,
+      vertically: true
+    });
+  }
+
+  _togglePageTopButton() {
+    const classes = this.classes.get('button').get('page-top');
+    const { x, y } = this.state.currentScroll;
+    if ((x > 0 || y > 0) && this.state.pageTopButtonVisible === false) {
+      classes.clear().add('displayed').wait(10).add('visible');
+      this.state.pageTopButtonVisible = true;
+    }
+    if ((x === 0 && y === 0) && this.state.pageTopButtonVisible === true) {
+      classes.clear().remove('visible').wait(250).remove('displayed');
+      this.state.pageTopButtonVisible = false;
+    }
+  }
+
+  _pageTop() {
+    if (this.state.scrollingTable) return;
+    const top = this.dom.get('scroll-box');
+    this.state.scrollingTable = true;
+    this.scroller.scroll(top, () => this.state.scrollingTable = false);
+  }
+
+  _seekOccurrence(event, id) {
+    event.preventDefault();
+    this.close();
+    this.ref.dialog.seekOccurrence(id);
+  }
+
+  _toggleSelect(action) {
+    const header = this.dom.get('select').get('header');
+    const list = this.dom.get('select').get('list');
+    const classes = this.classes.get('select').get('list');
+
+    switch (action) {
+      case 'open':
+        this._resetSelectListPosition();
+        this._adjuster(document.body, header, list, 6);
+        classes.wait(10).add("visible");
+        this.state.selectOpened = true;
+        break;
+      case 'close':
+        classes.clear().remove('visible').wait(150).remove('displayed');
+        this.state.selectOpened = false;
+        break;
+    }
+  }
+
+  _fitSelectList() {
+    if (this.state.selectOpened === false) return;
+    if (this.state.fitDelayPending === true) return;
+    const header = this.dom.get('select').get('header');
+    const list = this.dom.get('select').get('list');
+
+    this.state.fitDelayPending = true;
+    setTimeout(() => {
+      this._adjuster(document.body, header, list, 6);
+      this.state.fitDelayPending = false;
+    }, 50);
+  }
+
+  _resetSelectListPosition() {
+    const styles = this.dom.get('select').get('list');
+    const classes = this.classes.get('select').get('list');
+    classes.clear().add('displayed').remove('visible');
+    styles.top = '0px';
+    styles.bottom = null;
+    styles.left = '0px';
+    styles.right = null;
+  }
+
+  _adjuster(container, header, list, topOffset = 0) {
+    const style = list.style;
+    const { left: headerLeft, top: headerTop, width: headerWidth, height: headerHeight } = header.getBoundingClientRect();
+    const { left: containerLeft, top: containerTop, width: containerWidth, height: containerHeight } = container.getBoundingClientRect();
+    const { width: listWidth, height: listHeight } = list.getBoundingClientRect();
+
+    switch (true) {
+      case (containerTop + containerHeight) - (headerTop + headerHeight) >= listHeight:
+        style.top = (headerTop + headerHeight + topOffset) + 'px';
+        break;
+      case (headerTop - containerTop) >= listHeight:
+        style.top = (headerTop - listHeight + topOffset) + 'px';
+        break;
+      default:
+        style.top = (headerTop + headerHeight + topOffset) + 'px';
+        break;
+    }
+
+    switch (true) {
+      case (containerLeft + containerWidth) - (headerLeft) >= listWidth:
+        style.left = (headerLeft) + 'px';
+        style.right = null;
+        break;
+      case (headerLeft + headerWidth - containerLeft) >= listWidth:
+        style.left = (headerLeft + headerWidth - listWidth) + 'px';
+        style.right = null;
+        break;
+      default:
+        style.left = '-0';
+        style.right = '-0';
+        break;
+    }
+  }
+
+  _updateTableScroll() {
+    this.dom.get('scroll-box').scrollLeft = this.state.currentScroll.x;
+    this.dom.get('scroll-box').scrollTop = this.state.currentScroll.y;
   }
 
 }
