@@ -4,6 +4,7 @@ const { $randomItem } = $utils;
 class Words {
   constructor(words) {
     this._data = { words };
+    this._state = { sorted: false };
     this._map = {
       alphabet: new Map(),
       records: new Map(),
@@ -13,7 +14,6 @@ class Words {
       fixed: null,
       strings: null
     };
-
     this._buildAllMap(words);
     this._buildAlphabetMap();
     this._buildRepetitionMaps();
@@ -33,6 +33,10 @@ class Words {
     return this._map.strings;
   }
 
+  get repetitions(){
+    return this._repetition;
+  }
+
   get identifiers() {
     if (this._map.identifiers === null) this._buildIdentifiersMap();
     return this._map.identifiers;
@@ -48,7 +52,8 @@ class Words {
   }
 
   get typeNames() {
-    return [...this.types.keys()].sort();
+    if (!this._map.typeNames) this._buildTypesMap();
+    return this._map.typeNames;
   }
 
   get types() {
@@ -59,6 +64,20 @@ class Words {
   get clues() {
     if (!this._map.clues) this._buildCluesMap();
     return this._map.clues;
+  }
+
+  sort() {
+    if (this._state.sorted === true) return;
+    this._map.alphabet.forEach(({ sort }) => this._addSortModes(sort));
+    this._state.sorted = true;
+  }
+
+  _addSortModes(map){
+    map.set('word-desc', map.get('word-asc').slice().reverse());
+    map.set('word-az', map.get('word-asc').slice().sort((a, b) => this.strings.get(a).localeCompare(this.strings.get(b))));
+    map.set('word-za', map.get('word-az').slice().reverse());
+    map.set('type-az', map.get('word-asc').slice().sort((a, b) => this.records.get(a).type.localeCompare(this.records.get(b).type)));
+    map.set('type-za', map.get('type-az').slice().reverse());
   }
 
   random(collection, game = null) {
@@ -146,47 +165,79 @@ class Words {
     return map;
   }
 
-  filter({ clue = null, type = null } = {}) {
-    /*  const clueFilter = clue === null ? () => true : (props) => every(props, clue);
-        const typeFilter = type === null ? () => true : () => true;
-        this._map.records.forEach((record) => {
-          let recordProperties = Object.getOwnPropertyNames(record);
-        });
-    
-        function every(a, b) {
-          return b.every((x) => a.some((y) => x === y));
-        } */
+  filter({ types, letters }) {
+    const initial = this._map.alphabet.get(letters.slice(0, 2)).sort;
+    const filteredLetters = letters.length > 2 ? reduceByLetters.call(this, initial, letters).sort : initial;
+    const filteredTypes = reduceByTypes.call(this, filteredLetters);
+    return filteredTypes;
 
+    function reduceByLetters(data, letters) {
+      const identifiers = data.get('word-asc');
+      const strings = this.strings;
+      const matches = this._matchLetters({ strings, identifiers, letters: [...letters] });
+      this._addSortModes(matches.sort);
+      return matches;
+    }
+
+    function reduceByTypes(data) {
+      const sortMap = new Map();
+      data.forEach((collection, sortType) => {
+        sortMap.set(sortType, []);
+        let arr = sortMap.get(sortType);
+        collection.forEach((id) => {
+          let type = this.records.get(id).type;
+          if (types.get(type) === true) arr.push(id);
+        });
+      })
+      return sortMap;
+    }
   }
 
   _buildAlphabetMap() {
     const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', ' '];
+    const identifiers = [...this.strings.keys()];
+    const strings = this.strings;
+    this._map.alphabet.set('', this._matchLetters({ strings, identifiers }));
+
     for (let letterX of letters) {
-      let data = matches({
-        words: this.strings,
-        beginRegExp: new RegExp(`^${letterX}`, 'i'),
-        containRegExp: new RegExp(letterX, 'i')
-      })
+      let data = this._matchLetters({ strings, identifiers, letters: [letterX] });
       this._map.alphabet.set(letterX, data);
 
       for (let letterY of letters) {
-        let data = matches({
-          words: this.strings,
-          beginRegExp: new RegExp(`^${letterX}${letterY}`, 'i'),
-          containRegExp: new RegExp(`${letterX}.*${letterY}`, 'i')
-        })
+        let data = this._matchLetters({ strings, identifiers, letters: [letterX, letterY] })
         this._map.alphabet.set(letterX + letterY, data);
       }
     }
+  }
 
-    function matches({ words, beginRegExp, containRegExp }) {
-      let data = { begin: new Set(), contain: new Set() };
-      words.forEach((word, id) => {
-        if (word.match(beginRegExp)) data.begin.add(id);
-        if (word.match(containRegExp)) data.contain.add(id);
-      });
-      return data;
+  _matchLetters({ strings, identifiers, letters = [] }) {
+    if (!letters.length) return {
+      sort: new Map([
+        ['word-asc', identifiers], 
+        ['best-match-first', identifiers], 
+        ['best-match-next', []]
+      ])
     }
+    
+    const data = { begin: new Set(), contain: new Set() };
+    const joined = letters.join('');
+    const firstWordRegExp = new RegExp(`^${joined}`, 'i');
+    const nextWordRegExp = new RegExp(`\\b${joined}\\w*`,'i');
+    const hasLettersRegExp = new RegExp(letters.join('.*'), 'i');
+
+    data.sort = new Map([['word-asc', []], ['best-match-first', []], ['best-match-next', []]]);
+    identifiers.forEach((id) => {
+      let word = strings.get(id);
+      let hasFirstWord = word.match(firstWordRegExp);
+      let hasLetters = word.match(hasLettersRegExp);
+      let hasNextWord = word.match(nextWordRegExp);
+      if (hasFirstWord) data.begin.add(id);
+      if (hasLetters) data.contain.add(id);
+      if (hasFirstWord || hasNextWord) data.sort.get('word-asc').push(id);
+      if (hasFirstWord) data.sort.get('best-match-first').push(id);
+      if (hasNextWord && !hasFirstWord) data.sort.get('best-match-next').push(id);
+    });
+    return data;
   }
 
   _buildAllMap(words) {
@@ -199,7 +250,7 @@ class Words {
   }
 
   _buildRepetitionMaps() {
-    const names = ['global', 'crossword', 'presentation', 'test', 'pronunciation'];
+    const names = ['global', 'crossword', 'test-eng-pl', 'test-pl-eng', 'test-audio', 'test-definition'];
     this._repetition = {
       iterator: new Map()
     };
@@ -221,7 +272,7 @@ class Words {
     this._map.strings = new Map();
     this._map.fixed = new Map();
     this._map.records.forEach((record, id) => {
-      let parsed = parse(record.crossword);
+      let parsed = parse(record.keyword);
       this._map.strings.set(id, parsed.string);
       this._map.fixed.set(id, parsed.total);
     });
@@ -270,11 +321,16 @@ class Words {
 
   _buildTypesMap() {
     const map = new Map();
+    const set = new Set();
     this._map.records.forEach((record, id) => {
-      if (!map.has(record.type)) map.set(record.type, new Set());
+      if (!map.has(record.type)) {
+        map.set(record.type, new Set());
+        set.add(record.type);
+      }
       map.get(record.type).add(id);
     });
     this._map.types = map;
+    this._map.typeNames = set;
   }
 
   _buildCluesMap() {

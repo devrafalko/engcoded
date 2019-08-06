@@ -925,6 +925,7 @@ class Word {
     if (!valid) return;
     this.fix();
     this.crossword.ref.words.solve(this._data.id, 'crossword');
+    if(this.crossword.ref.games.presentation) this.crossword.ref.games.presentation.update(this._data.id);
     this.crossword.ref.hint.switchOccurrence(true);
   }
 
@@ -1461,8 +1462,8 @@ class StarHint {
 }
 
 class Crossword {
-  constructor(dialog, words) {
-    this.ref = { dialog, words };
+  constructor(dialog, words, games) {
+    this.ref = { dialog, words, games };
     this.data = {
       permitedClueTypes: new Set(),
       attempts: 10,

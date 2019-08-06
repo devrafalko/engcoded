@@ -14,7 +14,10 @@ class Presentation {
     this.state = {
       selectOpened: false,
       pageTopButtonVisible: false,
+      filterLetters: '',
       currentScroll: { x: 0, y: 0 },
+      currentCollection: null,
+      currentSortMode: 'word-asc',
       switches: {
         align: {
           options: ['right', 'left', 'center'],
@@ -56,11 +59,13 @@ class Presentation {
         this._close = fn;
       },
     };
+    this._sortInitialWords();
     this._setSelectedTypes();
     this._buildView();
     this._buildRowReferences();
     this._addListeners();
     this._addScroller();
+    this._filter();
   }
 
   get view() {
@@ -69,6 +74,38 @@ class Presentation {
 
   get on() {
     return this._on;
+  }
+
+  get sorted() {
+    switch (this.state.currentSortMode) {
+      case 'best-match':
+        const first = this.state.currentCollection.get('best-match-first');
+        const next = this.state.currentCollection.get('best-match-next');
+        return [...first, ...next];
+      case 'random-random':
+        const copy = this.state.currentCollection.get('word-asc').slice();
+        const sorted = [];
+        while (copy.length) {
+          let random = Math.floor(Math.random() * (copy.length));
+          sorted.push(copy.splice(random, 1)[0]);
+        }
+        return sorted;
+      case 'repetition-asc':
+      case 'repetition-desc':
+        if (!this.state.currentCollection.has(this.state.currentSortMode)) {
+          const set = new Set(this.state.currentCollection.get('word-asc'));
+          const reps = this.ref.words.repetitions.global;
+          const filtered = [];
+          for (let i = reps.size - 1; i >= 0; i--) {
+            for (let id of reps.get(i)) if (set.has(id)) filtered.push(id);
+          }
+          this.state.currentCollection.set('repetition-desc', filtered);
+          this.state.currentCollection.set('repetition-asc', filtered.slice().reverse());
+        }
+        return this.state.currentCollection.get(this.state.currentSortMode);
+      default:
+        return this.state.currentCollection.get(this.state.currentSortMode);
+    }
   }
 
   get rows() {
@@ -99,6 +136,16 @@ class Presentation {
     `);
   }
 
+  update(id) {
+    const reps = this.ref.words.repetitions.iterator.get(id);
+    this.dom.get('repetition').get(id).innerHTML = reps;
+    if(this.state.currentSortMode === 'repetition-asc' || this.state.currentSortMode === 'repetition-desc'){
+      this.state.currentCollection.delete('repetition-asc');
+      this.state.currentCollection.delete('repetition-desc');
+    }
+    this._render();
+  }
+
   open() {
     if (this.on.open) this.on.open();
     this._updateTableScroll();
@@ -116,7 +163,7 @@ class Presentation {
             <ul>
               <li class="search">
                 <div>
-                  <input class="search-box"/>
+                  <input ${ref('search-box')} class="search-box"/>
                   <span class="icon-box">${child($iconOccurrence())}</span>
                 </div>
               </li>
@@ -241,7 +288,7 @@ class Presentation {
                   </th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody ${ref('table-body')}>
                 ${child(this.rows)}
               </tbody>
             </table>
@@ -256,10 +303,15 @@ class Presentation {
     this.classes = classes;
   }
 
+  _sortInitialWords() {
+    this.ref.words.sort();
+  }
+
   _setSelectedTypes() {
+    const sortedTypes = [...this.ref.words.typeNames.keys()].sort();
     this.state.selectedTypes = new Map();
     this.state.selectedTypesNumber = 0;
-    this.ref.words.typeNames.forEach((name) => {
+    sortedTypes.forEach((name) => {
       this.state.selectedTypes.set(name, true);
       this.state.selectedTypesNumber++;
     });
@@ -292,6 +344,8 @@ class Presentation {
         classes.get(name).remove(btn.options[btn.current]);
         btn.current = btn.current + 1 === btn.options.length ? 1 : btn.current + 1;
         classes.get(name).add(btn.options[btn.current]);
+        this.state.currentSortMode = `${name}-${btn.options[btn.current]}`;
+        this._render();
       }
     }
   }
@@ -308,6 +362,7 @@ class Presentation {
     const list = this.dom.get('select').get('list');
     const tableClasses = this.classes.get('table');
     const tableElement = this.dom.get('table');
+    const search = this.dom.get('search-box');
     button.get('close').addEventListener('click', () => this.close());
     button.get('hide-word').addEventListener('click', () => tableClasses.toggle('hide-word'));
     button.get('hide-translation').addEventListener('click', () => tableClasses.toggle('hide-translation'));
@@ -317,6 +372,7 @@ class Presentation {
     sort.get('word').addEventListener('click', () => this._switchSort('word'));
     sort.get('type').addEventListener('click', () => this._switchSort('type'));
     sort.get('repetition').addEventListener('click', () => this._switchSort('repetition'));
+    search.addEventListener('input', (event) => this._filterLetters(event));
     window.addEventListener('resize', () => this._fitSelectList());
 
     tableElement.addEventListener('click', (event) => {
@@ -358,6 +414,8 @@ class Presentation {
           this.state.selectedTypes.set(name, !on);
           if (!on) this.state.selectedTypesNumber++;
           else this.state.selectedTypesNumber--;
+          this._filter();
+          this._render();
         }
       });
     });
@@ -482,6 +540,35 @@ class Presentation {
     this.dom.get('scroll-box').scrollTop = this.state.currentScroll.y;
   }
 
+  _filterLetters(event) {
+    this.state.filterLetters = event.target.value;
+    this._switchSort('best-match');
+    this.state.currentSortMode = 'best-match';
+    this._filter();
+    this._render();
+  }
+
+  _filter() {
+    this.state.currentCollection = this.ref.words.filter({
+      types: this.state.selectedTypes,
+      letters: this.state.filterLetters
+    });
+  }
+
+  _render() {
+    const table = this.dom.get('table-body');
+    const rowsCollection = [];
+
+    this.sorted.forEach((id) => {
+      rowsCollection.push(this.dom.get('row').get(id));
+    });
+
+    table.innerHTML = '';
+    table.appendChild($templater(({ child, list }) => `
+      ${list(rowsCollection, (item) => `${child(item)}`)}
+    `).template);
+  }
+  
 }
 
 export default Presentation;

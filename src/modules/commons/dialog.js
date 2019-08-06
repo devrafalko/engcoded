@@ -107,7 +107,7 @@ class Dialog {
       toggleNavigation.call(this, 'close');
       Card.hide(false);
       if (!data.games.presentation) {
-        data.games.presentation = new Presentation(this, data.words);
+        data.games.presentation = new Presentation(this, data.words, data.games);
         data.games.presentation.on.close = () => {
           this.state.gameActive = null;
           containerClasses.add('hidden');
@@ -162,7 +162,7 @@ class Dialog {
       toggleNavigation.call(this, 'close');
       Card.hide(false);
       if (!data.games.crossword) {
-        data.games.crossword = new Crossword(this, data.words);
+        data.games.crossword = new Crossword(this, data.words, data.games);
         data.games.crossword.on.close = () => {
           this.state.gameActive = null;
           containerClasses.add('hidden');

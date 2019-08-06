@@ -175,7 +175,8 @@ $bezier-soft-out: cubic-bezier(0.73, 0.18, 0.86, 0.45);
     cursor: pointer;
   }
 
-  .button.sound:not([data-mp3]) ~ .word-tab:not([data-mp3]) {
+  .button.sound:not([data-mp3]) ~ .word-tab:not([data-mp3]),
+  .word-tab [data-pronoun] {
     color: #748682;
     font-size: 15px;
     font-style: italic;

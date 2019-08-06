@@ -65,7 +65,7 @@ export default {
     { index: 7, id: '538e53wsjvmtvedv', meaning: [0, 2] },
     { index: 9, id: '538e568ojtwvxo3s', meaning: [0] },
     { index: 10, id: '538e53wsjvmtvec6', meaning: [0] },
-    { index: 11, id: '538e53wsjvmtvedw', meaning: [2] },
+    { index: 11, id: '538e53wsjvmtvedw', meaning: [2, 3] },
     { index: 12, id: '538e53wsjvmtvec1', meaning: [0] },
     { index: 13, id: '538e54i4jtwc76yx', meaning: [0] },
     { index: 14, id: '538e53wsjvmtvebl', meaning: [0, 1] },
