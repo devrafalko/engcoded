@@ -12,12 +12,23 @@ class Presentation {
     this.ref = { dialog, words };
     this.data = {};
     this.state = {
-      selectOpened: false,
-      pageTopButtonVisible: false,
-      filterLetters: '',
       currentScroll: { x: 0, y: 0 },
       currentCollection: null,
       currentSortMode: 'word-asc',
+      currentNavigButton: null,
+      filterLetters: '',
+      pageIndex: null,
+      pageTopButtonVisible: false,
+      pageWords: null,
+      selectOpened: false,
+      validGoInput: false,
+      buttonIndex: new Map([
+        [0, 1],
+        [1, 2],
+        [2, 3],
+        [3, 4],
+        [4, 5]
+      ]),
       switches: {
         align: {
           options: ['right', 'left', 'center'],
@@ -59,13 +70,15 @@ class Presentation {
         this._close = fn;
       },
     };
-    this._sortInitialWords();
+
+    this._initialSortWords();
     this._setSelectedTypes();
     this._buildView();
     this._buildRowReferences();
     this._addListeners();
     this._addScroller();
     this._filter();
+    this._initialTableConfig();
   }
 
   get view() {
@@ -74,6 +87,39 @@ class Presentation {
 
   get on() {
     return this._on;
+  }
+
+  get pageWords() {
+    return Number(this.state.pageWords);
+  }
+
+  set pageWords(next) {
+    if (Number(next) === Number(this.state.pageWords)) return;
+    const button = this.classes.get('button').get('page');
+    const previous = this.state.pageWords;
+    this.state.pageWords = next;
+    if (previous !== null) button.get(String(previous)).remove('on');
+    button.get(String(next)).add('on');
+    this.page = 1;
+  }
+
+  get page() {
+    return this.state.pageIndex;
+  }
+
+  set page(next) {
+    const limited = next < 1 ? 1 : next > this.totalPages ? this.totalPages : next;
+    this.state.pageIndex = limited;
+    this._updatePagesNavigationBar();
+    this._updateGoPagesBar();
+    this._render();
+  }
+
+  get totalPages() {
+    if (this.pageWords === Infinity) return 1;
+    const total = this.state.currentCollection.get('word-asc').length / this.pageWords;
+    const integer = total === 0 ? 1 : Math.ceil(total);
+    return integer;
   }
 
   get sorted() {
@@ -117,7 +163,7 @@ class Presentation {
           </td>
           <td class="translation">
             <ul class="meaning-list">
-              ${list(meaning, (item) =>/*html*/`
+              ${list(meaning, (item, iter) =>/*html*/`
                 <li>${item}</li>
               `)}
             </ul>
@@ -139,7 +185,7 @@ class Presentation {
   update(id) {
     const reps = this.ref.words.repetitions.iterator.get(id);
     this.dom.get('repetition').get(id).innerHTML = reps;
-    if(this.state.currentSortMode === 'repetition-asc' || this.state.currentSortMode === 'repetition-desc'){
+    if (this.state.currentSortMode === 'repetition-asc' || this.state.currentSortMode === 'repetition-desc') {
       this.state.currentCollection.delete('repetition-asc');
       this.state.currentCollection.delete('repetition-desc');
     }
@@ -153,6 +199,20 @@ class Presentation {
 
   close() {
     if (this.on.close) this.on.close();
+  }
+
+  _initialSortWords() {
+    this.ref.words.sort();
+  }
+
+  _setSelectedTypes() {
+    const sortedTypes = [...this.ref.words.typeNames.keys()].sort();
+    this.state.selectedTypes = new Map();
+    this.state.selectedTypesNumber = 0;
+    sortedTypes.forEach((name) => {
+      this.state.selectedTypes.set(name, true);
+      this.state.selectedTypesNumber++;
+    });
   }
 
   _buildView() {
@@ -200,30 +260,30 @@ class Presentation {
             <ul class="controls pages">
               <li>
                 <ul class="page-buttons">
-                  <li><button class="setting-button navig"><span>${child($iconChevronDoubleLeft())}</span></button></li>
-                  <li><button class="setting-button navig"><span>${child($iconChevronLeft())}</span></button></li>
-                  <li><button class="setting-button value"><span>1</span></button></li>
-                  <li><button class="setting-button value"><span>2</span></button></li>
-                  <li><button class="setting-button value"><span>3</span></button></li>
-                  <li><button class="setting-button value"><span>4</span></button></li>
-                  <li><button class="setting-button value"><span>5</span></button></li>
-                  <li><button class="setting-button navig"><span>${child($iconChevronRight())}</span></button></li>
-                  <li><button class="setting-button navig"><span>${child($iconChevronDoubleRight())}</span></button></li>
+                  <li><button ${ref('button.page-navig.-10')} ${classes('button.page-navig.-10')} class="setting-button navig"><span>${child($iconChevronDoubleLeft())}</span></button></li>
+                  <li><button ${ref('button.page-navig.-1')} ${classes('button.page-navig.-1')} class="setting-button navig"><span>${child($iconChevronLeft())}</span></button></li>
+                  <li><button ${ref('button.page-navig.index.0')} ${classes('button.page-navig.index.0')} class="setting-button value"><span ${ref('button.page-navig.value.0')}>1</span></button></li>
+                  <li><button ${ref('button.page-navig.index.1')} ${classes('button.page-navig.index.1')} class="setting-button value"><span ${ref('button.page-navig.value.1')}>2</span></button></li>
+                  <li><button ${ref('button.page-navig.index.2')} ${classes('button.page-navig.index.2')} class="setting-button value"><span ${ref('button.page-navig.value.2')}>3</span></button></li>
+                  <li><button ${ref('button.page-navig.index.3')} ${classes('button.page-navig.index.3')} class="setting-button value"><span ${ref('button.page-navig.value.3')}>4</span></button></li>
+                  <li><button ${ref('button.page-navig.index.4')} ${classes('button.page-navig.index.4')} class="setting-button value"><span ${ref('button.page-navig.value.4')}>5</span></button></li>
+                  <li><button ${ref('button.page-navig.1')} ${classes('button.page-navig.1')} class="setting-button navig"><span>${child($iconChevronRight())}</span></button></li>
+                  <li><button ${ref('button.page-navig.10')} ${classes('button.page-navig.10')} class="setting-button navig"><span>${child($iconChevronDoubleRight())}</span></button></li>
                 </ul>
               </li>
               <li class="go-page">
                 <div class="go-page-box">
-                  <input type="text" placeholder="1 - 55"/>
-                  <button class="setting-button value"><span>Go</span></button>
+                  <input ${ref('go-pages.input')} ${classes('go-pages.input')} type="text" placeholder="1 - 55"/>
+                  <button ${ref('go-pages.submit')} ${classes('go-pages.submit')} class="setting-button value"><span>Go</span></button>
                 </div>
               </li>
             </ul>
             <ul class="controls rows">
-              <li><button class="setting-button value"><span>10</span></button></li>
-              <li><button class="setting-button value"><span>25</span></button></li>
-              <li><button class="setting-button value"><span>50</span></button></li>
-              <li><button class="setting-button value"><span>100</span></button></li>
-              <li><button class="setting-button value"><span>All</span></button></li>
+              <li><button ${ref('button.page.10')} ${classes('button.page.10')} class="setting-button value"><span>10</span></button></li>
+              <li><button ${ref('button.page.25')} ${classes('button.page.25')} class="setting-button value"><span>25</span></button></li>
+              <li><button ${ref('button.page.50')} ${classes('button.page.50')} class="setting-button value"><span>50</span></button></li>
+              <li><button ${ref('button.page.100')} ${classes('button.page.100')} class="setting-button value"><span>100</span></button></li>
+              <li><button ${ref('button.page.Infinity')} ${classes('button.page.Infinity')} class="setting-button value"><span>All</span></button></li>
             </ul>
           </nav>
           <div class="table-box">
@@ -303,53 +363,6 @@ class Presentation {
     this.classes = classes;
   }
 
-  _sortInitialWords() {
-    this.ref.words.sort();
-  }
-
-  _setSelectedTypes() {
-    const sortedTypes = [...this.ref.words.typeNames.keys()].sort();
-    this.state.selectedTypes = new Map();
-    this.state.selectedTypesNumber = 0;
-    sortedTypes.forEach((name) => {
-      this.state.selectedTypes.set(name, true);
-      this.state.selectedTypesNumber++;
-    });
-  }
-
-  _switchWordAlign() {
-    const options = this.state.switches.align.options;
-    const current = this.state.switches.align.current;
-    const table = this.classes.get('table');
-    const classes = this.classes.get('button').get('word-align');
-    const next = current + 1 === options.length ? 0 : current + 1;
-
-    classes.remove(options[current]);
-    table.remove(options[current]);
-    this.state.switches.align.current = next;
-    classes.add(options[next]);
-    table.add(options[next]);
-  }
-
-  _switchSort(current) {
-    const classes = this.classes.get('button').get('sort');
-    const data = this.state.switches.sort;
-
-    for (let name of Object.getOwnPropertyNames(data)) {
-      let btn = data[name];
-      if (current !== name) {
-        classes.get(name).remove(btn.options[btn.current]).add(btn.options[0]);
-        btn.current = 0;
-      } else {
-        classes.get(name).remove(btn.options[btn.current]);
-        btn.current = btn.current + 1 === btn.options.length ? 1 : btn.current + 1;
-        classes.get(name).add(btn.options[btn.current]);
-        this.state.currentSortMode = `${name}-${btn.options[btn.current]}`;
-        this._render();
-      }
-    }
-  }
-
   _buildRowReferences() {
     this.data.rows = new Map();
     this.dom.get('row').forEach((tr, id) => this.data.rows.set(tr, id));
@@ -363,6 +376,10 @@ class Presentation {
     const tableClasses = this.classes.get('table');
     const tableElement = this.dom.get('table');
     const search = this.dom.get('search-box');
+    const pages = button.get('page');
+    const pageNavigButton = button.get('page-navig');
+    const pageIndexButtons = button.get('page-navig').get('index');
+    const goPages = this.dom.get('go-pages');
     button.get('close').addEventListener('click', () => this.close());
     button.get('hide-word').addEventListener('click', () => tableClasses.toggle('hide-word'));
     button.get('hide-translation').addEventListener('click', () => tableClasses.toggle('hide-translation'));
@@ -374,6 +391,19 @@ class Presentation {
     sort.get('repetition').addEventListener('click', () => this._switchSort('repetition'));
     search.addEventListener('input', (event) => this._filterLetters(event));
     window.addEventListener('resize', () => this._fitSelectList());
+    pages.forEach((button, value) => button.addEventListener('click', () => this.pageWords = value));
+
+    pageIndexButtons.forEach((button, index) => button.addEventListener('click', () => this._switchPageButton(Number(index), true)));
+    pageNavigButton.get('-10').addEventListener('click', () => this._switchPageValue(-10));
+    pageNavigButton.get('-1').addEventListener('click', () => this._switchPageValue(-1));
+    pageNavigButton.get('1').addEventListener('click', () => this._switchPageValue(1));
+    pageNavigButton.get('10').addEventListener('click', () => this._switchPageValue(10));
+
+    goPages.get('submit').addEventListener('click', () => this._goPage());
+    goPages.get('input').addEventListener('input', (event) => this._validateGoPageInput(event));
+    goPages.get('input').addEventListener('keydown', (event) => {
+      if (event.keyCode === 13) this._goPage();
+    });
 
     tableElement.addEventListener('click', (event) => {
       let findButtonClicked = false;
@@ -415,11 +445,10 @@ class Presentation {
           if (!on) this.state.selectedTypesNumber++;
           else this.state.selectedTypesNumber--;
           this._filter();
-          this._render();
+          this.page = 1;
         }
       });
     });
-
   }
 
   _addScroller() {
@@ -431,6 +460,49 @@ class Presentation {
       horizontally: true,
       vertically: true
     });
+  }
+
+  _initialTableConfig() {
+    this.pageWords = 25;
+    this._switchPageButton(0);
+  }
+
+  _switchWordAlign() {
+    const options = this.state.switches.align.options;
+    const current = this.state.switches.align.current;
+    const table = this.classes.get('table');
+    const classes = this.classes.get('button').get('word-align');
+    const next = current + 1 === options.length ? 0 : current + 1;
+
+    classes.remove(options[current]);
+    table.remove(options[current]);
+    this.state.switches.align.current = next;
+    classes.add(options[next]);
+    table.add(options[next]);
+  }
+
+  _switchSort(current) {
+    const classes = this.classes.get('button').get('sort');
+    const data = this.state.switches.sort;
+
+    for (let name of Object.getOwnPropertyNames(data)) {
+      let btn = data[name];
+      if (current !== name) {
+        classes.get(name).remove(btn.options[btn.current]).add(btn.options[0]);
+        btn.current = 0;
+      } else {
+        classes.get(name).remove(btn.options[btn.current]);
+        btn.current = btn.current + 1 === btn.options.length ? 1 : btn.current + 1;
+        classes.get(name).add(btn.options[btn.current]);
+        this.state.currentSortMode = `${name}-${btn.options[btn.current]}`;
+        this.page = 1;
+      }
+    }
+  }
+
+  _switchPageValue(value) {
+    if (this.page === 1 && value < 0 || this.page === this.totalPages && value > 0) return;
+    this.page += value;
   }
 
   _togglePageTopButton() {
@@ -540,12 +612,111 @@ class Presentation {
     this.dom.get('scroll-box').scrollTop = this.state.currentScroll.y;
   }
 
+  _updatePagesNavigationBar() {
+    const buttonIndex = this.state.buttonIndex;
+    const activeButtonIndex = this.state.currentNavigButton;
+    if (activeButtonIndex !== null && this.page !== buttonIndex.get(activeButtonIndex)) {
+      const buttons = this.dom.get('button').get('page-navig');
+      const activeButtonValue = buttonIndex.get(activeButtonIndex);
+      const pagesStep = this.page - activeButtonValue;
+      const buttonsSize = this.totalPages < buttonIndex.size ? this.totalPages : buttonIndex.size;
+      const middleButtonIndex = Math.ceil((buttonsSize - 1) / 2);
+      const activeButtonSide = activeButtonIndex - middleButtonIndex;
+      const lastButtonValue = buttonIndex.get(buttonsSize - 1);
+      const firstButtonValue = buttonIndex.get(0);
+      let totalShift = pagesStep;
+      let activeButtonShift;
+      if (pagesStep > 0) activeButtonShift = activeButtonSide < 0 ? activeButtonIndex + totalShift > middleButtonIndex ? middleButtonIndex - activeButtonIndex : totalShift : 0;
+      if (pagesStep < 0) activeButtonShift = activeButtonSide > 0 ? activeButtonIndex + totalShift < middleButtonIndex ? middleButtonIndex - activeButtonIndex : totalShift : 0;
+      totalShift -= activeButtonShift;
+      let buttonValueShift;
+      if (pagesStep > 0) buttonValueShift = lastButtonValue + totalShift > this.totalPages ? this.totalPages - lastButtonValue : totalShift;
+      if (pagesStep < 0) buttonValueShift = firstButtonValue + totalShift < 1 ? -firstButtonValue + 1 : totalShift;
+      totalShift -= buttonValueShift;
+      activeButtonShift += totalShift;
+      this._switchPageButton(activeButtonIndex + activeButtonShift);
+      for (let i = 0; i < buttonIndex.size; i++) {
+        let previousButtonValue = buttonIndex.get(i);
+        buttonIndex.set(i, previousButtonValue + buttonValueShift);
+        buttons.get('value').get(String(i)).innerHTML = previousButtonValue + buttonValueShift;
+      }
+    }
+
+    const classes = this.classes.get('button').get('page-navig');
+    const prevAction = this.page === 1 ? 'add' : 'remove';
+    const nextAction = this.page === this.totalPages ? 'add' : 'remove';
+
+    classes.get('-10')[prevAction]('disabled');
+    classes.get('-1')[prevAction]('disabled');
+    classes.get('1')[nextAction]('disabled');
+    classes.get('10')[nextAction]('disabled');
+    classes.get('index').forEach((instance, index) => {
+      let disabled = buttonIndex.get(Number(index)) > this.totalPages;
+      let action = disabled ? 'add' : 'remove';
+      instance[action]('disabled');
+    });
+  }
+
+  _updateGoPagesBar() {
+    const placeholder = this.totalPages === 1 ? `${this.totalPages}` : `1 - ${this.totalPages}`;
+    this.dom.get('go-pages').get('input').placeholder = placeholder;
+    this._resetGoPage();
+  }
+
+  _validateGoPageInput(event) {
+    const value = event.target.value;
+    const input = this.classes.get('go-pages').get('input');
+    const submit = this.classes.get('go-pages').get('submit');
+    const isEmpty = !value.length;
+    const isNumber = /^[0-9]+$/.test(value);
+    const isInRange = !isNumber ? false : Number(value) >= 1 && Number(value) <= this.totalPages;
+
+    if (!isEmpty && (!isNumber || !isInRange)) {
+      this.state.validGoInput = false;
+      input.add('invalid');
+      submit.add('disabled');
+    } else if (isEmpty) {
+      this.state.validGoInput = false;
+      input.remove('invalid');
+      submit.remove('disabled');
+    } else {
+      this.state.validGoInput = true;
+      input.remove('invalid');
+      submit.remove('disabled');
+    }
+  }
+
+  _goPage() {
+    if (!this.state.validGoInput) return;
+    const input = this.dom.get('go-pages').get('input');
+    const value = Number(input.value);
+    if (this.page === value) return this._resetGoPage();
+    this.page = Number(input.value);
+  }
+
+  _resetGoPage() {
+    this.classes.get('go-pages').get('input').remove('invalid');
+    this.classes.get('go-pages').get('submit').remove('disabled');
+    this.dom.get('go-pages').get('input').value = null;
+    this.state.validGoInput = false;
+  }
+
+  _switchPageButton(next, switchPage = false) {
+    const previous = this.state.currentNavigButton;
+    if (next === previous) return;
+    const classes = this.classes.get('button').get('page-navig').get('index');
+    if (previous !== null) classes.get(String(previous)).remove('on');
+    classes.get(String(next)).add('on');
+    this.state.currentNavigButton = next;
+    if (switchPage) this.page = this.state.buttonIndex.get(next);
+  }
+
   _filterLetters(event) {
     this.state.filterLetters = event.target.value;
     this._switchSort('best-match');
     this.state.currentSortMode = 'best-match';
     this._filter();
-    this._render();
+    this.page = 1;
   }
 
   _filter() {
@@ -558,17 +729,18 @@ class Presentation {
   _render() {
     const table = this.dom.get('table-body');
     const rowsCollection = [];
-
-    this.sorted.forEach((id) => {
+    const total = this.pageWords === Infinity ? this.sorted.length : this.pageWords;
+    for (let i = (this.page - 1) * total; i < this.page * total || i === this.sorted.length; i++) {
+      let id = this.sorted[i];
       rowsCollection.push(this.dom.get('row').get(id));
-    });
+    }
 
     table.innerHTML = '';
     table.appendChild($templater(({ child, list }) => `
       ${list(rowsCollection, (item) => `${child(item)}`)}
     `).template);
   }
-  
+
 }
 
 export default Presentation;

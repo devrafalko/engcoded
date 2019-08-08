@@ -297,7 +297,15 @@
     left: 0px;
     padding: 2px;
     padding-left: 4px;
+    transition-property: border, color;
+    transition-duration: 0.1s;
+    transition-timing-function: ease-in-out;
     width: 100%;
+  }
+
+  input.invalid{
+    border-color: #ff8eb3;
+    color: #ff4481;
   }
 
   button.setting-button {

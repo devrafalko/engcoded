@@ -33,7 +33,7 @@ class Words {
     return this._map.strings;
   }
 
-  get repetitions(){
+  get repetitions() {
     return this._repetition;
   }
 
@@ -72,7 +72,7 @@ class Words {
     this._state.sorted = true;
   }
 
-  _addSortModes(map){
+  _addSortModes(map) {
     map.set('word-desc', map.get('word-asc').slice().reverse());
     map.set('word-az', map.get('word-asc').slice().sort((a, b) => this.strings.get(a).localeCompare(this.strings.get(b))));
     map.set('word-za', map.get('word-az').slice().reverse());
@@ -166,7 +166,9 @@ class Words {
   }
 
   filter({ types, letters }) {
-    const initial = this._map.alphabet.get(letters.slice(0, 2)).sort;
+    const firstLetters = letters.slice(0, 2);
+    if (!this._map.alphabet.has(firstLetters)) return this.matchTemplate;
+    const initial = this._map.alphabet.get(firstLetters).sort;
     const filteredLetters = letters.length > 2 ? reduceByLetters.call(this, initial, letters).sort : initial;
     const filteredTypes = reduceByTypes.call(this, filteredLetters);
     return filteredTypes;
@@ -210,22 +212,29 @@ class Words {
     }
   }
 
+  get matchTemplate() {
+    return new Map([
+      ['word-asc', []],
+      ['best-match-first', []],
+      ['best-match-next', []]
+    ]);
+  }
+
   _matchLetters({ strings, identifiers, letters = [] }) {
-    if (!letters.length) return {
-      sort: new Map([
-        ['word-asc', identifiers], 
-        ['best-match-first', identifiers], 
-        ['best-match-next', []]
-      ])
+    if (!letters.length) {
+      const sort = this.matchTemplate;
+      sort.set('word-asc', identifiers);
+      sort.set('best-match-first', identifiers);
+      return { sort };
     }
-    
+
     const data = { begin: new Set(), contain: new Set() };
     const joined = letters.join('');
     const firstWordRegExp = new RegExp(`^${joined}`, 'i');
-    const nextWordRegExp = new RegExp(`\\b${joined}\\w*`,'i');
+    const nextWordRegExp = new RegExp(`\\b${joined}\\w*`, 'i');
     const hasLettersRegExp = new RegExp(letters.join('.*'), 'i');
 
-    data.sort = new Map([['word-asc', []], ['best-match-first', []], ['best-match-next', []]]);
+    data.sort = this.matchTemplate;
     identifiers.forEach((id) => {
       let word = strings.get(id);
       let hasFirstWord = word.match(firstWordRegExp);

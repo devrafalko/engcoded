@@ -12,8 +12,8 @@ button.setting-button {
   margin: 6px 0px;
   outline: none;
   overflow: hidden;
-  transition-property: border, box-shadow;
   transition-duration: 0.1s;
+  transition-property: border, box-shadow;
   transition-timing-function: ease-in-out;
 
   ul,
@@ -25,8 +25,8 @@ button.setting-button {
     height: 100%;
     padding: 4px 12px;
     position: relative;
-    transition-property: color, bottom;
     transition-duration: 0.1s;
+    transition-property: color, bottom;
     transition-timing-function: ease-in-out;
   }
 
@@ -42,6 +42,10 @@ button.setting-button {
     span,
     ul {
       color: #c9caca;
+    }
+    svg {
+      fill: #c9caca;
+      stroke: #c9caca;
     }
   }
 
