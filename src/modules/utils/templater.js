@@ -1,4 +1,5 @@
 import type from 'of-type';
+const { $loopParents } = $utils;
 
 class Queue {
   constructor(instance) {
@@ -144,13 +145,171 @@ class Classes {
   }
 }
 
+class Events {
+  constructor() {
+    this._references = new Map();
+    this._elements = new Map();
+    this._instances = new Map();
+    this._identifiers = new Map();
+    this._paths = new Map();
+    this._handlers = new Map();
+    this.mount = this._mount.bind(this);
+  }
+
+  reference(name, data) {
+    this._references.set(name, data);
+  }
+
+  add({ element, attribute }) {
+    const name = element.getAttribute(attribute);
+    const data = this._references.get(name);
+    const paths = this._parseId(element.getAttribute(attribute));
+
+    let currentScope = this._instances;
+    for (let i = 0; i < paths.length; i++) {
+      let path = paths[i];
+      let isLast = i + 1 === paths.length;
+      if (!currentScope.has(path)) currentScope.set(path, { data: null, scope: new Map() });
+      if (isLast) {
+        data.paths = paths;
+        data.element = element;
+        this._identifiers.set(data.name, data);
+        this._elements.set(data.element, data);
+        this._paths.set(paths, data);
+        currentScope.get(path).data = data;
+      } else {
+        currentScope = currentScope.get(path).scope;
+      }
+    }
+  }
+
+  _parseId(id) {
+    return id.split('.');
+  }
+
+  _prepareCallback(event, currentTarget, { action, data, name, paths, element }, callback) {
+    callback({
+      event,
+      data,
+      type: action,
+      id: name,
+      path: paths,
+      current: currentTarget,
+      target: element
+    });
+  }
+
+  _mount(id, callback) {
+    if (!arguments.length) return this;
+    const data = this._identifiers.get(id);
+    const paths = data ? data.paths : this._parseId(id);
+
+    this._traverse(paths, ({ element, action }) => {
+      if (!this._handlers.has(action)) this._handlers.set(action, new Map());
+      const handler = this._handlers.get(action);
+      if (!handler.has(element)) handler.set(element, paths);
+      else if (paths.length > handler.get(element).length) handler.set(element, paths);
+    });
+
+    const commons = this._findCommonParents(paths);
+    commons.forEach((element, action) => {
+      element.addEventListener(action, (event) => {
+        const handlers = this._handlers.get(action);
+        const collection = [];
+        $loopParents(event.target, (node, stop) => {
+          if (handlers.has(node) && handlers.get(node) === paths) {
+            collection.unshift(this._elements.get(node));
+          }
+          if (event.target === element) stop();
+        });
+
+        if (!collection.length) return;
+        for (let i = 0; i < collection.length; i++) {
+          let data = collection[i];
+          if (data.bubble) {
+            this._prepareCallback(event, element, data, callback);
+            collection.splice(i, 1);
+            i--;
+          }
+        }
+
+        for (let i = collection.length - 1; i >= 0; i--) {
+          let data = collection[i];
+          this._prepareCallback(event, element, data, callback);
+        }
+      });
+    });
+  }
+
+  join(added, main) {
+    added._elements.forEach((value, key) => main._elements.set(key, value))
+    added._identifiers.forEach((value, key) => main._identifiers.set(key, value));
+    added._paths.forEach((value, key) => main._paths.set(key, value));
+    added._references.forEach((value, key) => main._references.set(key, value));
+    added._handlers.forEach((map, action) => {
+      if (!main._handlers.has(action)) main._handlers.set(action, new Map());
+      let actionHandler = main._handlers.get(action);
+      map.forEach((value, key) => actionHandler.set(key, value));
+    });
+
+    joinInstances(added._instances, main._instances);
+
+    function joinInstances(added, main) {
+      added.forEach((value, key) => {
+        const { data, scope } = value;
+        if (!main.has(key)) main.set(key, { data: null, scope: new Map() });
+        main.get(key).data = data;
+        if (scope.size) joinInstances(scope, main.get(key).scope);
+      });
+    }
+  }
+
+  _traverse(paths, callback) {
+    let currentScope = this._instances;
+    for (let path of paths) {
+      let scope = type(currentScope, Map) ? currentScope : currentScope.scope;
+      currentScope = scope.get(path);
+    }
+
+    loop(currentScope);
+
+    function loop(current) {
+      let { data, scope } = current;
+      if (data !== null) callback(data);
+      scope.forEach((item) => loop(item));
+    }
+  }
+
+  _findCommonParents(pathsA) {
+    const commons = new Map();
+    let range = document.createRange();
+    this._handlers.forEach((map, _action) => {
+      map.forEach((pathsB, node) => {
+        if (pathsA === pathsB) {
+          range.setStart(commons.get(_action) || node, 0);
+          range.setEnd(node, 0);
+          commons.set(_action, range.commonAncestorContainer);
+        }
+      });
+    });
+    return commons;
+  }
+}
+
 export default function (callback) {
   const childCollection = [];
   const nodeReferences = new Map();
   const classReferences = new Map();
+  const events = new Events();
   const classInstanceReferences = new Map();
   const stringContent = callback({
     ref: (name) => `data-reference="${name}"`,
+    on: (name, action, _data = {}) => {
+      const { bubble = false, data } = _data;
+      const dataDefined = _data.hasOwnProperty('data');
+      events.reference(name, { name, action, dataDefined, data, bubble });
+      return `data-action="${name}"`;
+    },
     child: (nodes) => {
       if (type(nodes, Array)) {
         let content = '';
@@ -162,6 +321,7 @@ export default function (callback) {
       } else if (type(nodes, Object)) {
         joinDescendantReferences(nodes.references, nodeReferences);
         joinDescendantReferences(nodes.classes, classInstanceReferences);
+        events.join(nodes.$on(), events.mount());
         return `<template data-child="${childCollection.push(nodes.template) - 1}"></template>`;
       } else if (nodes instanceof Element) {
         return `<template data-child="${childCollection.push(nodes) - 1}"></template>`;
@@ -215,6 +375,12 @@ export default function (callback) {
     createReferencesMap(element, 'data-classes', classInstanceReferences, instance);
   }
 
+  const _eventTargets = wrapper.content.querySelectorAll('[data-action]');
+  for (let element of _eventTargets) {
+    events.add({ element, attribute: 'data-action' });
+    element.removeAttribute('data-action');
+  }
+
   const _children = wrapper.content.querySelectorAll('[data-child]');
   for (let i = 0; i < _children.length; i++) {
     let node = _children[i];
@@ -223,7 +389,12 @@ export default function (callback) {
   }
 
   const child = wrapper.content.children.length === 1 ? wrapper.content.children[0] : wrapper.content;
-  return { template: child, references: nodeReferences, classes: classInstanceReferences };
+  return {
+    template: child,
+    references: nodeReferences,
+    classes: classInstanceReferences,
+    $on: events.mount
+  };
 
   function createReferencesMap(element, attribute, map, property) {
     const paths = element.getAttribute(attribute).split('.');
@@ -249,4 +420,5 @@ export default function (callback) {
       if (isMap) joinDescendantReferences(value, main.get(key));
     });
   }
+
 }

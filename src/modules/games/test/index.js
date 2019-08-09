@@ -1,3 +1,5 @@
+import './test.scss';
+
 const { $templater } = $utils;
 const { $iconMinimize } = $icons;
 
