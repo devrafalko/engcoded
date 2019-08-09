@@ -1,7 +1,7 @@
 import './navigation.scss';
 
 const { Scroller } = $commons;
-const { $loopParents, $templater } = $utils;
+const { $templater } = $utils;
 const { $iconMinimize, $iconOccurrence, $iconShuffle, $iconSelect, $iconChevronRight,
   $iconChevronDoubleRight, $iconChevronLeft, $iconChevronDoubleLeft, $iconSpy, $iconSortAZ,
   $iconSortZA, $iconSort19, $iconSort91, $iconSortRandom, $iconChevronUp, $iconAlignLeft,
@@ -95,7 +95,7 @@ class Presentation {
 
   set pageWords(next) {
     if (Number(next) === Number(this.state.pageWords)) return;
-    const button = this.classes.get('button').get('page');
+    const button = this.classes.get('rows');
     const previous = this.state.pageWords;
     this.state.pageWords = next;
     if (previous !== null) button.get(String(previous)).remove('on');
@@ -155,7 +155,7 @@ class Presentation {
   }
 
   get rows() {
-    return $templater(({ ref, child, list }) =>/*html*/`
+    return $templater(({ ref, child, list, on }) =>/*html*/`
       ${list(this.ref.words.records, ({ word, type, meaning }, id) =>/*html*/`
         <tr ${ref(`row.${id}`)}>
           <td class="word">
@@ -175,7 +175,7 @@ class Presentation {
             <p ${ref(`repetition.${id}`)}>0</p>
           </td>
           <td data-find class="find">
-            <span ${ref(`find.${id}`)}>${child($iconOccurrence())}</span>
+            <span ${on(`find.${id}`, 'click')}>${child($iconOccurrence())}</span>
           </td>
         </tr>
       `)}
@@ -216,14 +216,14 @@ class Presentation {
   }
 
   _buildView() {
-    const { references, classes } = $templater(({ ref, child, classes, list }) =>/*html*/`
+    const templater = $templater(({ ref, child, classes, list, on }) =>/*html*/`
       <div ${ref('container')} ${classes('container')} class="presentation">
-        <nav ${ref('panel')} class="navigation-panel">
+        <nav class="navigation-panel">
           <div class="controls game">
             <ul>
               <li class="search">
                 <div>
-                  <input ${ref('search-box')} class="search-box"/>
+                  <input ${on('search-box', 'input')} class="search-box"/>
                   <span class="icon-box">${child($iconOccurrence())}</span>
                 </div>
               </li>
@@ -238,9 +238,9 @@ class Presentation {
                   <div ${ref('select.list')} ${classes('select.list')} class="list-box">
                     <ul class="list">
                       ${list(this.state.selectedTypes, (selected, name) =>/*html*/`
-                        <li data-type="${name}" ${ref(`select.item.${name}`)}>
+                        <li data-type="${name}" ${on(`select.item.${name}`, 'click')}>
                           <span class="text-box">${name}</span>
-                          <button class="switch-button" ${classes(`button.word-type.${name}`, selected ? ['on'] : [])}><span></span></button>
+                          <button class="switch-button" ${classes(`word-type.${name}`, selected ? ['on'] : [])}><span></span></button>
                         </li>
                       `)}
                     </ul>
@@ -251,58 +251,118 @@ class Presentation {
           </div>
           <div class="controls navigation">
             <ul>
-              <li ${ref('button.close')} class="close">${child($iconMinimize())}</li>
+              <li ${on('close', 'click')} class="close">${child($iconMinimize())}</li>
             </ul>
           </div>
         </nav>
-        <div ${ref('scroll-box')} class="scrollable">
-          <nav ${ref('table-navigation')} class="navigation-table">
+        <div ${ref('scroll-box')} ${on('scroll-box', 'scroll')} class="scrollable">
+          <nav class="navigation-table">
             <ul class="controls pages">
               <li>
                 <ul class="page-buttons">
-                  <li><button ${ref('button.page-navig.-10')} ${classes('button.page-navig.-10')} class="setting-button navig"><span>${child($iconChevronDoubleLeft())}</span></button></li>
-                  <li><button ${ref('button.page-navig.-1')} ${classes('button.page-navig.-1')} class="setting-button navig"><span>${child($iconChevronLeft())}</span></button></li>
-                  <li><button ${ref('button.page-navig.index.0')} ${classes('button.page-navig.index.0')} class="setting-button value"><span ${ref('button.page-navig.value.0')}>1</span></button></li>
-                  <li><button ${ref('button.page-navig.index.1')} ${classes('button.page-navig.index.1')} class="setting-button value"><span ${ref('button.page-navig.value.1')}>2</span></button></li>
-                  <li><button ${ref('button.page-navig.index.2')} ${classes('button.page-navig.index.2')} class="setting-button value"><span ${ref('button.page-navig.value.2')}>3</span></button></li>
-                  <li><button ${ref('button.page-navig.index.3')} ${classes('button.page-navig.index.3')} class="setting-button value"><span ${ref('button.page-navig.value.3')}>4</span></button></li>
-                  <li><button ${ref('button.page-navig.index.4')} ${classes('button.page-navig.index.4')} class="setting-button value"><span ${ref('button.page-navig.value.4')}>5</span></button></li>
-                  <li><button ${ref('button.page-navig.1')} ${classes('button.page-navig.1')} class="setting-button navig"><span>${child($iconChevronRight())}</span></button></li>
-                  <li><button ${ref('button.page-navig.10')} ${classes('button.page-navig.10')} class="setting-button navig"><span>${child($iconChevronDoubleRight())}</span></button></li>
+                  <li>
+                    <button ${on('page-navig.arrow.a', 'click', { data: -10 })} ${classes('page-navig.-10')} class="setting-button navig">
+                      <span>${child($iconChevronDoubleLeft())}</span>
+                    </button>
+                  </li>
+                  <li>
+                    <button ${on('page-navig.arrow.b', 'click', { data: -1 })} ${classes('page-navig.-1')} class="setting-button navig">
+                      <span>${child($iconChevronLeft())}</span>
+                    </button>
+                  </li>
+                  <li>
+                    <button ${on('page-navig.index.a', 'click', { data: 0 })} ${classes('page-navig.index.0')} class="setting-button value">
+                      <span ${ref('page-tab-value.0')}>1</span>
+                    </button>
+                  </li>
+                  <li>
+                    <button ${on('page-navig.index.b', 'click', { data: 1 })} ${classes('page-navig.index.1')} class="setting-button value">
+                      <span ${ref('page-tab-value.1')}>2</span>
+                    </button>
+                  </li>
+                  <li>
+                    <button ${on('page-navig.index.c', 'click', { data: 2 })} ${classes('page-navig.index.2')} class="setting-button value">
+                      <span ${ref('page-tab-value.2')}>3</span>
+                    </button>
+                  </li>
+                  <li>
+                    <button ${on('page-navig.index.d', 'click', { data: 3 })} ${classes('page-navig.index.3')} class="setting-button value">
+                      <span ${ref('page-tab-value.3')}>4</span>
+                    </button>
+                  </li>
+                  <li>
+                    <button ${on('page-navig.index.e', 'click', { data: 4 })} ${classes('page-navig.index.4')} class="setting-button value">
+                      <span ${ref('page-tab-value.4')}>5</span>
+                    </button>
+                  </li>
+                  <li>
+                    <button ${on('page-navig.arrow.c', 'click', { data: 1 })} ${classes('page-navig.1')} class="setting-button navig">
+                      <span>${child($iconChevronRight())}</span>
+                    </button>
+                  </li>
+                  <li>
+                    <button ${on('page-navig.arrow.d', 'click', { data: 10 })} ${classes('page-navig.10')} class="setting-button navig">
+                      <span>${child($iconChevronDoubleRight())}</span>
+                    </button>
+                  </li>
                 </ul>
               </li>
               <li class="go-page">
                 <div class="go-page-box">
-                  <input ${ref('go-pages.input')} ${classes('go-pages.input')} type="text" placeholder="1 - 55"/>
-                  <button ${ref('go-pages.submit')} ${classes('go-pages.submit')} class="setting-button value"><span>Go</span></button>
+                  <input ${on('go-pages.input', ['input', 'keydown'])} ${ref('go-pages.input')} ${classes('go-pages.input')} type="text" placeholder="1 - 55"/>
+                  <button ${on('go-pages.submit', 'click')} ${classes('go-pages.submit')} class="setting-button value"><span>Go</span></button>
                 </div>
               </li>
             </ul>
             <ul class="controls rows">
-              <li><button ${ref('button.page.10')} ${classes('button.page.10')} class="setting-button value"><span>10</span></button></li>
-              <li><button ${ref('button.page.25')} ${classes('button.page.25')} class="setting-button value"><span>25</span></button></li>
-              <li><button ${ref('button.page.50')} ${classes('button.page.50')} class="setting-button value"><span>50</span></button></li>
-              <li><button ${ref('button.page.100')} ${classes('button.page.100')} class="setting-button value"><span>100</span></button></li>
-              <li><button ${ref('button.page.Infinity')} ${classes('button.page.Infinity')} class="setting-button value"><span>All</span></button></li>
+              <li>
+                <button ${on('rows.a', 'click', { data: 10 })} ${classes('rows.10')} class="setting-button value">
+                  <span>10</span>
+                </button>
+              </li>
+              <li>
+                <button ${on('rows.b', 'click', { data: 25 })} ${classes('rows.25')} class="setting-button value">
+                  <span>25</span>
+                </button>
+              </li>
+              <li>
+                <button ${on('rows.c', 'click', { data: 50 })} ${classes('rows.50')} class="setting-button value">
+                  <span>50</span>
+                </button>
+              </li>
+              <li>
+                <button ${on('rows.d', 'click', { data: 100 })} ${classes('rows.100')} class="setting-button value">
+                  <span>100</span>
+                </button>
+              </li>
+              <li>
+                <button ${on('rows.e', 'click', { data: Infinity })} ${classes('rows.Infinity')} class="setting-button value">
+                  <span>All</span>
+                </button>
+              </li>
             </ul>
           </nav>
           <div class="table-box">
-            <table ${ref('table')} ${classes('table')}>
+            <table ${classes('table')}>
               <thead>
                 <tr>
                   <th class="head word">
                     <h1 class="header">Word</h1>
                     <div class="button-set">
-                      <button ${ref('button.word-align')} ${classes('button.word-align', [this.state.switches.align.options[this.state.switches.align.current]])} class="setting-button navig">
+                      <button ${on('table-button.word-align', 'click')} ${classes('word-align', [this.state.switches.align.options[this.state.switches.align.current]])} class="setting-button navig">
                         <ul>
                           <li data-side="left">${child($iconAlignLeft())}</li>
                           <li data-side="center">${child($iconAlignCenter())}</li>
                           <li data-side="right">${child($iconAlignRight())}</li>
                         </ul>
                       </button>
-                      <button ${ref('button.hide-word')} class="setting-button navig"><span>${child($iconSpy())}</span></button>
-                      <button ${ref('button.sort.random')} ${classes('button.sort.random')} class="setting-button navig"><span>${child($iconShuffle())}</span></button>
-                      <button ${ref('button.sort.word')} ${classes('button.sort.word', [this.state.switches.sort.word.options[this.state.switches.sort.word.current]])} class="setting-button navig">
+                      <button ${on('table-button.hide-word', 'click')} class="setting-button navig">
+                        <span>${child($iconSpy())}</span>
+                      </button>
+                      <button ${on('table-button.sort.random', 'click')} ${classes('sort.random')} class="setting-button navig">
+                        <span>${child($iconShuffle())}</span>
+                      </button>
+                      <button ${on('table-button.sort.word', 'click')} ${classes('sort.word', [this.state.switches.sort.word.options[this.state.switches.sort.word.current]])} class="setting-button navig">
                         <ul>
                           <li data-sort="az">${child($iconSortAZ())}</li>
                           <li data-sort="za">${child($iconSortZA())}</li>
@@ -316,13 +376,15 @@ class Presentation {
                   <th class="head translation">
                     <h1 class="header">Translation</h1>
                     <div class="button-set">
-                      <button ${ref('button.hide-translation')} class="setting-button navig"><span>${child($iconSpy())}</span></button>
+                      <button ${on('table-button.hide-translation', 'click')} class="setting-button navig">
+                        <span>${child($iconSpy())}</span>
+                      </button>
                     </div>
                   </th>
                   <th class="head word-type">
                     <h1 class="header">Type</h1>
                     <div class="button-set">
-                      <button ${ref('button.sort.type')} ${classes('button.sort.type', [this.state.switches.sort.type.options[this.state.switches.sort.type.current]])} class="setting-button navig random">
+                      <button ${on('table-button.sort.type', 'click')} ${classes('sort.type', [this.state.switches.sort.type.options[this.state.switches.sort.type.current]])} class="setting-button navig random">
                         <ul>
                           <li data-sort="az">${child($iconSortAZ())}</li>
                           <li data-sort="za">${child($iconSortZA())}</li>
@@ -334,7 +396,7 @@ class Presentation {
                   <th class="head repetitions">
                     <h1 class="header">Rep.</h1>
                     <div class="button-set">
-                      <button ${ref('button.sort.repetition')} ${classes('button.sort.repetition', [this.state.switches.sort.repetition.options[this.state.switches.sort.repetition.current]])} class="setting-button navig random">
+                      <button ${on('table-button.sort.repetition', 'click')} ${classes('sort.repetition', [this.state.switches.sort.repetition.options[this.state.switches.sort.repetition.current]])} class="setting-button navig random">
                         <ul>
                           <li data-sort="asc">${child($iconSort19())}</li>
                           <li data-sort="desc">${child($iconSort91())}</li>
@@ -354,13 +416,14 @@ class Presentation {
             </table>
           </div>
         </div>
-        <div ${ref('button.page-top')} ${classes('button.page-top')} class="page-top">
+        <div ${on('page-top', 'click')} ${classes('page-top')} class="page-top">
           <div>${child($iconChevronUp())}</div>
         </div>
       </div>
     `);
-    this.dom = references;
-    this.classes = classes;
+    this.dom = templater.references;
+    this.classes = templater.classes;
+    this.html = templater;
   }
 
   _buildRowReferences() {
@@ -369,86 +432,58 @@ class Presentation {
   }
 
   _addListeners() {
-    const button = this.dom.get('button');
-    const sort = button.get('sort');
-    const select = button.get('select');
-    const list = this.dom.get('select').get('list');
-    const tableClasses = this.classes.get('table');
-    const tableElement = this.dom.get('table');
-    const search = this.dom.get('search-box');
-    const pages = button.get('page');
-    const pageNavigButton = button.get('page-navig');
-    const pageIndexButtons = button.get('page-navig').get('index');
-    const goPages = this.dom.get('go-pages');
-    button.get('close').addEventListener('click', () => this.close());
-    button.get('hide-word').addEventListener('click', () => tableClasses.toggle('hide-word'));
-    button.get('hide-translation').addEventListener('click', () => tableClasses.toggle('hide-translation'));
-    button.get('word-align').addEventListener('click', () => this._switchWordAlign());
-    button.get('page-top').addEventListener('click', () => this._pageTop());
-    sort.get('random').addEventListener('click', () => this._switchSort('random'));
-    sort.get('word').addEventListener('click', () => this._switchSort('word'));
-    sort.get('type').addEventListener('click', () => this._switchSort('type'));
-    sort.get('repetition').addEventListener('click', () => this._switchSort('repetition'));
-    search.addEventListener('input', (event) => this._filterLetters(event));
+    const { $on } = this.html;
+
     window.addEventListener('resize', () => this._fitSelectList());
-    pages.forEach((button, value) => button.addEventListener('click', () => this.pageWords = value));
-
-    pageIndexButtons.forEach((button, index) => button.addEventListener('click', () => this._switchPageButton(Number(index), true)));
-    pageNavigButton.get('-10').addEventListener('click', () => this._switchPageValue(-10));
-    pageNavigButton.get('-1').addEventListener('click', () => this._switchPageValue(-1));
-    pageNavigButton.get('1').addEventListener('click', () => this._switchPageValue(1));
-    pageNavigButton.get('10').addEventListener('click', () => this._switchPageValue(10));
-
-    goPages.get('submit').addEventListener('click', () => this._goPage());
-    goPages.get('input').addEventListener('input', (event) => this._validateGoPageInput(event));
-    goPages.get('input').addEventListener('keydown', (event) => {
-      if (event.keyCode === 13) this._goPage();
-    });
-
-    tableElement.addEventListener('click', (event) => {
-      let findButtonClicked = false;
-      $loopParents(event.target, (element, stop) => {
-        if (element === tableElement) return stop();
-        if (element.hasAttribute('data-find')) findButtonClicked = true;
-        if (element.tagName === 'TR') {
-          if (!findButtonClicked) return stop();
-          if (this.data.rows.has(element)) {
-            const id = this.data.rows.get(element);
-            this._seekOccurrence(event, id);
-            return stop();
-          }
-        }
-      });
-    });
-
-    this.dom.get('scroll-box').addEventListener('scroll', (event) => {
-      this.state.currentScroll.x = event.target.scrollLeft;
-      this.state.currentScroll.y = event.target.scrollTop;
-      this._togglePageTopButton();
-    });
-
     document.body.addEventListener('click', (event) => {
+      const select = this.dom.get('button').get('select');
+      const list = this.dom.get('select').get('list');
       if ((!select.contains(event.target) && !this.state.selectOpened) || list.contains(event.target)) return;
       this._toggleSelect(!select.contains(event.target) || this.state.selectOpened ? 'close' : 'open');
     });
 
-    list.addEventListener('click', (event) => {
-      $loopParents(event.target, (element, stop) => {
-        if (element === list) return stop();
-        if (element.hasAttribute('data-type')) {
-          const name = element.getAttribute('data-type');
-          const classes = this.classes.get('button').get('word-type').get(name);
-          const on = classes.has('on');
-          if (this.state.selectedTypesNumber === 1 && on) return;
-          classes.toggle('on');
-          this.state.selectedTypes.set(name, !on);
-          if (!on) this.state.selectedTypesNumber++;
-          else this.state.selectedTypesNumber--;
-          this._filter();
-          this.page = 1;
-        }
-      });
+    $on('rows', ({ data }) => this.pageWords = data);
+    $on('find', ({ event, last }) => this._seekOccurrence(event, last));
+    $on('select.item', ({ last }) => this._switchWordType(last));
+    $on('search-box', ({ event }) => this._filterLetters(event));
+    $on('close', () => this.close());
+    $on('page-top', () => this._pageTop());
+
+    $on('table-button', ({ id, last }) => {
+      if (id.startsWith('table-button.sort')) this._switchSort(last);
+      if (last === 'hide-word') this.classes.get('table').toggle(last);
+      if (last === 'hide-translation') this.classes.get('table').toggle(last);
+      if (last === 'word-align') this._switchWordAlign();
+    })
+
+    $on('go-pages', ({ event, last, type }) => {
+      if (last === 'submit') this._goPage();
+      if (last === 'input' && type === 'input') this._validateGoPageInput(event);
+      if (last === 'input' && type === 'keydown' && event.keyCode === 13) this._goPage();
     });
+
+    $on('page-navig', ({ id, data }) => {
+      if (id.startsWith('page-navig.arrow')) this._switchPageValue(data);
+      if (id.startsWith('page-navig.index')) this._switchPageButton(data, true);
+    });
+
+    $on('scroll-box', ({ event }) => {
+      this.state.currentScroll.x = event.target.scrollLeft;
+      this.state.currentScroll.y = event.target.scrollTop;
+      this._togglePageTopButton();
+    });
+  }
+
+  _switchWordType(name) {
+    const classes = this.classes.get('word-type').get(name);
+    const on = classes.has('on');
+    if (this.state.selectedTypesNumber === 1 && on) return;
+    classes.toggle('on');
+    this.state.selectedTypes.set(name, !on);
+    if (!on) this.state.selectedTypesNumber++;
+    else this.state.selectedTypesNumber--;
+    this._filter();
+    this.page = 1;
   }
 
   _addScroller() {
@@ -471,7 +506,7 @@ class Presentation {
     const options = this.state.switches.align.options;
     const current = this.state.switches.align.current;
     const table = this.classes.get('table');
-    const classes = this.classes.get('button').get('word-align');
+    const classes = this.classes.get('word-align');
     const next = current + 1 === options.length ? 0 : current + 1;
 
     classes.remove(options[current]);
@@ -482,7 +517,7 @@ class Presentation {
   }
 
   _switchSort(current) {
-    const classes = this.classes.get('button').get('sort');
+    const classes = this.classes.get('sort');
     const data = this.state.switches.sort;
 
     for (let name of Object.getOwnPropertyNames(data)) {
@@ -506,7 +541,7 @@ class Presentation {
   }
 
   _togglePageTopButton() {
-    const classes = this.classes.get('button').get('page-top');
+    const classes = this.classes.get('page-top');
     const { x, y } = this.state.currentScroll;
     if ((x > 0 || y > 0) && this.state.pageTopButtonVisible === false) {
       classes.clear().add('displayed').wait(10).add('visible');
@@ -616,7 +651,7 @@ class Presentation {
     const buttonIndex = this.state.buttonIndex;
     const activeButtonIndex = this.state.currentNavigButton;
     if (activeButtonIndex !== null && this.page !== buttonIndex.get(activeButtonIndex)) {
-      const buttons = this.dom.get('button').get('page-navig');
+      const buttons = this.dom.get('page-tab-value');
       const activeButtonValue = buttonIndex.get(activeButtonIndex);
       const pagesStep = this.page - activeButtonValue;
       const buttonsSize = this.totalPages < buttonIndex.size ? this.totalPages : buttonIndex.size;
@@ -638,11 +673,11 @@ class Presentation {
       for (let i = 0; i < buttonIndex.size; i++) {
         let previousButtonValue = buttonIndex.get(i);
         buttonIndex.set(i, previousButtonValue + buttonValueShift);
-        buttons.get('value').get(String(i)).innerHTML = previousButtonValue + buttonValueShift;
+        buttons.get(String(i)).innerHTML = previousButtonValue + buttonValueShift;
       }
     }
 
-    const classes = this.classes.get('button').get('page-navig');
+    const classes = this.classes.get('page-navig');
     const prevAction = this.page === 1 ? 'add' : 'remove';
     const nextAction = this.page === this.totalPages ? 'add' : 'remove';
 
@@ -704,7 +739,7 @@ class Presentation {
   _switchPageButton(next, switchPage = false) {
     const previous = this.state.currentNavigButton;
     if (next === previous) return;
-    const classes = this.classes.get('button').get('page-navig').get('index');
+    const classes = this.classes.get('page-navig').get('index');
     if (previous !== null) classes.get(String(previous)).remove('on');
     classes.get(String(next)).add('on');
     this.state.currentNavigButton = next;

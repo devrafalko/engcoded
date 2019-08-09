@@ -187,13 +187,14 @@ class Events {
     return id.split('.');
   }
 
-  _prepareCallback(event, currentTarget, { action, data, name, paths, element }, callback) {
+  _prepareCallback(event, currentTarget, action, { data, name, paths, element }, callback) {
     callback({
       event,
       data,
       type: action,
       id: name,
       path: paths,
+      last: paths[paths.length - 1],
       current: currentTarget,
       target: element
     });
@@ -205,10 +206,13 @@ class Events {
     const paths = data ? data.paths : this._parseId(id);
 
     this._traverse(paths, ({ element, action }) => {
-      if (!this._handlers.has(action)) this._handlers.set(action, new Map());
-      const handler = this._handlers.get(action);
-      if (!handler.has(element)) handler.set(element, paths);
-      else if (paths.length > handler.get(element).length) handler.set(element, paths);
+      let actions = type(action,Array) ? action:[action];
+      for(let _action of actions){
+        if (!this._handlers.has(_action)) this._handlers.set(_action, new Map());
+        const handler = this._handlers.get(_action);
+        if (!handler.has(element)) handler.set(element, paths);
+        else if (paths.length > handler.get(element).length) handler.set(element, paths);
+      }
     });
 
     const commons = this._findCommonParents(paths);
@@ -227,7 +231,7 @@ class Events {
         for (let i = 0; i < collection.length; i++) {
           let data = collection[i];
           if (data.bubble) {
-            this._prepareCallback(event, element, data, callback);
+            this._prepareCallback(event, element, action, data, callback);
             collection.splice(i, 1);
             i--;
           }
@@ -235,7 +239,7 @@ class Events {
 
         for (let i = collection.length - 1; i >= 0; i--) {
           let data = collection[i];
-          this._prepareCallback(event, element, data, callback);
+          this._prepareCallback(event, element, action, data, callback);
         }
       });
     });
