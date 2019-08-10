@@ -5,7 +5,7 @@ import './../commons.scss';
 import './youtube.scss';
 
 const { Items, Dialog, Card, Timer, Scroller, Words } = $commons;
-const { $templater, $loopParents } = $utils;
+const { $templater } = $utils;
 const { $iconTextPlay } = $icons;
 
 class YouTube {
@@ -337,7 +337,7 @@ class YouTube {
   renderMovie(movieId) {
     const movie = this.data.movies[movieId];
     const instance = this.instances[movieId];
-    const data = $templater(({ ref, list, child, classes }) =>/*html*/`
+    const data = $templater(({ ref, list, child, classes, on }) =>/*html*/`
       <div class="youtube-container">
         <section ${ref('movie')} class="movie-box">
           <div ${ref('mask')} ${classes('mask')} class="mask"></div>
@@ -345,11 +345,11 @@ class YouTube {
         </section>
         <section ${ref('zip')} ${classes('zip')} class="movie-zip"></section>
         <section ${ref('subtitles')} class="subtitles-container" data-family="0">
-          <ul ${ref('list')} class="subtitles-content text-content">
+          <ul class="subtitles-content text-content">
             <li data-header><h1>${movie.header}</h1></li>
             ${list(instance.subtitlesMap, ({ text }, index) => /*html*/`
             <li ${ref(`line.${index}`)}>
-              <div ${ref(`jump.${index}`)} class="jump-to-button">${child($iconTextPlay())}</div>
+              <div ${on(`jump.${index}`, 'click')} class="jump-to-button">${child($iconTextPlay())}</div>
               <p>${text}</p>
             </li>`)}
           </ul>
@@ -369,33 +369,19 @@ class YouTube {
   }
 
   renderLinesMap(movieId) {
-    const elements = new Map();
     const lines = new Map();
     const refs = this.views[movieId].references;
-    refs.get('jump').forEach((node, index) => elements.set(node, Number(index)));
     refs.get('line').forEach((node, index) => lines.set(node, Number(index)));
-    this.instances[movieId].elementsMap = elements;
     this.instances[movieId].linesMap = lines;
   }
 
   addSubtitlesListeners(movieId) {
-    const { references } = this.views[movieId];
-    const list = references.get('list');
-    const jumps = this.instances[movieId].elementsMap;
+    const { $on } = this.views[movieId];
     const subtitles = this.instances[movieId].subtitlesMap;
-    list.addEventListener('click', (event) => {
-      let index = null;
-      $loopParents(event.target, (descendant, stop) => {
-        if (event.currentTarget === descendant) return stop();
-        if (jumps.has(descendant)) {
-          index = jumps.get(descendant);
-          return stop();
-        }
-      });
-      if (typeof index !== 'number') return;
-      const time = subtitles.get(index).time.totalFloatSeconds;
+    $on('jump', ({ last }) => {
+      const time = subtitles.get(Number(last)).time.totalFloatSeconds;
       this.seekTo(time);
-    }, false);
+    });
   }
 
   seekTo(time = this.state.seekQueue) {

@@ -158,15 +158,15 @@ class Podcasts {
   renderView(id) {
     const podcast = this.data.podcasts[id];
     const instance = this.instances[id];
-    const data = $templater(({ ref, list, child }) =>/*html*/`
+    const data = $templater(({ ref, list, child, on }) =>/*html*/`
       <div class="podcasts-container">
         <section ${ref('player-container')} class="player-container"></section>
         <section ${ref('subtitles')} class="subtitles-container" data-family="0">
-          <ul ${ref('list')} class="subtitles-content text-content">
+          <ul class="subtitles-content text-content">
             <li data-header><h1>${podcast.header}</h1></li>
             ${list(instance.subtitlesMap, ({ text }, index) => /*html*/`
             <li ${ref(`line.${index}`)}>
-              <div ${ref(`jump.${index}`)} class="jump-to-button">${child($iconTextPlay())}</div>
+              <div ${on(`jump.${index}`, 'click')} class="jump-to-button">${child($iconTextPlay())}</div>
               <p>${text}</p>
             </li>`)}
           </ul>
@@ -186,31 +186,18 @@ class Podcasts {
   }
 
   renderLinesMap(id) {
-    const elements = new Map();
     const lines = new Map();
     const refs = this.views[id].references;
-    refs.get('jump').forEach((node, index) => elements.set(node, Number(index)));
     refs.get('line').forEach((node, index) => lines.set(node, Number(index)));
-    this.instances[id].elementsMap = elements;
     this.instances[id].linesMap = lines;
   }
 
   addSubtitlesListeners(id) {
-    const { references } = this.views[id];
-    const list = references.get('list');
-    const jumps = this.instances[id].elementsMap;
+    const { $on } = this.views[id];
     const subtitles = this.instances[id].subtitlesMap;
-    list.addEventListener('click', (event) => {
-      let index = null;
-      $loopParents(event.target, (descendant, stop) => {
-        if (event.currentTarget === descendant) return stop();
-        if (jumps.has(descendant)) {
-          index = jumps.get(descendant);
-          return stop();
-        }
-      });
-      if (typeof index !== 'number') return;
-      const time = subtitles.get(index).time.totalFloatSeconds;
+
+    $on('jump', ({ last }) => {
+      const time = subtitles.get(Number(last)).time.totalFloatSeconds;
       this.seekTo(time);
     });
   }

@@ -6,7 +6,7 @@ const { $templater } = $utils;
 const { $iconPlayBuffer, $iconPause, $iconPlay, $iconRewind, $iconFastForward, $iconMute, $iconVolume, $iconSpeed } = $icons;
 
 class Events {
-  constructor(scope){
+  constructor(scope) {
     this._scope = scope;
   }
   get play() {
@@ -57,9 +57,9 @@ class Player {
     this.dom = {
       buffered: [],
       played: [],
-      icon:{
-        mute:$iconMute(),
-        volume:$iconVolume()
+      icon: {
+        mute: $iconMute(),
+        volume: $iconVolume()
       }
     };
     this.data = {
@@ -87,14 +87,14 @@ class Player {
     this.state.play = 'play';
     this._updatePlayState();
     this.audio.play();
-    if(this.on.play) this.on.play();
+    if (this.on.play) this.on.play();
   }
 
   pause() {
     this.state.play = 'pause';
     this._updatePlayState();
     this.audio.pause();
-    if(this.on.pause) this.on.pause();
+    if (this.on.pause) this.on.pause();
   }
 
   reset() {
@@ -158,16 +158,16 @@ class Player {
     this.state.muted = value;
   }
 
-  get playing(){
+  get playing() {
     return !this.audio.paused;
   }
 
-  get time(){
+  get time() {
     return this.audio.currentTime;
   }
 
   _initAudio() {
-    this.audio = document.createElement("AUDIO");
+    this.audio = this.dom.controls.get('audio-player');
     this.audio.controls = false;
     this.audio.preload = 'metadata';
     this.audio.autoplay = false;
@@ -179,12 +179,15 @@ class Player {
       <span ${ref('pause')}>${child($iconPause())}</span>
       <span ${ref('buffer')}>${child($iconPlayBuffer())}</span>
     `);
-    const player = $templater(({ ref, child }) =>/*html*/`
+    const player = $templater(({ ref, child, on }) =>/*html*/`
       <ul class="podcast-player">
-        <li ${ref('play-button')} class="button play">${child(playState.references.get('buffer'))}</li>
-        <li ${ref('rewind-button')} class="button rewind">${child($iconRewind())}</li> 
-        <li ${ref('forward-button')} class="button forward">${child($iconFastForward())}</li>
-        <li ${ref('muted-button')} class="button muted">${child(this.dom.icon.mute)}</li>
+        <li ${on('button.play', 'click')} ${ref('play-button')} class="button play">
+          ${child(playState.references.get('buffer'))}
+          <audio ${ref('audio-player')} ${on('audio-player', ['loadedmetadata', 'ended', 'loadstart', 'canplay', 'timeupdate'])}></audio>
+        </li>
+        <li ${on('button.rewind', 'click')} class="button rewind">${child($iconRewind())}</li> 
+        <li ${on('button.forward', 'click')} class="button forward">${child($iconFastForward())}</li>
+        <li ${on('button.muted', 'click')} ${ref('muted-button')} class="button muted">${child(this.dom.icon.mute)}</li>
         <li ${ref('volume-container')} class="range volume">
           <div>
             <span ${ref('volume-value')} class="output">60</span>
@@ -200,7 +203,7 @@ class Player {
             <span ${ref('played-span')} class="span played"></span>
           </div>
         </li>
-        <li ${ref('speed-button')} class="button speed">${child($iconSpeed())}</li>
+        <li ${on('button.speed', 'click')} class="button speed">${child($iconSpeed())}</li>
         <li ${ref('speed-container')} class="range speed">
           <div>
             <span ${ref('speed-value')} class="output speed">0.75</span>
@@ -213,51 +216,53 @@ class Player {
     this.dom.player = player.template;
     this.dom.controls = player.references;
     this.dom.playState = playState.references;
+    this.html = player;
   }
 
   _initListeners() {
-    this.audio.addEventListener('loadedmetadata', () => this._updateDuration());
-    this.audio.addEventListener('ended', () => this.reset());
-    this.audio.addEventListener('loadstart', () => {
-      this.state.play = 'buffer';
-      this._updatePlayState();
-      this._updateDuration();
-    });
-    this.audio.addEventListener('canplay', () => {
-      this.state.play = ['play', 'pause'][+this.audio.paused];
-      this._bufferTimeout(null);
-      this._updatePlayState();
-    });
-    this.audio.addEventListener('timeupdate', () => {
-      this._updateCurrentTime();
-      this._updateRange({
-        range: this.audio.buffered,
-        container: this.dom.controls.get('buffer-span'),
-        elements: this.dom.buffered
-      });
-      this._updateRange({
-        range: this.audio.played,
-        container: this.dom.controls.get('played-span'),
-        elements: this.dom.played
-      });
-      if(this.on.playing && this.playing) this.on.playing();
-    });
-    
-    this.dom.controls.get('muted-button').addEventListener('click', () => this.muted = !this.muted);
-    this.dom.controls.get('speed-button').addEventListener('click', () => this.speed = 1);
-    this.dom.controls.get('rewind-button').addEventListener('click',()=>{
-      if(this.on.previous) this.on.previous();
-    });
-    this.dom.controls.get('forward-button').addEventListener('click',()=>{
-      if(this.on.next) this.on.next();
-    });
-    this.dom.controls.get('play-button').addEventListener('click', () => {
-      if (this.state.play === 'buffer') return;
-      if (this.state.play === 'play') this.pause();
-      else this.play();
+    const { $on } = this.html;
+    $on('audio-player', ({ type }) => {
+      switch (type) {
+        case 'loadedmetadata': return this._updateDuration();
+        case 'ended': return this.reset();
+        case 'loadstart':
+          this.state.play = 'buffer';
+          this._updatePlayState();
+          this._updateDuration();
+          return;
+        case 'canplay':
+          this.state.play = ['play', 'pause'][+this.audio.paused];
+          this._bufferTimeout(null);
+          this._updatePlayState();
+          return;
+        case 'timeupdate':
+          this._updateCurrentTime();
+          this._updateRange({
+            range: this.audio.buffered,
+            container: this.dom.controls.get('buffer-span'),
+            elements: this.dom.buffered
+          });
+          this._updateRange({
+            range: this.audio.played,
+            container: this.dom.controls.get('played-span'),
+            elements: this.dom.played
+          });
+          if (this.on.playing && this.playing) this.on.playing();
+      }
     });
 
-    this._onScroll({
+    $on('button', ({ last }) => {
+      if (last === 'play' && this.state.play !== 'buffer') {
+        if (this.state.play === 'play') this.pause();
+        else this.play();
+      }
+      if (last === 'rewind' && this.on.previous) this.on.previous();
+      if (last === 'forward' && this.on.next) this.on.next();
+      if (last === 'muted') this.muted = !this.muted;
+      if (last === 'speed') this.speed = 1;
+    });
+
+    this._onSlide({
       element: this.dom.controls.get('time-span'),
       range: this.dom.controls.get('current-span'),
       min: 0,
@@ -270,7 +275,7 @@ class Player {
       }
     });
 
-    this._onScroll({
+    this._onSlide({
       element: this.dom.controls.get('volume-container'),
       range: this.dom.controls.get('volume-span'),
       min: 0,
@@ -279,7 +284,7 @@ class Player {
       callback: (value) => this.volume = value
     });
 
-    this._onScroll({
+    this._onSlide({
       element: this.dom.controls.get('speed-container'),
       min: .25,
       max: 1.5,
@@ -293,7 +298,7 @@ class Player {
     this.speed = this.data.speed;
   }
 
-  _onScroll({ element, min, max, step, callback }) {
+  _onSlide({ element, min, max, step, callback }) {
     let moveState = false;
     const fn = (event) => {
       const { left, width } = element.getBoundingClientRect();
@@ -307,12 +312,12 @@ class Player {
     element.addEventListener('mousedown', (event) => {
       moveState = true;
       fn(event);
-      window.addEventListener('mousemove', fn)
+      window.addEventListener('mousemove', fn);
     });
 
     window.addEventListener('mouseup', () => {
       if (!moveState) return;
-      window.removeEventListener('mousemove', fn)
+      window.removeEventListener('mousemove', fn);
       moveState = false;
     });
   }
@@ -337,7 +342,7 @@ class Player {
   _updateVolumeIcon(isMuted) {
     const icon = this.dom.controls.get('muted-button');
     icon.innerHTML = '';
-    icon.appendChild(isMuted ? this.dom.icon.mute:this.dom.icon.volume);
+    icon.appendChild(isMuted ? this.dom.icon.mute : this.dom.icon.volume);
   }
 
   _updateDuration() {
@@ -388,14 +393,14 @@ class Player {
     }
   }
 
-  _bufferTimeout(time){
-    if(time===null) return clearTimeout(this.data.bufferTimeout);
+  _bufferTimeout(time) {
+    if (time === null) return clearTimeout(this.data.bufferTimeout);
     clearTimeout(this.data.bufferTimeout);
-    this.data.bufferTimeout = setTimeout(()=>{
-      if(this.state.play === 'buffer') return;
+    this.data.bufferTimeout = setTimeout(() => {
+      if (this.state.play === 'buffer') return;
       this.state.play = 'buffer';
       this._updatePlayState();
-    },time);
+    }, time);
   }
 
 }

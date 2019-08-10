@@ -55,18 +55,20 @@ export default class Slider {
   }
 
   _buildView() {
-    const { references, classes } = $templater(({ ref, classes }) => /*html*/`
+    const template = $templater(({ ref, classes, on }) => /*html*/`
       <div ${ref('container')} class="image-slider">
-        <ul ${ref('navigation')} ${classes('navigation')} class="image-navigation"></ul>
+        <ul ${on('navigation', 'click')} ${ref('navigation')} ${classes('navigation')} class="image-navigation"></ul>
         <img ${ref('image')} src="" class="image-element"></img>
       </div>
     `);
-    this.dom = references;
-    this.classes = classes;
+    this.dom = template.references;
+    this.classes = template.classes;
+    this.html = template;
   }
 
   _addListeners() {
-    this.dom.get('navigation').addEventListener('click', (event) => {
+    const { $on } = this.html;
+    $on('navigation', ({ event }) => {
       if (event.target.hasAttribute('data-image')) {
         this.image = event.target.getAttribute('data-image');
       }

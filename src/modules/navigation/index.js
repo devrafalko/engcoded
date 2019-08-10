@@ -13,16 +13,16 @@ class Navigation {
   }
 
   _buildView(buttons) {
-    const { references, classes } = $templater(({ ref, list, classes }) =>/*html*/`
+    const template = $templater(({ ref, list, classes, on }) =>/*html*/`
       <nav ${ref('section.navigation')} ${classes('section.navigation')} id="navigation-container">
         <ul class="navigation-panel">
-          <li ${ref('toggle-button')} class="toggle-menu">
+          <li ${on('button.toggle','click')} class="toggle-menu">
             <div><i></i></div>
             <div><i></i></div>
             <div><i></i></div>
           </li>
           ${list(buttons, ({ name, content }) =>/*html*/`
-            <li ${ref(`button.${name}`)} ${classes(`button.${name}`)} class="navigation-button">${content}</li>
+            <li ${on(`button.${name}`,'click')} ${classes(`button.${name}`)} class="navigation-button">${content}</li>
           `)}
         </ul>
       </nav>
@@ -34,8 +34,9 @@ class Navigation {
         </ul>
       </main>
     `);
-    this.dom = references;
-    this.classes = classes;
+    this.dom = template.references;
+    this.classes = template.classes;
+    this.html = template;
   }
 
   init() {
@@ -45,8 +46,13 @@ class Navigation {
   }
 
   _addListeners() {
-    this.dom.get('button').forEach((button, name) => button.addEventListener('click', () => this.active = name));
-    this.dom.get('toggle-button').addEventListener('click', () => this.toggle('toggle'));
+    const {$on} = this.html;
+
+    $on('button',({last})=>{
+      if(last==='toggle') return this.toggle('toggle');
+      this.active = last;
+    });
+
     window.addEventListener('resize', () => this.toggle('close'));
   }
 

@@ -35,24 +35,28 @@ class WordTest {
   }
 
   buildView() {
-    const { references, classes } = $templater(({ ref, child, classes }) =>/*html*/`
+    const template = $templater(({ ref, child, classes, on }) =>/*html*/`
       <div ${ref('container')} ${classes('container')} class="test hidden">
         <nav ${ref('panel')} class="navigation-panel">
           <div class="controls game"></div>
           <div class="controls navigation">
             <ul>
-              <li ${ref('button.close')} class="close">${child($iconMinimize())}</li>
+              <li ${on('button.close', 'click')} class="close">${child($iconMinimize())}</li>
             </ul>
           </div>
         </nav>
       </div>
     `);
-    this.dom = references;
-    this.classes = classes;
+    this.dom = template.references;
+    this.classes = template.classes;
+    this.html = template;
   }
 
   addListeners() {
-    this.dom.get('button').get('close').addEventListener('click', () => this.close());
+    const { $on } = this.html;
+    $on('button', ({ last }) => {
+      if (last === 'close') this.close();
+    });
   }
 
   open() {

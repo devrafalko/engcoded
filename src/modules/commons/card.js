@@ -14,8 +14,6 @@ class Card {
     this.events = {};
     this._renderView();
     this._addListeners();
-    this._fitOnResize();
-    this._supportAudio();
     this._addScroller();
   }
 
@@ -72,16 +70,16 @@ class Card {
 
     this.hide(true);
     this._renderWordPage(word, meaning, audio, meanings, (wordPage) => {
-      this.dom.get('card').get('word').innerHTML = '';
-      this.dom.get('card').get('word').appendChild(wordPage);
+      this.dom.get('page').get('word').innerHTML = '';
+      this.dom.get('page').get('word').appendChild(wordPage);
     });
 
     this._renderDefinitionPage(definition, (empty, rendered) => {
       this.classes.get('button').get('definition')[empty ? 'add' : 'remove']('disabled');
       if (empty && this.state.active === 'definition') this._switchCard('word');
       if (empty) return;
-      this.dom.get('card').get('definition').innerHTML = '';
-      this.dom.get('card').get('definition').appendChild(rendered);
+      this.dom.get('page').get('definition').innerHTML = '';
+      this.dom.get('page').get('definition').appendChild(rendered);
     });
 
     this._renderImagePage(img, (empty) => {
@@ -111,31 +109,6 @@ class Card {
       offset: .1,
       horizontally: true,
       vertically: true
-    });
-  }
-
-  _supportAudio() {
-    const audio = document.createElement('AUDIO');
-    const card = this.dom.get('card').get('word');
-
-    card.addEventListener('click', (event) => {
-      $loopParents(event.target, (element, stop) => {
-        if (element === card) return stop();
-        if (element.hasAttribute('data-mp3')) {
-          const src = element.getAttribute('data-mp3');
-          audio.src = src;
-          audio.play();
-          return stop();
-        }
-      });
-    });
-
-    audio.addEventListener('play', () => {
-      this.state.currentPlayerClasses.add('sound-on');
-    });
-
-    audio.addEventListener('pause', () => {
-      this.state.currentPlayerClasses.remove('sound-on');
     });
   }
 
@@ -178,20 +151,36 @@ class Card {
   }
 
   _addListeners() {
-    const button = this.dom.get('button');
-    button.get('word').addEventListener('click', this._switchCard.bind(this, 'word', true));
-    button.get('definition').addEventListener('click', this._switchCard.bind(this, 'definition', true));
-    button.get('image').addEventListener('click', this._switchCard.bind(this, 'image', true));
-    button.get('close').addEventListener('click', this.hide.bind(this, false));
-    button.get('next').addEventListener('click', this._switchOccurrence.bind(this, 'next'));
-    button.get('previous').addEventListener('click', this._switchOccurrence.bind(this, 'previous'));
+    const { $on } = this.html;
     this._switchCard('word');
+
+    window.addEventListener('resize', () => this.fit());
     window.addEventListener('keydown', (event) => {
       if (!this.state.opened) return;
       if (event.ctrlKey === true) return;
       if (event.keyCode === 39) this._switchOccurrence('next');
       if (event.keyCode === 37) this._switchOccurrence('previous');
       if (event.keyCode === 27) this.hide(false);
+    });
+
+    $on('card', ({ id, last, type }) => {
+      if (id.startsWith('card.tab')) this._switchCard(last, true);
+      if (id.startsWith('card.turn')) this._switchOccurrence(last);
+      if (last === 'close') this.hide(false);
+      if (last === 'player' && type === 'play') this.state.currentPlayerClasses.add('sound-on');
+      if (last === 'player' && type === 'pause') this.state.currentPlayerClasses.remove('sound-on');
+    });
+
+    $on('page.word',({current, event})=>{
+      $loopParents(event.target, (element, stop) => {
+        if (element === current) return stop();
+        if (element.hasAttribute('data-mp3')) {
+          const audio = this.dom.get('player');
+          audio.src = element.getAttribute('data-mp3');
+          audio.play();
+          return stop();
+        }
+      });
     });
   }
 
@@ -264,20 +253,16 @@ class Card {
 
   }
 
-  _fitOnResize() {
-    window.addEventListener('resize', (event) => this.fit());
-  }
-
   _switchCard(id, fitPosition) {
     if (id === this.state.active) return;
     const button = this.classes.get('button').get(id);
-    const card = this.classes.get('card').get(id);
+    const card = this.classes.get('page').get(id);
 
     if (button.has('disabled')) return;
 
     if (this.state.active) {
       let _button = this.classes.get('button').get(this.state.active);
-      let _card = this.classes.get('card').get(this.state.active);
+      let _card = this.classes.get('page').get(this.state.active);
       _button.remove('active');
       _card.remove('active');
     }
@@ -291,7 +276,7 @@ class Card {
   _renderWordPage(words, meanings, audioSource, meaningOrder, callback) {
     const singular = type(audioSource, String);
     const definitions = prepareDefinitions(meanings, meaningOrder);
-    const { template, classes } = $templater(({ when, classes, list, child, ref }) => /*html*/`
+    const { template, classes } = $templater(({ when, classes, list, child }) => /*html*/`
       <div>
         <ul class="section word">
           <li class="button sound" ${when(singular, () => `data-mp3="${audioSource}"`)} ${classes('player')}>
@@ -352,35 +337,37 @@ class Card {
   }
 
   _renderView() {
-    const { references, classes } = $templater(({ child, ref, classes }) => /*html*/`
+    const template = $templater(({ child, ref, classes, on }) => /*html*/`
       <div class="card container" ${ref('view')} ${classes('view')}>
         <div class="card relative-box">
         <nav class="card navigation">
           <ul class="section pages">
-            <li ${ref('button.word')} ${classes('button.word')} class="button">${child($iconCardWord())}</li>
-            <li ${ref('button.definition')} ${classes('button.definition')} class="button">${child($iconCardDefinition())}</li>
-            <li ${ref('button.image')} ${classes('button.image')} class="button">${child($iconCardImage())}</li>
+            <li ${on('card.tab.word', 'click')} ${classes('button.word')} class="button">${child($iconCardWord())}</li>
+            <li ${on('card.tab.definition', 'click')} ${classes('button.definition')} class="button">${child($iconCardDefinition())}</li>
+            <li ${on('card.tab.image', 'click')} ${classes('button.image')} class="button">${child($iconCardImage())}</li>
           </ul>
           <ul class="section control" ${classes('section.control')}>
-            <li ${ref('button.previous')} ${classes('button.previous')} class="button nav previous">${child($iconPreviousWord())}</li>
-            <li ${ref('button.next')} ${classes('button.next')} class="button nav next">${child($iconNextWord())}</li>
-            <li ${ref('button.close')} ${classes('button.close')} class="button close">${child($iconClose())}</li>
+            <li ${on('card.turn.previous', 'click')} ${classes('button.previous')} class="button nav previous">${child($iconPreviousWord())}</li>
+            <li ${on('card.turn.next', 'click')} ${classes('button.next')} class="button nav next">${child($iconNextWord())}</li>
+            <li ${on('card.close', 'click')} ${classes('button.close')} class="button close">${child($iconClose())}</li>
           </ul>
         </nav>
         <main class="card content">
           <ul>
-            <li ${ref('card.word')} ${classes('card.word')} class="page word"></li>
-            <li ${ref('card.definition')} ${classes('card.definition')} class="page definition"></li>
-            <li ${ref('card.image')} ${classes('card.image')} class="page image">
+            <li ${ref('page.word')} ${on('page.word','click')} ${classes('page.word')} class="page word"></li>
+            <li ${ref('page.definition')} ${classes('page.definition')} class="page definition"></li>
+            <li ${ref('page.image')} ${classes('page.image')} class="page image">
               ${child(this.slider.view)}
             </li>
           </ul>
         </main>
+        <audio ${ref('player')} ${on('card.player', ['play', 'pause'])}></audio>
         </div>
       </div>`
     );
-    this.dom = references;
-    this.classes = classes;
+    this.dom = template.references;
+    this.classes = template.classes;
+    this.html = template;
   }
 
 }

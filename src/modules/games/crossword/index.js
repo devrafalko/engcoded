@@ -46,16 +46,12 @@ class Game {
   }
 
   _addListeners() {
-    const table = this.crossword.ref.grid.dom.get('table');
+    const { $on } = this.crossword.ref.grid.html;
 
-    table.addEventListener('click', (event) => {
-      $loopParents(event.target, (parent, stop) => {
-        if (parent === table) return stop();
-        if (parent.tagName === 'TD') {
-          if (this.crossword.ref.virtual.cell.has(parent)) this.chooseWord(this.crossword.ref.virtual.cell.get(parent));
-          return stop();
-        }
-      });
+    $on('table.cell', ({ target }) => {
+      if (this.crossword.ref.virtual.cell.has(target)) {
+        this.chooseWord(this.crossword.ref.virtual.cell.get(target));
+      }
     });
 
     this.crossword.ref.keyboard.on.keydown = (data) => {
@@ -222,9 +218,9 @@ class VirtualKeyboard {
   }
 
   _buildView() {
-    const { references, classes } = $templater(({ ref, child, classes, list }) =>/*html*/`
+    const template = $templater(({ ref, child, classes, list, on }) =>/*html*/`
       <ul ${ref('container')} ${classes('container')} class="keyboard-box">
-        <li ${ref('button')} class="keyboard-button">
+        <li ${on('keyboard.button', 'click')} class="keyboard-button">
           <div>
             <ul class="sprite">
               <li class="open">${child($iconKeyboard())}</li>
@@ -232,31 +228,25 @@ class VirtualKeyboard {
             </ul>
           </div>
         </li>
-        <li ${ref('dialog')} class="keyboard-dialog">
+        <li class="keyboard-dialog">
           ${list(this.rows, (letters) =>
             /*html*/`<ul class="row">
               ${list(letters, ({ key, keyCode, classList }) =>
-              /*html*/`<li data-key="${keyCode}" ${classList ? classes(`key.${keyCode}`, classList) : ''}><span>${key}</span></li>`)}
+              /*html*/`<li  ${on(`keyboard.letter.${key}`, 'click', { data: keyCode })} data-key="${keyCode}" ${classList ? classes(`key.${keyCode}`, classList) : ''}><span>${key}</span></li>`)}
             </ul>`)}
         </li>
       </ul>
     `);
-    this.dom = references;
-    this.classes = classes;
+    this.dom = template.references;
+    this.classes = template.classes;
+    this.html = template;
   }
 
   _addListeners() {
-    this.dom.get('button').addEventListener('click', () => this.switch('toggle'));
-    this.dom.get('dialog').addEventListener('click', (event) => {
-      $loopParents(event.target, (parent, stop) => {
-        if (parent.hasAttribute('data-key')) {
-          const key = parent.getAttribute('data-key');
-          const data = this.codes.get(Number(key));
-          if (this.on.keydown) this.on.keydown(data);
-          stop();
-        }
-        if (parent === this.dom.get('dialog')) stop();
-      });
+    const { $on } = this.html;
+    $on('keyboard', ({ id, last, data }) => {
+      if (last === 'button') this.switch('toggle');
+      if (id.startsWith('keyboard.letter')) this.on.keydown(this.codes.get(data));
     });
   }
 
@@ -300,9 +290,7 @@ class Hint {
     };
 
     this._buildView();
-    this._buildMedia();
     this._addListeners();
-    this._addPlayerListeners();
   }
 
   get on() {
@@ -400,9 +388,25 @@ class Hint {
   }
 
   _addListeners() {
-    this.dom.get('button').addEventListener('click', () => this.switch('toggle'));
-    this.dom.get('autoplay').addEventListener('click', () => this._toggleAutoplay());
-    this.dom.get('occurrence').addEventListener('click', (event) => this.seekOccurrence(event));
+    const player = this.classes.get('player');
+    const { $on } = this.html;
+    $on('hint', ({ event, last, type, target }) => {
+      if (last === 'button') this.switch('toggle');
+      if (last === 'autoplay') this._toggleAutoplay();
+      if (last === 'occurrence') this.seekOccurrence(event);
+      if (last === 'player') this._playAudio();
+      if (last === 'audio' && type === 'play') player.add('playing');
+      if (last === 'audio' && type === 'ended') {
+        if (this.state.currentAudioIndex < this.data.audioSources.length - 1) {
+          this.state.currentAudioIndex++;
+          target.src = this.data.audioSources[this.state.currentAudioIndex];
+          target.play();
+        } else {
+          player.remove('playing');
+          this.state.currentAudioIndex = Infinity;
+        }
+      }
+    });
   }
 
   seekOccurrence(event) {
@@ -415,25 +419,6 @@ class Hint {
   _toggleAutoplay() {
     this.state.autoplay = !this.state.autoplay;
     this.classes.get('autoplay')[this.state.autoplay ? 'add' : 'remove']('on');
-  }
-
-  _addPlayerListeners() {
-    const player = this.dom.get('player');
-    const classes = this.classes.get('player');
-    const audio = this.data.player;
-
-    player.addEventListener('click', () => this._playAudio());
-    audio.addEventListener('play', () => classes.add('playing'));
-    audio.addEventListener('ended', () => {
-      if (this.state.currentAudioIndex < this.data.audioSources.length - 1) {
-        this.state.currentAudioIndex++;
-        audio.src = this.data.audioSources[this.state.currentAudioIndex];
-        audio.play();
-      } else {
-        classes.remove('playing');
-        this.state.currentAudioIndex = Infinity;
-      }
-    });
   }
 
   _playAudio() {
@@ -485,15 +470,13 @@ class Hint {
     for (let element of template.querySelectorAll('[data-keyword]')) {
       element.innerHTML = element.innerHTML.replace(/[A-Za-z0-9]/g, '_');
     }
-
     return template;
-
   }
 
   _buildView() {
-    const { references, classes } = $templater(({ ref, child, classes }) =>/*html*/`
+    const template = $templater(({ ref, child, classes, on }) =>/*html*/`
       <ul ${ref('container')} ${classes('container')} class="hint-box">
-        <li ${ref('button')} class="hint-button">
+        <li ${on('hint.button', 'click')} class="hint-button">
           <div>
             <ul class="sprite">
               <li class="open">${child($iconQuestionMark())}</li>
@@ -501,7 +484,7 @@ class Hint {
             </ul>
           </div>
         </li>
-        <li ${ref('dialog')} class="hint-dialog">
+        <li class="hint-dialog">
           <ul class="list">
             <li ${ref('meaning')} ${classes('meaning')} class="card meaning">a</li>
             <li ${ref('definition')} ${classes('definition')} class="card definition">b</li>
@@ -510,11 +493,12 @@ class Hint {
             </li>
             <li ${ref('audio')} ${classes('audio')} class="card audio">
               <div class="section button">
-                <span ${ref('player')} ${classes('player')} class="button player">
+                <span ${on('hint.player', 'click')} ${classes('player')} class="button player">
                   ${child($iconVolume())}
                 </span>
+                <audio ${ref('audio-element')} ${on('hint.audio', ['play', 'ended'])}></audio>
               </div>
-              <div ${ref('autoplay')} ${classes('autoplay')} class="section autoplay">
+              <div ${on('hint.autoplay', 'click')} ${classes('autoplay')} class="section autoplay">
                 <span class="check on">${child($iconCheckIn())}</span>
                 <span class="check off">${child($iconCheckOut())}</span>
                 <span class="label">autoplay</span>
@@ -522,7 +506,7 @@ class Hint {
             </li>
           </ul>
           <p ${ref('word-type')} class="word-type"></p>
-          <div ${ref('occurrence')} ${classes('occurrence')} class="find-occurrence">
+          <div ${on('hint.occurrence', 'click')} ${classes('occurrence')} class="find-occurrence">
             <div>
               ${child($iconOccurrence())}
             </div>
@@ -530,12 +514,10 @@ class Hint {
         </li>
       </ul>
     `);
-    this.dom = references;
-    this.classes = classes;
-  }
-
-  _buildMedia() {
-    this.data.player = document.createElement('AUDIO');
+    this.dom = template.references;
+    this.data.player = this.dom.get('audio-element');
+    this.classes = template.classes;
+    this.html = template;
   }
 }
 
@@ -566,7 +548,7 @@ class Grid {
   }
 
   _buildCrosswordView() {
-    const { references, classes } = $templater(({ ref, child }) =>/*html*/`
+    const template = $templater(({ ref, child }) =>/*html*/`
       <div ${ref('content')}>
         <div ${ref('container')} tabindex="0" class="crossword">
           ${child(this._crossword())}
@@ -577,8 +559,9 @@ class Grid {
         </div>
       </div>
     `);
-    this.dom = references;
-    this.classes = classes;
+    this.dom = template.references;
+    this.classes = template.classes;
+    this.html = template;
   }
 
   getCellByCoords(x, y, name) {
@@ -591,7 +574,7 @@ class Grid {
 
   _crossword() {
     return $templater(({ loop, ref, child }) =>/*html*/`
-      <table ${ref('table')} id="crossword-table">
+      <table id="crossword-table">
         <tbody>
           ${loop(this.crossword.ref.virtual.rows.size, (y) =>/*html*/`
             ${child(this._row(y))}
@@ -616,14 +599,14 @@ class Grid {
     let row = this.crossword.ref.virtual.edges.top + y;
     let letter = this.crossword.ref.virtual.hasLetter(column, row);
     let keyword = this.crossword.ref.virtual.hasKeyword(column, row);
-    const cell = $templater(({ ref, when, child, classes }) =>/*html*/`
+    const cell = $templater(({ ref, when, child, classes, on }) =>/*html*/`
       ${when(keyword, () =>/*html*/`
-        <td class="clue-cell ${keyword.side}" ${ref(`clue.${column}.${row}`)} ${classes(`clue.${column}.${row}`)}>
+        <td ${on(`table.cell.${column}.${row}`, 'click')} class="clue-cell ${keyword.side}" ${ref(`clue.${column}.${row}`)} ${classes(`clue.${column}.${row}`)}>
           ${child(this._clue(keyword.clue.type, keyword.side))}
         </td>
       `)}
       ${when(letter, () =>/*html*/`
-        <td class="letter-cell" ${ref(`letter.${column}.${row}`)} ${classes(`letter.${column}.${row}`)}>
+        <td ${on(`table.cell.${column}.${row}`, 'click')} class="letter-cell" ${ref(`letter.${column}.${row}`)} ${classes(`letter.${column}.${row}`)}>
           <div>
             <span ${ref(`input.${column}.${row}`)}></span>
           </div>
@@ -925,7 +908,7 @@ class Word {
     if (!valid) return;
     this.fix();
     this.crossword.ref.words.solve(this._data.id, 'crossword');
-    if(this.crossword.ref.games.presentation) this.crossword.ref.games.presentation.update(this._data.id);
+    if (this.crossword.ref.games.presentation) this.crossword.ref.games.presentation.update(this._data.id);
     this.crossword.ref.hint.switchOccurrence(true);
   }
 
@@ -1386,7 +1369,6 @@ class StarHint {
       mouseMove: (event) => this._onMouseMove(event)
     };
     this._resetHintsNumber();
-    this._addListeners();
   }
 
   update() {
@@ -1399,10 +1381,6 @@ class StarHint {
     this.data.total = Math.round(this.data.wordsNumber / per) * number;
     this.data.left = this.data.total;
     this.dom.get('hints-output').innerHTML = this.data.left;
-  }
-
-  _addListeners() {
-    this.dom.get('button').get('star').addEventListener('mousedown', this.event.mouseDown);
   }
 
   _onMouseDown(event) {
@@ -1498,9 +1476,8 @@ class Crossword {
 
     this._buildView();
     this._addListeners();
-    this._addGameListeners();
     this._addKeywordListeners();
-    this._permitClue(this.classes.get('button').get('switch').get('meaning'), 'meaning');
+    this._permitClue('meaning');
   }
 
   get view() {
@@ -1524,25 +1501,25 @@ class Crossword {
   }
 
   _switchButtonView(name) {
-    return $templater(({ ref, classes }) =>/*html*/`
-    <button ${ref(`button.switch.${name}`)} ${classes(`button.switch.${name}`)} class="switch-button">
+    return $templater(({ classes, on }) =>/*html*/`
+    <button ${on(`config.switch.${name}`, 'click')} ${classes(`button.switch.${name}`)} class="switch-button">
       <span></span>
     </button>`);
   }
 
   _buildView() {
-    const { references, classes } = $templater(({ ref, child, classes }) =>/*html*/`
+    const template = $templater(({ ref, child, classes, on }) =>/*html*/`
       <div ${ref('container')} ${classes('container')} class="crossword">
         <nav ${ref('panel')} ${classes('panel')} class="navigation-panel">
           <div class="controls game">
             <ul class="buttons pages">
-              <li ${ref('button.config')} ${classes('button.config')} >${child($iconConfig())}</li>
-              <li ${ref('button.crossword')} ${classes('button.crossword')} class="disabled">${child($iconGameCrossword())}</li>
+              <li ${on('nav.config', 'click')} ${classes('button.config')} >${child($iconConfig())}</li>
+              <li ${on('nav.crossword', 'click')} ${classes('button.crossword')} class="disabled">${child($iconGameCrossword())}</li>
             </ul>
             <ul class="buttons game">
-              <li ${ref('button.previous')}>${child($iconPrevious())}</li>            
-              <li ${ref('button.next')}>${child($iconNext())}</li>            
-              <li ${ref('button.star')} class="button-star">${child($iconStar())}</li>
+              <li ${on('nav.previous', 'click', { data: -1 })}>${child($iconPrevious())}</li>            
+              <li ${on('nav.next', 'click', { data: 1 })}>${child($iconNext())}</li>            
+              <li ${on('nav.star', 'mousedown')} class="button-star">${child($iconStar())}</li>
               <li ${ref('hints-output')} class="count-container"></li>
               <li ${ref('cursor-star')} ${classes('cursor-star')} class="cursor-star">${child($iconStar())}</li>
             </ul>
@@ -1554,18 +1531,18 @@ class Crossword {
             </ul>
             <ul class="buttons control">
               <li>
-                <span ${ref('button.game-over')}>${child($iconGameFinish())}</span>
+                <span ${on('nav.game-over', 'click')}>${child($iconGameFinish())}</span>
               </li>
             </ul>
           </div>
           <div class="controls navigation">
             <ul>
-              <li class="toggle-menu" ${ref('button.toggle')}>
+              <li class="toggle-menu" ${on('nav.toggle', 'click')}>
                 <div><i></i></div>
                 <div><i></i></div>
                 <div><i></i></div>
               </li>
-              <li ${ref('button.close')} class="close">${child($iconMinimize())}</li>
+              <li ${on('nav.close', 'click')} class="close">${child($iconMinimize())}</li>
             </ul>
           </div>
         </nav>
@@ -1581,10 +1558,10 @@ class Crossword {
                   <span>Words in crossword: </span>
                   <span ${ref('output-used-words')} class="output">${this.data.wordsNumber}</span>
                   <span class="setting-buttons">
-                    <button ${ref('button.min')} ${classes('button.min')} class="setting-button"><span>min</span></button>
-                    <button ${ref('button.decrease')} ${classes('button.decrease')} class="setting-button"><span>-</span></button>
-                    <button ${ref('button.increase')} ${classes('button.increase')} class="setting-button"><span>+</span></button>
-                    <button ${ref('button.max')} ${classes('button.max')} class="setting-button"><span>max</span></button>
+                    <button ${on('config.words-number.min', 'click', { data: -Infinity })} ${classes('button.min')} class="setting-button"><span>min</span></button>
+                    <button ${on('config.words-number.decrease', 'click', { data: -1 })} ${classes('button.decrease')} class="setting-button"><span>-</span></button>
+                    <button ${on('config.words-number.increase', 'click', { data: 1 })} ${classes('button.increase')} class="setting-button"><span>+</span></button>
+                    <button ${on('config.words-number.max', 'click', { data: Infinity })} ${classes('button.max')} class="setting-button"><span>max</span></button>
                   </span>
                 </p>
                 <div>
@@ -1600,7 +1577,7 @@ class Crossword {
             </section>
             <section class="controls">
               <div>
-                <button ${ref('button.generate')} ${classes('button.generate')} class="setting-button">
+                <button ${on('config.generate', 'click')} ${classes('button.generate')} class="setting-button">
                   <span>Generate Crossword</span>
                 </button>
               </div>
@@ -1613,8 +1590,8 @@ class Crossword {
                     The already generated crossword will be deleted, are you sure?
                   </p>
                   <div class="controls">
-                    <button ${ref('button.confirm.remove-crossword')} class="setting-button"><span>Yes, give me new crossword!</span></button>
-                    <button ${ref('button.reject.remove-crossword')} class="setting-button"><span>No, let me finish it up!</span></button>
+                    <button ${on('config.confirm.remove-crossword', 'click')} class="setting-button"><span>Yes, give me new crossword!</span></button>
+                    <button ${on('config.reject.remove-crossword', 'click')} class="setting-button"><span>No, let me finish it up!</span></button>
                   </div>
                 </li>
                 <li ${ref('warning.insufficient-words')} ${classes('warning.insufficient-words')} class="warning">
@@ -1630,8 +1607,8 @@ class Crossword {
                     Too many words do not match and could not be crossed in any way.
                   </p>
                   <div class="controls">
-                    <button ${ref('button.confirm.generate-fail')} class="setting-button"><span>Ok!</span></button>
-                    <button ${ref('button.reject.generate-fail')} class="setting-button"><span>Try again!</span></button>
+                    <button ${on('config.confirm.generate-fail', 'click')} class="setting-button"><span>Ok!</span></button>
+                    <button ${on('config.reject.generate-fail', 'click')} class="setting-button"><span>Try again!</span></button>
                   </div>
                 </li>
                 <li ${ref('warning.less-words')} ${classes('warning.less-words')} class="warning">
@@ -1642,8 +1619,8 @@ class Crossword {
                     In the end the crossword has been generated with <span ${ref('crossing-words-output')}></span> words.
                   </p>
                   <div class="controls">
-                    <button ${ref('button.confirm.less-words')} class="setting-button"><span>Ok!</span></button>
-                    <button ${ref('button.reject.less-words')} class="setting-button"><span>Try again!</span></button>
+                    <button ${on('config.confirm.less-words', 'click')} class="setting-button"><span>Ok!</span></button>
+                    <button ${on('config.reject.less-words', 'click')} class="setting-button"><span>Try again!</span></button>
                   </div>
                 </li>
               </ul>
@@ -1686,8 +1663,9 @@ class Crossword {
         </ul>
       </div>
     `);
-    this.dom = references;
-    this.classes = classes;
+    this.dom = template.references;
+    this.classes = template.classes;
+    this.html = template;
   }
 
   generateCrossword() {
@@ -1763,52 +1741,36 @@ class Crossword {
   }
 
   _addListeners() {
-    const button = this.dom.get('button');
-    button.get('close').addEventListener('click', () => this.close());
-    button.get('config').addEventListener('click', () => this._switchCrosswordPage('config'));
-    button.get('crossword').addEventListener('click', () => this._switchCrosswordPage('crossword'));
-    button.get('generate').addEventListener('click', () => this.generateCrossword());
-    button.get('min').addEventListener('click', () => this._updateCrosswordWordsNumber(-Infinity));
-    button.get('max').addEventListener('click', () => this._updateCrosswordWordsNumber(Infinity));
-    button.get('increase').addEventListener('click', () => this._updateCrosswordWordsNumber(1));
-    button.get('decrease').addEventListener('click', () => this._updateCrosswordWordsNumber(-1));
-    button.get('toggle').addEventListener('click', () => this._toggleNavigation('toggle'));
+    const { $on } = this.html;
     window.addEventListener('resize', () => this._toggleNavigation('close'));
-
-    button.get('switch').forEach((elem, name) => {
-      elem.addEventListener('click', () => {
-        this._permitClue(this.classes.get('button').get('switch').get(name), name);
-      })
+    $on('nav', ({ last, data, event }) => {
+      if (last === 'config' || last === 'crossword') this._switchCrosswordPage(last);
+      if (last === 'previous' || last === 'next') this.ref.game.switchWord(data);
+      if (last === 'game-over') this.ref.game.gameOver();
+      if (last === 'star') this.ref.star.event.mouseDown(event);
+      if (last === 'toggle') this._toggleNavigation(last);
+      if (last === 'close') this.close();
     });
 
-    button.get('confirm').get('remove-crossword').addEventListener('click', () => {
-      this.state.finished = true;
-      warningAction.call(this, 'remove-crossword');
-      this.generateCrossword();
+    $on('config', ({ id, last, data }) => {
+      if (id.startsWith('config.words-number')) this._updateCrosswordWordsNumber(data);
+      if (id.startsWith('config.switch')) this._permitClue(last);
+      if (last === 'generate') this.generateCrossword();
     });
 
-    button.get('reject').get('remove-crossword').addEventListener('click', () => {
-      warningAction.call(this, 'remove-crossword');
-      this._switchCrosswordPage('crossword');
+    $on('config.confirm', ({ last }) => {
+      warningAction.call(this, last);
+      if (last === 'less-words') this._switchCrosswordPage('crossword');
+      if (last === 'remove-crossword') {
+        this.state.finished = true;
+        this.generateCrossword();
+      }
     });
 
-    button.get('confirm').get('generate-fail').addEventListener('click', () => {
-      warningAction.call(this, 'generate-fail');
-    });
-
-    button.get('reject').get('generate-fail').addEventListener('click', () => {
-      warningAction.call(this, 'generate-fail');
-      this.generateCrossword();
-    });
-
-    button.get('confirm').get('less-words').addEventListener('click', () => {
-      warningAction.call(this, 'less-words');
-      this._switchCrosswordPage('crossword');
-    });
-
-    button.get('reject').get('less-words').addEventListener('click', () => {
-      warningAction.call(this, 'less-words');
-      this.generateCrossword();
+    $on('config.reject', ({ last }) => {
+      warningAction.call(this, last);
+      if (last === 'remove-crossword') this._switchCrosswordPage('crossword');
+      if (last === 'generate-fail' || last === 'less-words') this.generateCrossword();
     });
 
     function warningAction(name) {
@@ -1853,13 +1815,6 @@ class Crossword {
     });
   }
 
-  _addGameListeners() {
-    const button = this.dom.get('button');
-    button.get('previous').addEventListener('click', () => this.ref.game.switchWord(-1));
-    button.get('next').addEventListener('click', () => this.ref.game.switchWord(1));
-    button.get('game-over').addEventListener('click', () => this.ref.game.gameOver());
-  }
-
   _switchCrosswordPage(name) {
     const previous = this.state.activePage;
 
@@ -1879,7 +1834,8 @@ class Crossword {
     }
   }
 
-  _permitClue(classes, name) {
+  _permitClue(name) {
+    const classes = this.classes.get('button').get('switch').get(name);
     let has = classes.has('on');
     if (has && this.data.permitedClueTypes.size === 1) return;
     classes[has ? 'remove' : 'add']('on');

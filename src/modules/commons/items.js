@@ -21,20 +21,19 @@ class Items {
   }
 
   _addListeners() {
-    this.dom.get('item').forEach((element, name) => {
-      element.addEventListener('click', (event) => {
-        if (event.target.tagName === 'A') return;
-        this.events.open(name);
-      })
+    const { $on } = this.html;
+    $on('item', ({ event, last }) => {
+      if (event.target.tagName === 'A') return;
+      this.events.open(last);
     });
   }
 
   _renderView() {
-    const { references } = $templater(({ ref, list }) =>/*html*/`
+    const template = $templater(({ ref, list, on }) =>/*html*/`
       <div ${ref('items-container')} class="items-container">
         <ul class="centered">
           ${list(this.data.items, ({ thumbnail, title, url }, name, iter) =>/*html*/`
-            <li ${ref(`item.${name}`)} class="item">
+            <li ${on(`item.${name}`, 'click')} class="item">
               <div class="outline">
                 <header>
                   <div class="image-container">
@@ -53,7 +52,8 @@ class Items {
         </ul>
       </div>
     `);
-    this.dom = references;
+    this.dom = template.references;
+    this.html = template;
   }
 }
 

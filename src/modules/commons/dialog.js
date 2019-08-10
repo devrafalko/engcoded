@@ -2,12 +2,11 @@ import type from 'of-type';
 import './dialog.scss';
 import Crossword from './../games/crossword/index';
 import Presentation from './../games/presentation/index';
-import Pronunciation from './../games/pronunciation/index';
 import Test from './../games/test/index';
 
 const { Card } = $commons;
 const { $templater } = $utils;
-const { $iconGameCrossword, $iconGameHearing, $iconGameTest, $iconWordList, $iconAlignLeft, 
+const { $iconGameCrossword, $iconGameTest, $iconWordList, $iconAlignLeft,
   $iconAlignCenter, $iconSpy, $iconPalette, $iconTextSize, $iconClose } = $icons;
 
 class Dialog {
@@ -17,6 +16,7 @@ class Dialog {
     this.events = { onClose: null, beforeClose: null, onStopSpy: null };
     this._renderView();
     this._addListeners();
+    this._setInitialState();
   }
 
   get fonts() {
@@ -96,163 +96,110 @@ class Dialog {
   }
 
   _addListeners() {
-    const button = this.dom.get('button');
-    const buttonClasses = this.classes.get('button');
-    const container = this.dom.get('game-container');
-    const containerClasses = this.classes.get('game-container');
-    const game = button.get('game');
+    const { $on } = this.html;
+    window.addEventListener('resize', () => this._toggleNavigation('close'));
 
-    game.get('presentation').addEventListener('click', () => {
-      const data = this.state.currentContentData;
-      toggleNavigation.call(this, 'close');
+    $on('button.game', ({ data }) => {
+      const container = this.dom.get('game-container');
+      const { name, instance } = data;
+      const { games, words } = this.state.currentContentData;
+      const classes = this.classes.get('game-container');
+      this._toggleNavigation('close');
       Card.hide(false);
-      if (!data.games.presentation) {
-        data.games.presentation = new Presentation(this, data.words, data.games);
-        data.games.presentation.on.close = () => {
+      if (!games[name]) {
+        games[name] = new instance(this, words, games);
+        games[name].on.close = () => {
           this.state.gameActive = null;
-          containerClasses.add('hidden');
+          classes.add('hidden');
         };
       }
-      this.state.gameActive = data.games.presentation;
+      games[name].open();
+      this.state.gameActive = games[name];
       container.innerHTML = '';
-      container.appendChild(data.games.presentation.view);
-      containerClasses.remove('hidden');
-      data.games.presentation.open();
+      container.appendChild(games[name].view);
+      classes.remove('hidden');
     });
 
-    game.get('word-test').addEventListener('click', () => {
-      const data = this.state.currentContentData;
-      toggleNavigation.call(this, 'close');
-      Card.hide(false);
-      if (!data.games.test) {
-        data.games.test = new Test(this, data.words);
-        data.games.test.on.close = () => {
-          this.state.gameActive = null;
-          containerClasses.add('hidden');
-        };
-      }
-      data.games.test.open();
-      this.state.gameActive = data.games.test;
-      container.innerHTML = '';
-      container.appendChild(data.games.test.view);
-      containerClasses.remove('hidden');
+    $on('button', ({ id, last, data, target }) => {
+      if (id.startsWith('button.size')) this._fontSize(data, last);
+      if (id.startsWith('button.align')) this._subtitlesAlign(last);
+      if (last === 'font') this._fontFamily(target.selectedIndex);
+      if (last === 'color-text') this._colorText();
+      if (last === 'close') this.close();
+      if (last === 'spy-subtitles') this.spySubtitles(null);
+      if (last === 'toggle') this._toggleNavigation(last);
     });
 
-    game.get('voice-test').addEventListener('click', () => {
-      const data = this.state.currentContentData;
-      toggleNavigation.call(this, 'close');
-      Card.hide(false);
-
-      if (!data.games.pronunciation) {
-        data.games.pronunciation = new Pronunciation(this, data.words);
-        data.games.pronunciation.on.close = () => {
-          this.state.gameActive = null;
-          containerClasses.add('hidden');
-        };
-      }
-      data.games.pronunciation.open();
-      this.state.gameActive = data.games.pronunciation;
-      container.innerHTML = '';
-      container.appendChild(data.games.pronunciation.view);
-      containerClasses.remove('hidden');
+    $on('content-container', ({ event }) => {
+      if (!event.target.hasAttribute('data-word')) return;
+      Card.refresh({
+        container: this.state.currentContentElements.cardArea,
+        scroll: false,
+        index: Number(event.target.getAttribute('data-word')),
+        contentData: this.state.currentContentData
+      });
     });
+  }
 
-    game.get('crossword').addEventListener('click', () => {
-      const data = this.state.currentContentData;
-      toggleNavigation.call(this, 'close');
-      Card.hide(false);
-      if (!data.games.crossword) {
-        data.games.crossword = new Crossword(this, data.words, data.games);
-        data.games.crossword.on.close = () => {
-          this.state.gameActive = null;
-          containerClasses.add('hidden');
-        };
-      }
-      data.games.crossword.open();
-      this.state.gameActive = data.games.crossword;
-      container.innerHTML = '';
-      container.appendChild(data.games.crossword.view);
-      containerClasses.remove('hidden');
-    });
-
-    button.get('color-text').addEventListener('click', () => colorText.call(this));
-    button.get('close').addEventListener('click', () => this.close());
-    button.get('text-small').addEventListener('click', () => fontSize.call(this, 'md-small', buttonClasses.get('text-small')));
-    button.get('text-medium').addEventListener('click', () => fontSize.call(this, 'md-medium', buttonClasses.get('text-medium')));
-    button.get('text-big').addEventListener('click', () => fontSize.call(this, 'md-big', buttonClasses.get('text-big')));
-    button.get('align-left').addEventListener('click', () => subtitlesAlign.call(this, 'left', buttonClasses.get('align-left')));
-    button.get('align-center').addEventListener('click', () => subtitlesAlign.call(this, 'center', buttonClasses.get('align-center')));
-    button.get('spy-subtitles').addEventListener('click', () => this.spySubtitles(null));
-    button.get('font-select').addEventListener('change', (event) => fontFamily.call(this, event.target.selectedIndex));
-    button.get('toggle').addEventListener('click', () => toggleNavigation.call(this, 'toggle'));
-    window.addEventListener('resize', () => toggleNavigation.call(this, 'close'));
-    this.contentContainer.addEventListener('click', (event) => {
-      if (event.target.hasAttribute('data-word')) {
-        Card.refresh({
-          container: this.state.currentContentElements.cardArea,
-          scroll: false,
-          index: Number(event.target.getAttribute('data-word')),
-          contentData: this.state.currentContentData
-        });
-      }
-    });
-
-    subtitlesAlign.call(this, 'left', buttonClasses.get('align-left'));
-    colorText.call(this);
-    fontSize.call(this, 'md-medium', buttonClasses.get('text-medium'));
-    fontFamily.call(this, 0);
+  _setInitialState() {
+    this._subtitlesAlign('left');
+    this._colorText();
+    this._fontSize('md-medium', 'text-medium');
+    this._fontFamily(0);
     this.spySubtitles(true);
+  }
 
-    function subtitlesAlign(align, classes) {
-      if (this.state.alignClasses === classes) return;
-      classes.add('active');
-      if (this.state.alignClasses) this.state.alignClasses.remove('active');
-      this.contentContainer.setAttribute('data-align', align);
-      this.state.alignClasses = classes;
+  _toggleNavigation(action) {
+    const navigation = this.classes.get('navigation-panel');
+    switch (action) {
+      case 'open':
+        if (this.state.navigationOpened === true) return;
+        navigation.add('opened');
+        this.state.navigationOpened = true;
+        break;
+      case 'close':
+        if (this.state.navigationOpened === false) return;
+        navigation.remove('opened');
+        this.state.navigationOpened = false;
+        break;
+      case 'toggle':
+        const next = this.state.navigationOpened ? 'close' : 'open';
+        this._toggleNavigation(next);
+        break;
     }
+  }
 
-    function colorText() {
-      const classes = this.classes.get('content-container');
-      const colored = classes.has('color-text');
-      this.classes.get('button').get('color-text')[colored ? 'remove' : 'add']('active');
-      classes[colored ? 'remove' : 'add']('color-text');
-      Card.fit();
-    }
+  _fontFamily(index) {
+    this.dom.get('button').get('font-select').style.fontFamily = this.fonts[index].family;
+    this.contentContainer.style.fontFamily = this.fonts[index].family;
+    Card.fit();
+  }
 
-    function fontSize(size, classes) {
-      if (this.state.fontSizeClasses === classes) return;
-      classes.add('active');
-      if (this.state.fontSizeClasses) this.state.fontSizeClasses.remove('active');
-      this.contentContainer.setAttribute('data-size', size);
-      this.state.fontSizeClasses = classes;
-      Card.fit();
-    }
+  _subtitlesAlign(align) {
+    const classes = this.classes.get('button').get('align').get(align);
+    if (this.state.alignClasses === classes) return;
+    classes.add('active');
+    if (this.state.alignClasses) this.state.alignClasses.remove('active');
+    this.contentContainer.setAttribute('data-align', align);
+    this.state.alignClasses = classes;
+  }
 
-    function fontFamily(index) {
-      this.dom.get('button').get('font-select').style.fontFamily = this.fonts[index].family;
-      this.contentContainer.style.fontFamily = this.fonts[index].family;
-      Card.fit();
-    }
+  _colorText() {
+    const classes = this.classes.get('content-container');
+    const colored = classes.has('color-text');
+    this.classes.get('button').get('color-text')[colored ? 'remove' : 'add']('active');
+    classes[colored ? 'remove' : 'add']('color-text');
+    Card.fit();
+  }
 
-    function toggleNavigation(action) {
-      const navigation = this.classes.get('navigation-panel');
-      switch (action) {
-        case 'open':
-          if (this.state.navigationOpened === true) return;
-          navigation.add('opened');
-          this.state.navigationOpened = true;
-          break;
-        case 'close':
-          if (this.state.navigationOpened === false) return;
-          navigation.remove('opened');
-          this.state.navigationOpened = false;
-          break;
-        case 'toggle':
-          const next = this.state.navigationOpened ? 'close' : 'open';
-          toggleNavigation.call(this, next);
-          break;
-      }
-    }
+  _fontSize(size, name) {
+    const classes = this.classes.get('button').get(name);
+    if (this.state.fontSizeClasses === classes) return;
+    classes.add('active');
+    if (this.state.fontSizeClasses) this.state.fontSizeClasses.remove('active');
+    this.contentContainer.setAttribute('data-size', size);
+    this.state.fontSizeClasses = classes;
+    Card.fit();
   }
 
   seekOccurrence(id) {
@@ -272,56 +219,56 @@ class Dialog {
   }
 
   _renderView() {
-    const { references, classes } = $templater(({ child, ref, classes, list, when }) => {
+    const template = $templater(({ child, ref, classes, list, when, on }) => {
       return /*html*/`
         <div ${ref('dialog-box')} class="dialog-box">
           <nav ${ref('navigation-panel')} ${classes('navigation-panel')} class="navigation-panel">
             <div class="controls game">
               <ul>
-                <li ${ref('button.game.presentation')}>${child($iconWordList())}</li>
-                <li ${ref('button.game.word-test')}>${child($iconGameTest())}</li>
-                <li ${ref('button.game.voice-test')}>${child($iconGameHearing())}</li>
-                <li ${ref('button.game.crossword')}>${child($iconGameCrossword())}</li>
+                <li ${on('button.game.presentation', 'click', { data: { name: 'presentation', instance: Presentation } })}>${child($iconWordList())}</li>
+                <li ${on('button.game.word-test', 'click', { data: { name: 'test', instance: Test } })}>${child($iconGameTest())}</li>
+                <li ${on('button.game.crossword', 'click', { data: { name: 'crossword', instance: Crossword } })}>${child($iconGameCrossword())}</li>
               </ul>
             </div>
             <div class="controls text">
               <ul ${classes('section.subtitles')} class="section-subtitles">
-                <li ${ref('button.align-left')} ${classes('button.align-left')}>${child($iconAlignLeft())}</li>
-                <li ${ref('button.align-center')} ${classes('button.align-center')}>${child($iconAlignCenter())}</li>
-                <li ${ref('button.spy-subtitles')} ${classes('button.spy-subtitles')}>${child($iconSpy())}</li>
+                <li ${on('button.align.left', 'click')} ${classes('button.align.left')}>${child($iconAlignLeft())}</li>
+                <li ${on('button.align.center', 'click')} ${classes('button.align.center')}>${child($iconAlignCenter())}</li>
+                <li ${on('button.spy-subtitles', 'click')} ${classes('button.spy-subtitles')}>${child($iconSpy())}</li>
               </ul>
               <ul class="section-font">
-                <li ${ref('button.color-text')} ${classes('button.color-text')}>${child($iconPalette())}</li>
+                <li ${on('button.color-text', 'click')} ${classes('button.color-text')}>${child($iconPalette())}</li>
                 <li class="font-select">
-                  <select ${ref('button.font-select')}>
+                  <select ${on('button.font', 'change')} ${ref('button.font-select')}>
                     ${list(this.fonts, ({ name, family }, iter) =>/*html*/`
                       <option ${when(iter === 0, () => `selected`)} style="font-family: ${family}">${name}</option>
                     `)}
                   </select>
                 </li>
-                <li ${ref('button.text-small')} ${classes('button.text-small')} class="font-size-button text-small">${child($iconTextSize())}</li>
-                <li ${ref('button.text-medium')} ${classes('button.text-medium')} class="font-size-button text-medium">${child($iconTextSize())}</li>
-                <li ${ref('button.text-big')} ${classes('button.text-big')} class="font-size-button text-big">${child($iconTextSize())}</li>
+                <li ${on('button.size.text-small', 'click', { data: 'md-small' })} ${classes('button.text-small')} class="font-size-button text-small">${child($iconTextSize())}</li>
+                <li ${on('button.size.text-medium', 'click', { data: 'md-medium' })} ${classes('button.text-medium')} class="font-size-button text-medium">${child($iconTextSize())}</li>
+                <li ${on('button.size.text-big', 'click', { data: 'md-big' })} ${classes('button.text-big')} class="font-size-button text-big">${child($iconTextSize())}</li>
               </ul>
             </div>
             <div class="controls navigation">
               <ul>
-                <li class="toggle-menu" ${ref('button.toggle')}>
+                <li class="toggle-menu" ${on('button.toggle', 'click')}>
                   <div><i></i></div>
                   <div><i></i></div>
                   <div><i></i></div>
                 </li>
-                <li ${ref('button.close')} class="close">${child($iconClose())}</li>
+                <li ${on('button.close', 'click')} class="close">${child($iconClose())}</li>
               </ul>
             </div>
           </nav>
-          <div ${ref('content-container')} ${classes('content-container')} class="content-container"></div>
+          <div ${on('content-container', 'click')} ${ref('content-container')} ${classes('content-container')} class="content-container"></div>
           <div ${ref('game-container')} ${classes('game-container', ['hidden'])} class="game-container"></div>
         </div>
       `;
     });
-    this.classes = classes;
-    this.dom = references;
+    this.classes = template.classes;
+    this.dom = template.references;
+    this.html = template;
   }
 }
 
