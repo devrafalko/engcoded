@@ -1,7 +1,5 @@
-import $id from './id';
-import $loopBetween from './loop-between';
-import $loopParents from './loop-parents';
-import $randomItem from './random-item';
-import $templater from './templater';
-
-export { $id, $randomItem, $loopBetween, $loopParents, $templater };
+module.exports.$id = require('./id').default;
+module.exports.$loopBetween = require('./loop-between').default;
+module.exports.$loopParents = require('./loop-parents').default;
+module.exports.$randomItem = require('./random-item').default;
+module.exports.$templater = require('./templater').default;
