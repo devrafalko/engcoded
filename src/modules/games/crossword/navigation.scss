@@ -6,6 +6,7 @@ $grid-hide-point: 443px;
   0% {
     font-size: 18px;
   }
+
   100% {
     font-size: 28px;
     color: #a8f5f5;
@@ -16,38 +17,37 @@ $grid-hide-point: 443px;
   0% {
     transform: rotate(0deg);
   }
+
   80% {
     transform: rotate(-30deg);
   }
+
   100% {
     transform: rotate(-30deg);
   }
 }
 
-.game-container > .crossword {
+.game-container>.crossword {
   height: 100%;
   width: 100%;
 }
 
-.game-container > .crossword > .navigation-panel {
+.game-container>.crossword>.navigation-panel {
   z-index: 1;
 }
 
-.game-container > .crossword .navigation-panel .controls * {
+.game-container>.crossword .navigation-panel .controls * {
   color: #2fe0e0;
 }
 
-.game-container
-  > .crossword
-  > .navigation-panel
-  .controls.navigation
-  .toggle-menu {
+.game-container>.crossword>.navigation-panel .controls.navigation .toggle-menu {
   display: none;
 }
 
-.dialog-box .game-container > .crossword .navigation-panel {
+.dialog-box .game-container>.crossword .navigation-panel {
   &[data-page="config"] {
     .controls.game {
+
       .buttons.game,
       .buttons.info,
       .buttons.control {
@@ -66,6 +66,7 @@ $grid-hide-point: 443px;
 
       .controls.game {
         height: auto;
+
         .buttons.pages,
         .buttons.game,
         .buttons.info,
@@ -79,11 +80,12 @@ $grid-hide-point: 443px;
   }
 }
 
-.game-container > .crossword > .navigation-panel .controls.game .buttons.game {
+.game-container>.crossword>.navigation-panel .controls.game .buttons.game {
   .button-star {
     margin-right: 0px;
+
     &,
-    & > .icon {
+    &>.icon {
       cursor: grab;
     }
   }
@@ -129,6 +131,7 @@ $grid-hide-point: 443px;
     &.allowed {
       height: 36px;
       width: 36px;
+
       .icon {
         fill: #01b9b9;
         stroke: #01b9b9;
@@ -137,8 +140,9 @@ $grid-hide-point: 443px;
   }
 }
 
-.game-container > .crossword > .navigation-panel .controls.game .buttons.info {
+.game-container>.crossword>.navigation-panel .controls.game .buttons.info {
   vertical-align: top;
+
   li {
     color: #01b9b9;
     cursor: default;
@@ -148,12 +152,7 @@ $grid-hide-point: 443px;
   }
 }
 
-.game-container
-  > .crossword
-  > .navigation-panel
-  .controls.game
-  .buttons.info
-  .output {
+.game-container>.crossword>.navigation-panel .controls.game .buttons.info .output {
   color: #2fe0e0;
   font-size: 18px;
   text-align: left;
@@ -177,11 +176,7 @@ $grid-hide-point: 443px;
   }
 }
 
-.game-container
-  > .crossword
-  > .navigation-panel
-  .controls.game
-  .buttons.control {
+.game-container>.crossword>.navigation-panel .controls.game .buttons.control {
   .icon {
     animation-direction: alternate;
     animation-duration: 0.2s;
@@ -192,15 +187,15 @@ $grid-hide-point: 443px;
     animation-timing-function: ease-in-out;
   }
 
-  & > li:hover .icon {
+  &>li:hover .icon {
     animation-play-state: running;
   }
 }
 
-.game-container > .crossword > .navigation-panel .controls.game {
+.game-container>.crossword>.navigation-panel .controls.game {
   padding: 0px 4px;
 
-  & > .buttons > li {
+  &>.buttons>li {
     width: 26px;
   }
 
@@ -238,7 +233,7 @@ $grid-hide-point: 443px;
   @media (min-width: $grid-medium) and (min-height: $grid-medium) {
     padding: 0px 12px;
 
-    & > .buttons > li {
+    &>.buttons>li {
       width: 30px;
     }
 
@@ -260,15 +255,17 @@ $grid-hide-point: 443px;
   }
 }
 
-.game-container > .crossword > .game-pages {
+.game-container>.crossword>.game-pages {
   height: 100%;
   position: relative;
   z-index: 0;
-  & > li {
+
+  &>li {
     display: block;
     height: 100%;
   }
-  & > li.hidden {
+
+  &>li.hidden {
     display: none;
   }
 }

@@ -16,7 +16,8 @@ $hint-margin: 14px;
 .hint-box,
 .keyboard-box {
   z-index: 5;
-  &.displayed{
+
+  &.displayed {
     z-index: 6;
   }
 }
@@ -43,11 +44,11 @@ $hint-margin: 14px;
   width: 30px;
   z-index: 7;
 
-  & > div {
+  &>div {
     @extend %hint-button;
   }
 
-  &:hover > div {
+  &:hover>div {
     background-color: #00d8d9;
     height: 40px;
     padding: 4px;
@@ -59,9 +60,11 @@ $hint-margin: 14px;
     top: 0%;
     transition: top 0.5s 0.05s cubic-bezier(1, -1.45, 0, 1.95);
     width: 100%;
+
     .open {
       padding: 4px;
     }
+
     .close {
       padding: 8px;
     }
@@ -82,11 +85,13 @@ $hint-margin: 14px;
 
 .hint-box.visible,
 .keyboard-box.visible {
+
   .hint-dialog,
   .keyboard-dialog {
     bottom: 0px;
     opacity: 1;
   }
+
   .sprite {
     top: -100%;
   }
@@ -94,6 +99,7 @@ $hint-margin: 14px;
 
 .hint-box.displayed,
 .keyboard-box.displayed {
+
   .hint-dialog,
   .keyboard-dialog {
     display: inline-block;
@@ -131,7 +137,7 @@ $hint-margin: 14px;
   top: 0px;
   width: 30px;
 
-  & > div {
+  &>div {
     @extend %hint-button;
     height: 0px;
     opacity: 0;
@@ -152,14 +158,14 @@ $hint-margin: 14px;
     display: block;
   }
 
-  &.visible > div {
+  &.visible>div {
     height: 100%;
     opacity: 1;
     padding: 4px;
     width: 100%;
   }
 
-  &.visible:hover > div {
+  &.visible:hover>div {
     background-color: #00d8d9;
     height: 40px;
     padding: 8px;
@@ -193,6 +199,7 @@ $hint-margin: 14px;
   display: none;
   height: 100%;
   width: 100%;
+
   &.active {
     display: block;
   }
@@ -201,7 +208,8 @@ $hint-margin: 14px;
 .hint-box .hint-dialog .meaning-list {
   padding: 8px;
   padding-right: 16px;
-  & > li {
+
+  &>li {
     border: dotted 1px #9c9c9c;
     border-radius: 4px;
     display: inline-block;
@@ -229,18 +237,22 @@ $hint-margin: 14px;
 .hint-box .hint-dialog .definition-list {
   padding: 8px;
   padding-right: 16px;
-  & > li {
+
+  &>li {
     font-size: 17px;
     line-height: 1.25;
     text-align: justify;
   }
-  & > li:not(:last-child) {
+
+  &>li:not(:last-child) {
     margin-bottom: 12px;
   }
-  & > li:not(:only-child) {
+
+  &>li:not(:only-child) {
     list-style-type: decimal;
     margin-left: 12px;
   }
+
   [data-keyword] {
     letter-spacing: 2px;
   }
@@ -250,7 +262,7 @@ $hint-margin: 14px;
   padding-right: 12px;
 
   .image-navigation {
-    &:empty + .image-element {
+    &:empty+.image-element {
       border-top-right-radius: 12px;
       margin-top: 8px;
     }
@@ -276,12 +288,15 @@ $hint-margin: 14px;
     display: none;
     height: $autoplay-height;
     width: $autoplay-height;
+
     .icon {
       fill: #00c3cc;
     }
+
     &.on {
       display: inline-block;
     }
+
     &.off {
       display: none;
     }
@@ -291,6 +306,7 @@ $hint-margin: 14px;
     .check.on {
       display: none;
     }
+
     .check.off {
       display: inline-block;
     }
@@ -310,6 +326,7 @@ $hint-margin: 14px;
     height: 36px;
     transition: transform 0.15s ease-in-out;
     width: 36px;
+
     .icon {
       fill: #008cab;
       height: 100%;
@@ -320,6 +337,7 @@ $hint-margin: 14px;
 
   .button.player.playing {
     transform: rotate(-45deg);
+
     .icon {
       fill: #05d8bc;
     }
@@ -347,7 +365,8 @@ $hint-margin: 14px;
     transition: padding 0.1s ease-in-out;
     vertical-align: bottom;
     width: $size - 4px;
-    & > span {
+
+    &>span {
       border: solid 1px #009bb4;
       border-radius: 4px;
       box-shadow: 2px 2px 0px rgba(0, 155, 180, 0.7);
@@ -361,25 +380,28 @@ $hint-margin: 14px;
 
     &:active {
       padding: 2px 0px 0px 2px;
-      & > span {
+
+      &>span {
         box-shadow: 0px 0px 0px rgba(0, 155, 180, 0.7);
       }
     }
   }
 
   .row li.special {
-    & > span {
+    &>span {
       border-color: #636363;
       box-shadow: 2px 2px 0px rgba(99, 99, 99, 0.7);
       color: #636363;
     }
-    &:active > span {
+
+    &:active>span {
       box-shadow: 0px 0px 0px rgba(99, 99, 99, 0.7);
     }
   }
 
   @media (min-width: 360px) {
     padding: 12px;
+
     .row li {
       margin: 0px 2px;
     }
@@ -387,6 +409,7 @@ $hint-margin: 14px;
 
   @media (min-width: 400px) {
     padding: 12px;
+
     .row li {
       height: $size;
       margin: 0px 2px;

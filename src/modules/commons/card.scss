@@ -78,16 +78,20 @@ $bezier-soft-out: cubic-bezier(0.73, 0.18, 0.86, 0.45);
 
   .button.nav {
     display: none;
+
     .top {
       fill: #80e4dc;
     }
+
     .bottom {
       fill: #00c9b8;
     }
+
     &:hover {
       .top {
         fill: #a4faf1;
       }
+
       .bottom {
         fill: #00e7c1;
       }
@@ -109,6 +113,7 @@ $bezier-soft-out: cubic-bezier(0.73, 0.18, 0.86, 0.45);
     fill: #00c9b8;
     transition: fill 0.15s ease-in-out, background-color 0.15s ease-in-out;
   }
+
   .card.navigation .button:hover & {
     fill: #00e7c1;
   }
@@ -134,6 +139,7 @@ $bezier-soft-out: cubic-bezier(0.73, 0.18, 0.86, 0.45);
 
   .page.image {
     padding: 0px;
+
     .image-slider .image-element {
       border-radius: 8px 8px 12px 12px;
       padding: 4px;
@@ -175,7 +181,7 @@ $bezier-soft-out: cubic-bezier(0.73, 0.18, 0.86, 0.45);
     cursor: pointer;
   }
 
-  .button.sound:not([data-mp3]) ~ .word-tab:not([data-mp3]),
+  .button.sound:not([data-mp3])~.word-tab:not([data-mp3]),
   .word-tab [data-pronoun] {
     color: #748682;
     font-size: 15px;
@@ -187,12 +193,14 @@ $bezier-soft-out: cubic-bezier(0.73, 0.18, 0.86, 0.45);
     font-family: "Raleway", sans-serif;
     font-size: 17px;
     margin-right: 0.34em;
+
     &[data-mp3] {
       border-bottom: dotted 1px #00a59d;
       cursor: pointer;
       transition-duration: 0.15s;
       transition-property: border-bottom, color;
       transition-timing-function: ease-in-out;
+
       &:hover {
         color: #009191;
         border-bottom: dotted 1px #009191;

@@ -28,15 +28,17 @@
   from {
     background-color: #3ecce2;
   }
+
   to {
     background-color: #009bb4;
   }
 }
 
-.crossword-page > div {
+.crossword-page>div {
   height: 100%;
   position: relative;
   width: 100%;
+
   .crossword {
     @extend %scrollbar;
     height: 100%;
@@ -45,6 +47,7 @@
     padding: 22px;
     width: 100%;
   }
+
   .buttons {
     width: 100%;
   }
@@ -58,7 +61,7 @@
     height: 30px;
   }
 
-  td > div {
+  td>div {
     display: block;
     height: 100%;
     position: relative;
@@ -66,22 +69,25 @@
   }
 }
 
-div > span {
+div>span {
   font-family: "Roboto", sans-serif;
-  #crossword-table td.letter-cell > & {
+
+  #crossword-table td.letter-cell>& {
     @extend %cell;
+
     &:hover {
       @extend %cell-hover;
     }
   }
 
-  #crossword-table td.letter-cell.active > & {
+  #crossword-table td.letter-cell.active>& {
     border: dashed 1px #008cab;
     bottom: -1px;
     height: 35px;
     right: -1px;
     width: 35px;
     z-index: 2;
+
     &:hover {
       @extend %cell-hover;
     }
@@ -97,7 +103,7 @@ div > span {
     }
   }
 
-  #crossword-table td.letter-cell.fixed > & {
+  #crossword-table td.letter-cell.fixed>& {
     background-color: #009bb4;
     border-color: #56bdd4;
     color: white;
@@ -105,7 +111,7 @@ div > span {
     z-index: 1;
   }
 
-  #crossword-table td.letter-cell.highlight > & {
+  #crossword-table td.letter-cell.highlight>& {
     animation-duration: 0.4s;
     animation-name: highlight;
     animation-timing-function: ease-out;
@@ -113,11 +119,12 @@ div > span {
 }
 
 #crossword-table td.clue-cell {
-  & > div > ul {
+  &>div>ul {
     @extend %cell;
     border-color: #56bdd4;
     cursor: pointer;
     z-index: 3;
+
     &:hover {
       @extend %cell-hover;
     }
@@ -134,6 +141,7 @@ div > span {
   .arrow {
     position: absolute;
     margin: auto;
+
     svg {
       display: block;
       fill: #008cab;

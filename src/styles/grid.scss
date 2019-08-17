@@ -4,11 +4,15 @@
       @media (min-width: $min) {
         @content;
       }
-    } @else if $s {
+    }
+
+    @else if $s {
       @media (max-width: $max) {
         @content;
       }
-    } @else {
+    }
+
+    @else {
       @media (min-width: $min) and (max-width: $max) {
         @content;
       }
@@ -20,23 +24,31 @@
   $s: $extend==andsmaller;
   $l: $extend==andlarger;
 
-  @if $size == xsmall {
+  @if $size==xsmall {
     @include media-assertion(true, false, null, 480px) {
       @content;
     }
-  } @else if $size == small {
+  }
+
+  @else if $size==small {
     @include media-assertion($s, $l, 481px, 768px) {
       @content;
     }
-  } @else if $size == medium {
+  }
+
+  @else if $size==medium {
     @include media-assertion($s, $l, 769px, 992px) {
       @content;
     }
-  } @else if $size == large {
+  }
+
+  @else if $size==large {
     @include media-assertion($s, $l, 993px, 1200px) {
       @content;
     }
-  } @else if $size == xlarge {
+  }
+
+  @else if $size==xlarge {
     @include media-assertion(false, true, 1201px, null) {
       @content;
     }

@@ -51,6 +51,7 @@
       margin-top: 10px;
       transition: fill 0.15s ease-in-out;
       width: 22px;
+
       @media (min-width: $grid-medium) and (min-height: $grid-medium) {
         margin: 8px;
         height: 26px;
@@ -69,6 +70,7 @@
 
   li[data-current] .jump-to-button {
     visibility: visible;
+
     .icon {
       fill: rgba(0, 186, 199, 1);
     }
@@ -79,12 +81,15 @@
   width: 100%;
   margin: auto;
   padding: 6px;
+
   @include media(small, andsmaller) {
     width: 100%;
   }
+
   @include media(medium) {
     width: 734px;
   }
+
   @include media(large, andlarger) {
     width: 947px;
   }

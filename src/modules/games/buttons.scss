@@ -39,10 +39,12 @@ button.setting-button {
   &.disabled {
     border: solid 1px #c9caca;
     cursor: not-allowed;
+
     span,
     ul {
       color: #c9caca;
     }
+
     svg {
       fill: #c9caca;
       stroke: #c9caca;
@@ -56,6 +58,7 @@ button.setting-button {
   &:not(.disabled):hover,
   &:not(.disabled).on {
     border: solid 1px #00b8b8;
+
     span,
     ul {
       bottom: 0px;
@@ -75,7 +78,8 @@ button.switch-button {
   outline: 0px;
   position: relative;
   width: 40px;
-  & > span {
+
+  &>span {
     @extend %vertical-center;
     background-color: #008cab;
     border-radius: 50%;
@@ -85,7 +89,8 @@ button.switch-button {
     transition: left 0.15s ease-in-out, background-color 0.15s 0.15s ease-in-out;
     width: 16px;
   }
-  &.on > span {
+
+  &.on>span {
     background-color: white;
     left: 0px;
   }

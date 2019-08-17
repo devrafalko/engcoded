@@ -28,10 +28,12 @@
 %scrollbar {
   scrollbar-color: #39aac2 white;
   scrollbar-width: thin;
+
   &::-webkit-scrollbar {
     background: white;
     height: 14px;
     width: 14px;
+
     @include media(medium, andsmaller) {
       height: 10px;
       width: 10px;
@@ -46,6 +48,7 @@
     background: #39aac2;
     border-radius: 6px;
     box-shadow: 0px 0px 3px 0px rgba(white, 0.3) inset;
+
     &:hover {
       box-shadow: 0px 0px 4px 2px rgba(white, 0.3) inset;
     }
@@ -82,8 +85,7 @@
   }
 }
 
-@mixin menu-button(
-  $dots: 3,
+@mixin menu-button($dots: 3,
   $time: 0.15s,
   $delay: 0.15s,
   $width: 16px,
@@ -91,33 +93,34 @@
   $diameter: 16px,
   $color: white,
   $hover-diameter: $diameter * 1.15,
-  $hover-color: $color
-) {
+  $hover-color: $color) {
   $bezier: cubic-bezier(0.24, 2, 0.44, 0.99);
   width: $width;
   height: $height;
   cursor: pointer;
   pointer-events: auto;
+
   &.hidden {
     pointer-events: none;
   }
 
-  &.hidden > * > * {
+  &.hidden>*>* {
     width: 0px;
     height: 0px;
   }
 
-  &:hover > * > * {
+  &:hover>*>* {
     width: $hover-diameter;
     height: $hover-diameter;
     background-color: $hover-color;
   }
 
-  & > * {
+  &>* {
     position: relative;
     width: 100% / $dots;
     height: 100%;
-    & > * {
+
+    &>* {
       position: absolute;
       display: block;
       margin: auto;
@@ -130,9 +133,11 @@
       background-color: $color;
       border-radius: 50%;
     }
+
     @for $dot from 1 through $dots {
       $break: $dot - 1;
-      &:nth-child(#{$dot}) > * {
+
+      &:nth-child(#{$dot})>* {
         transition: width $time $delay * $break $bezier,
           height $time $delay * $break $bezier,
           background-color $time $delay * $break ease-in-out;

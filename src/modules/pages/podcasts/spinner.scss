@@ -2,17 +2,20 @@
   0% {
     transform: rotateZ(0deg);
   }
+
   100% {
     transform: rotateZ(360deg);
   }
 }
 
 @keyframes circle-animation {
+
   0%,
   25% {
     stroke-dashoffset: 280;
     transform: rotate(0);
   }
+
   50%,
   75% {
     stroke-dashoffset: 120;

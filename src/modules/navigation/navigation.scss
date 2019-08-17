@@ -29,6 +29,7 @@ body {
 
 #navigation-container.opened {
   z-index: 3;
+
   .navigation-panel {
     padding-top: 0px;
     height: auto;
@@ -36,8 +37,7 @@ body {
 }
 
 #navigation-container .toggle-menu {
-  @include menu-button(
-    $dots: 3,
+  @include menu-button($dots: 3,
     $time: 0.1s,
     $delay: 0.03s,
     $width: 60px,
@@ -45,15 +45,15 @@ body {
     $diameter: 12px,
     $hover-diameter: 16px,
     $color: #0cdbd1,
-    $hover-color: #73f8ed
-  );
+    $hover-color: #73f8ed);
   display: none;
   position: absolute;
   margin: 0px 12px;
   height: 35px;
   bottom: 0px;
   right: 0px;
-  & > div {
+
+  &>div {
     float: left;
   }
 
@@ -64,13 +64,11 @@ body {
 
 #navigation-container .navigation-panel {
   @extend %no-select;
-  background: linear-gradient(
-    to bottom,
-    #00dada 10%,
-    #0086a8 65%,
-    85%,
-    #1d7a86 95%
-  );
+  background: linear-gradient(to bottom,
+      #00dada 10%,
+      #0086a8 65%,
+      85%,
+      #1d7a86 95%);
   box-shadow: 0px 4px 12px 0px #004852;
   display: block;
   font-family: "Raleway", sans-serif;
@@ -79,12 +77,15 @@ body {
   white-space: nowrap;
   width: 100%;
   height: $grid-main-nav-small;
+
   @media (min-width: $grid-small) and (min-height: $grid-small) {
     height: $grid-main-nav-medium;
   }
+
   @media (min-width: $grid-medium) and (min-height: $grid-medium) {
     height: $grid-main-nav-large;
   }
+
   @media (max-width: $grid-hide-point) {
     padding-top: $grid-main-nav-small;
   }
@@ -97,7 +98,7 @@ body {
   padding: 3px 3px;
   text-align: center;
 
-  & > span {
+  &>span {
     background-color: rgba(255, 255, 255, 0);
     border: solid 1px rgba(255, 255, 255, 0);
     border-radius: 4px;
@@ -109,35 +110,39 @@ body {
       border 0.2s ease-in-out;
   }
 
-  &:hover:not(.active) > span {
+  &:hover:not(.active)>span {
     border: solid 1px rgba(255, 255, 255, 0.3);
     color: white;
   }
 
-  &:active:not(.active) > span {
+  &:active:not(.active)>span {
     background-color: rgba(255, 255, 255, 0.9);
     color: #006e7c;
     transition: none;
   }
 
-  &.active > span {
+  &.active>span {
     background-color: rgba(255, 255, 255, 0.3);
     color: white;
     transition: background-color 0.5s, color 0.5s;
   }
 
   @media (min-width: $grid-small) and (min-height: $grid-small) {
+
     &,
-    & > span {
+    &>span {
       padding: 6px 6px;
     }
   }
+
   @media (min-width: $grid-medium) and (min-height: $grid-medium) {
     padding: 12px 10px;
-    & > span {
+
+    &>span {
       padding: 12px 12px;
     }
   }
+
   @media (max-width: $grid-hide-point) {
     display: block;
   }
@@ -150,7 +155,8 @@ body {
   padding-top: 16px;
   position: relative;
   z-index: 2;
-  & > ul {
+
+  &>ul {
     height: 100%;
     position: relative;
     width: 100%;

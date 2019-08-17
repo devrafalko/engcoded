@@ -20,11 +20,13 @@
 .game-container .presentation .controls.game {
   padding: 0px 12px;
   width: 100%;
-  & > ul {
+
+  &>ul {
     display: block;
     width: 100%;
   }
-  & > ul > li {
+
+  &>ul>li {
     margin: 0px;
   }
 }
@@ -34,7 +36,7 @@
   padding: 0px 2px;
   width: 60%;
 
-  & > div {
+  &>div {
     height: 100%;
     position: relative;
   }
@@ -71,11 +73,13 @@
   @media (min-width: $grid-small) and (min-height: $grid-small) {
     padding: 0px 4px;
     width: 220px;
+
     .search-box {
       font-size: 17px;
       height: 30px;
       padding-right: 28px;
     }
+
     .icon-box {
       height: 30px;
       width: 22px;
@@ -85,11 +89,13 @@
   @media (min-width: $grid-medium) and (min-height: $grid-medium) {
     padding: 0px 6px;
     width: 280px;
+
     .search-box {
       font-size: 18px;
       height: 36px;
       padding-right: 30px;
     }
+
     .icon-box {
       height: 36px;
       width: 24px;
@@ -102,7 +108,7 @@
   padding: 0px 2px;
   width: 40%;
 
-  & > div {
+  &>div {
     height: 100%;
     position: relative;
   }
@@ -168,7 +174,7 @@
     top: 0px;
   }
 
-  .list > li {
+  .list>li {
     border-bottom: solid 1px #dcdcdc;
     margin: 0px 0px;
     padding: 2px 0px;
@@ -228,7 +234,7 @@
       width: 14px;
     }
 
-    .list > li {
+    .list>li {
       margin: 6px 0px;
       padding: 4px 0px;
     }
@@ -260,6 +266,7 @@
 
   @media (min-width: $grid-medium) and (min-height: $grid-medium) {
     margin: 0px 8px;
+
     .page-buttons {
       margin: 0px 8px;
     }
@@ -303,7 +310,7 @@
     width: 100%;
   }
 
-  input.invalid{
+  input.invalid {
     border-color: #ff8eb3;
     color: #ff4481;
   }
@@ -339,7 +346,7 @@
   height: 100%;
   margin: 0px 8px;
 
-  & > li {
+  &>li {
     float: left;
     height: 100%;
     margin: 0px 1px;
@@ -359,8 +366,9 @@
 
   &.value {
     min-width: 26px;
-    & > span,
-    & > ul {
+
+    &>span,
+    &>ul {
       padding: 0px 4px;
       padding-bottom: 4px;
       font-size: 18px;
@@ -370,15 +378,16 @@
 
   &.navig {
     width: 26px;
-    & > span,
-    & > ul {
+
+    &>span,
+    &>ul {
       padding: 0px;
       padding-bottom: 4px;
     }
   }
 
-  & > span .icon,
-  & > ul .icon {
+  &>span .icon,
+  &>ul .icon {
     height: 20px;
     width: 24px;
   }
@@ -386,10 +395,12 @@
   @media (min-width: $grid-medium) and (min-height: $grid-medium) {
     height: 32px;
     margin: 6px 0px;
+
     &.value {
       min-width: 32px;
-      & > span,
-      & > ul {
+
+      &>span,
+      &>ul {
         font-size: 20px;
         line-height: 24px;
       }
@@ -399,8 +410,8 @@
       width: 32px;
     }
 
-    & > span .icon,
-    & > ul .icon {
+    &>span .icon,
+    &>ul .icon {
       height: 22px;
       width: 30px;
     }
@@ -418,10 +429,11 @@
   }
 }
 
-.game-container .presentation .table-box > table {
+.game-container .presentation .table-box>table {
   border-collapse: collapse;
   table-layout: fixed;
   width: 100%;
+
   thead .header {
     display: inline-block;
     font-family: Raleway;
@@ -438,23 +450,29 @@
   th.head {
     height: 42px;
     position: relative;
+
     &.word {
       padding-right: 132px;
     }
+
     &.translation {
       padding-right: 40px;
     }
+
     &.word-type {
       padding-right: 40px;
       width: 78px;
     }
+
     &.repetitions {
       padding-right: 40px;
       width: 78px;
     }
+
     &.find {
       width: 48px;
     }
+
     .button-set {
       @extend %vertical-center;
       height: 32px;
@@ -472,7 +490,7 @@
     border-bottom: solid 1px #b3b3b3;
   }
 
-  tr:not(:last-child) > td {
+  tr:not(:last-child)>td {
     border-bottom: solid 1px #d6d6d6;
   }
 
@@ -481,12 +499,12 @@
     border-right: solid 1px #b3b3b3;
   }
 
-  tbody > tr:nth-child(odd) {
+  tbody>tr:nth-child(odd) {
     background-color: #f8f8f8;
   }
 
-  thead > tr,
-  tbody > tr:nth-child(even) {
+  thead>tr,
+  tbody>tr:nth-child(even) {
     background-color: white;
   }
 
@@ -517,13 +535,15 @@
     }
   }
 
-  &.left td.word > p {
+  &.left td.word>p {
     text-align: left;
   }
-  &.center td.word > p {
+
+  &.center td.word>p {
     text-align: center;
   }
-  &.right td.word > p {
+
+  &.right td.word>p {
     text-align: right;
   }
 
@@ -550,7 +570,7 @@
   }
 }
 
-.game-container .presentation .table-box > table {
+.game-container .presentation .table-box>table {
   td.word {
     p {
       font-family: "Raleway", sans-serif;
@@ -625,7 +645,7 @@
     }
   }
 
-  td.find > span {
+  td.find>span {
     display: block;
     position: relative;
     width: 100%;
@@ -649,19 +669,21 @@
   }
 
   &.hide-word {
-    td.word > p {
+    td.word>p {
       visibility: hidden;
     }
-    td.word:hover > p {
+
+    td.word:hover>p {
       visibility: visible;
     }
   }
 
   &.hide-translation {
-    td.translation > ul {
+    td.translation>ul {
       visibility: hidden;
     }
-    td.translation:hover > ul {
+
+    td.translation:hover>ul {
       visibility: visible;
     }
   }
@@ -700,19 +722,19 @@
     opacity: 1;
   }
 
-  & > div {
+  &>div {
     @extend %hint-button;
     height: 0px;
     padding: 6px;
     width: 0px;
   }
 
-  &.visible > div {
+  &.visible>div {
     height: 100%;
     width: 100%;
   }
 
-  &.visible:hover > div {
+  &.visible:hover>div {
     background-color: #00d8d9;
     height: 48px;
     padding: 8px;

@@ -1,21 +1,23 @@
 @import "./../../../styles/rules";
 @import "./../../../styles/responsive";
 
-.game-container > .crossword .config-page {
+.game-container>.crossword .config-page {
   @extend %scrollbar;
   overflow: auto;
   padding: 12px;
+
   section {
     text-align: center;
     margin: 22px 0px;
-    & > div {
+
+    &>div {
       display: inline-block;
       text-align: center;
     }
   }
 }
 
-.game-container > .crossword .config-page section.settings {
+.game-container>.crossword .config-page section.settings {
   font-family: "Open Sans", sans-serif;
   font-size: 16px;
 
@@ -27,7 +29,7 @@
     font-size: 18px;
   }
 
-  & > div {
+  &>div {
     border-bottom: solid 1px #00abbe;
     padding-bottom: 22px;
     text-align: left;
@@ -39,10 +41,12 @@
 
   .selection-list {
     padding-left: 16px;
-    & > li {
+
+    &>li {
       margin: 6px;
     }
-    & > li > span {
+
+    &>li>span {
       vertical-align: top;
     }
   }
@@ -57,6 +61,7 @@
     font-size: 18px;
     min-width: 30px;
     vertical-align: top;
+
     span {
       padding: 2px 3px;
     }
@@ -71,7 +76,7 @@
   }
 }
 
-.game-container > .crossword .config-page section.warnings .warning {
+.game-container>.crossword .config-page section.warnings .warning {
   text-align: center;
   display: none;
 
@@ -79,7 +84,7 @@
     display: block;
   }
 
-  & > .prompt {
+  &>.prompt {
     border: solid 1px #f1664d;
     display: inline-block;
     font-family: "PT Sans", sans-serif;
@@ -90,25 +95,27 @@
     position: relative;
     max-width: 520px;
     text-align: justify;
+
     .icon {
       @extend %vertical-center;
       left: 4px;
     }
   }
 
-  & > .controls {
+  &>.controls {
     margin: 8px 0px;
   }
 }
 
-.game-container > .crossword .config-page section.shortcuts {
+.game-container>.crossword .config-page section.shortcuts {
   text-align: center;
 
-  & > ul {
+  &>ul {
     display: inline-block;
     text-align: left;
   }
-  & > ul > li {
+
+  &>ul>li {
     margin: 8px 0px;
   }
 
