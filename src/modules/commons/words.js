@@ -80,8 +80,8 @@ class Words {
     map.set('type-za', map.get('type-az').slice().reverse());
   }
 
-  random(collection, game = null) {
-    const reps = game === null ? this._repetition.global : this._repetition[game];
+  random(collection) {
+    const reps = this._repetition.global;
     for (let [key, ids] of reps) {
       if (!ids.size) continue;
       let filtered = new Set();
@@ -140,19 +140,15 @@ class Words {
     return finalMatch;
   }
 
-  solve(id, gameName) {
-    const game = this._repetition[gameName];
+  solve(id) {
     const glob = this._repetition.global;
     const iter = this._repetition.iterator;
     const current = iter.get(id);
     const next = current + 1;
-    if (!game.has(next)) game.set(next, new Set());
     if (!glob.has(next)) glob.set(next, new Set());
 
     glob.get(current).delete(id);
     glob.get(next).add(id);
-    game.get(current).delete(id);
-    game.get(next).add(id);
     iter.set(id, next);
   }
 
@@ -165,7 +161,7 @@ class Words {
     return map;
   }
 
-  filter({ types, letters }) {
+  filter({ types = null, letters }) {
     const firstLetters = letters.slice(0, 2);
     if (!this._map.alphabet.has(firstLetters)) return this.matchTemplate;
     const initial = this._map.alphabet.get(firstLetters).sort;
@@ -188,10 +184,96 @@ class Words {
         let arr = sortMap.get(sortType);
         collection.forEach((id) => {
           let type = this.records.get(id).type;
-          if (types.get(type) === true) arr.push(id);
+          if (types === null || types.get(type) === true) arr.push(id);
         });
       })
       return sortMap;
+    }
+  }
+
+  sortByClueType(identifiers, permittedClues) {
+    const clues = this.clues;
+    const sorted = sortByCluesNumber();
+    const clueMap = createClueMap();
+    const sortedMap = createIdMap();
+    const dispersedList = disperse(sortedMap);
+    return dispersedList;
+
+    function createIdMap() {
+      const sortedMap = new Map();
+      for (let id of sorted) {
+        let chosenClueName = nextClue(id);
+        if (!sortedMap.has(chosenClueName)) sortedMap.set(chosenClueName, []);
+        sortedMap.get(chosenClueName).push(id);
+        clueMap.get(chosenClueName).records++;
+      }
+      return sortedMap;
+    }
+
+    function sortByCluesNumber() {
+      const sorted = identifiers;
+      sorted.sort((a, b) => countClues(a) - countClues(b));
+      return sorted;
+    }
+
+    function countClues(id) {
+      let iter = 0;
+      clues.forEach((set, key) => {
+        if (permittedClues.has(key) && set.has(id)) iter++;
+      });
+      return iter;
+    }
+
+    function nextClue(id) {
+      let chosen = null, lowest = Infinity;
+      clueMap.forEach(({ size, records }, name) => {
+        if (!clues.get(name).has(id)) return;
+        if (records < lowest) {
+          chosen = name;
+          lowest = records;
+        }
+        if (records === lowest && size < clueMap.get(chosen).size) chosen = name;
+      });
+      return chosen;
+    }
+
+    function createClueMap() {
+      const map = new Map();
+      for (let id of sorted) {
+        permittedClues.forEach((name) => {
+          if (!clues.get(name).has(id)) return;
+          if (!map.has(name)) map.set(name, { size: 0, records: 0 });
+          map.get(name).size++;
+        });
+      }
+      return map;
+    }
+
+    function disperse(_map) {
+      const intenseMap = new Map();
+      const collection = new Map();
+      _map.forEach((list, name) => collection.set(name, list.slice()));
+
+      const finalCollection = new Map();
+      let wordsSize = 0;
+      collection.forEach((list) => wordsSize += list.length);
+      collection.forEach((list, name) => intenseMap.set(name, { constIntense: list.length / wordsSize, currentIntense: 0 }));
+
+      while (wordsSize > 0) {
+        intenseMap.forEach((data, name) => data.currentIntense += data.constIntense);
+        let highestIntense = -Infinity;
+        let chosenName = null;
+        intenseMap.forEach(({ currentIntense }, name) => {
+          if (currentIntense >= highestIntense && collection.get(name).length) {
+            highestIntense = currentIntense;
+            chosenName = name;
+          }
+        });
+        finalCollection.set(collection.get(chosenName).pop(), chosenName);
+        intenseMap.get(chosenName).currentIntense = 0;
+        wordsSize--;
+      }
+      return finalCollection;
     }
   }
 
@@ -259,7 +341,7 @@ class Words {
   }
 
   _buildRepetitionMaps() {
-    const names = ['global', 'crossword', 'test-eng-pl', 'test-pl-eng', 'test-audio', 'test-definition'];
+    const names = ['global'];
     this._repetition = {
       iterator: new Map()
     };
@@ -344,12 +426,14 @@ class Words {
 
   _buildCluesMap() {
     const map = new Map([
+      ['word', new Set()],
       ['meaning', new Set()],
       ['definition', new Set()],
       ['img', new Set()],
       ['audio', new Set()],
     ]);
     this._map.records.forEach((record, id) => {
+      if (record.hasOwnProperty('word')) map.get('word').add(id);
       if (record.hasOwnProperty('meaning')) map.get('meaning').add(id);
       if (record.hasOwnProperty('definition')) map.get('definition').add(id);
       if (record.hasOwnProperty('img')) map.get('img').add(id);

@@ -907,7 +907,7 @@ class Word {
     const valid = this.letters.every(({ typed, letter, fixed }) => fixed ? true : typed.toLowerCase() === letter.toLowerCase());
     if (!valid) return;
     this.fix();
-    this.crossword.ref.words.solve(this._data.id, 'crossword');
+    this.crossword.ref.words.solve(this._data.id);
     if (this.crossword.ref.games.presentation) this.crossword.ref.games.presentation.update(this._data.id);
     this.crossword.ref.hint.switchOccurrence(true);
   }
@@ -1094,54 +1094,10 @@ class VirtualGrid {
   }
 
   _buildCluesMap() {
-    const words = this.crossword.ref.words;
-    const permittedClues = this.data.clues;
-    const wordInstances = sortByCluesNumber(this.word);
-    const clueMap = createClueMap();
-    for (let word of wordInstances) {
-      let chosenClueName = nextClue(word.id);
-      word.clue.type = chosenClueName;
-      clueMap.get(chosenClueName).records++;
-    }
-
-    function sortByCluesNumber(collection) {
-      const words = [...collection.values()];
-      words.sort((a, b) => countClues(a.id) - countClues(b.id));
-      return words;
-    }
-
-    function countClues(id) {
-      let iter = 0;
-      words.clues.forEach((set, key) => {
-        if (permittedClues.has(key) && set.has(id)) iter++;
-      });
-      return iter;
-    }
-
-    function nextClue(id) {
-      let chosen = null, lowest = Infinity;
-      clueMap.forEach(({ size, records }, name) => {
-        if (!words.clues.get(name).has(id)) return;
-        if (records < lowest) {
-          chosen = name;
-          lowest = records;
-        }
-        if (records === lowest && size < clueMap.get(chosen).size) chosen = name;
-      });
-      return chosen;
-    }
-
-    function createClueMap() {
-      const map = new Map();
-      for (let word of wordInstances) {
-        permittedClues.forEach((name) => {
-          if (!words.clues.get(name).has(word.id)) return;
-          if (!map.has(name)) map.set(name, { size: 0, records: 0 });
-          map.get(name).size++;
-        });
-      }
-      return map;
-    }
+    const identifiers = [];
+    for (let word of this.word.values()) identifiers.push(word.id);
+    const sorted = this.crossword.ref.words.sortByClueType(identifiers, this.data.clues);
+    this.word.forEach((word) => word.clue.type = sorted.get(word.id));
   }
 
   _addWord(x, y, side, id) {
@@ -1546,7 +1502,7 @@ class Crossword {
             </ul>
           </div>
         </nav>
-        <ul ${ref('pages')} class="game-pages">
+        <ul class="game-pages">
           <li ${ref('page.config')} ${classes('page.config')} class="config-page hidden">
             <section class="settings">
               <div>
@@ -1566,11 +1522,11 @@ class Crossword {
                 </p>
                 <div>
                   <p>Use as the crossword clue:</p>
-                  <ul ${ref('switch-list')} class="selection-list">
-                    <li><span>Translation</span> ${child(this._switchButtonView('meaning'))}</li>
-                    <li><span>Definition</span> ${child(this._switchButtonView('definition'))}</li>
-                    <li><span>Image</span> ${child(this._switchButtonView('img'))}</li>
-                    <li><span>Pronunciation</span> ${child(this._switchButtonView('audio'))}</li>
+                  <ul class="selection-list">
+                    <li>${child(this._switchButtonView('meaning'))} <span>Translation</span></li>
+                    <li>${child(this._switchButtonView('definition'))} <span>Definition</span></li>
+                    <li>${child(this._switchButtonView('img'))} <span>Image</span></li>
+                    <li>${child(this._switchButtonView('audio'))} <span>Pronunciation</span></li>
                   </ul>
                 </div>
               </div>
@@ -1717,9 +1673,9 @@ class Crossword {
       this.classes.get('button').get('crossword').remove('disabled');
       this._createNewInstances(used.size);
       this._appendCrossword();
-      this._switchCrosswordPage('crossword');
       this.state.generated = true;
       this.state.finished = false;
+      this._switchCrosswordPage('crossword');
     };
 
     this.ref.virtual.create();
@@ -1818,12 +1774,11 @@ class Crossword {
   _switchCrosswordPage(name) {
     const previous = this.state.activePage;
 
-    if (this.classes.get('button').get(name).has('disabled')) return;
+    if (name === 'crossword' && this.state.generated === false) return;
     if (previous === name) return;
     this.state.activePage = name;
 
     if (name === 'config') this._toggleNavigation('close');
-
     this.dom.get('panel').setAttribute('data-page', name);
     this.classes.get('button').get(name).add('active');
     this.classes.get('page').get(name).remove('hidden');
@@ -1849,14 +1804,13 @@ class Crossword {
   _updateCrosswordWordsNumber(value = 0) {
     const newValue = this.data.wordsNumber + value;
     const output = this.dom.get('output-used-words');
-    const all = this.ref.words.size;
+    const all = this.data.totalWordsNumber;
     const lowest = Math.min(all, this.data.wordsMaxNumber);
     const warning = this.classes.get('warning').get('insufficient-words');
     warning.remove('visible');
     this._enableButtons('min', 'max', 'increase', 'decrease', 'generate');
     this.classes.get('warning').get('remove-crossword').remove('visible');
     this.state.disabled = false;
-
     switch (true) {
       case all < this.data.wordsMinNumber:
         output.innerHTML = this.data.wordsMinNumber;

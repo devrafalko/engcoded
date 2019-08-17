@@ -35,6 +35,7 @@ import $iconPlayBuffer from './icon-play-buffer';
 import $iconPlay from './icon-play';
 import $iconPrevious from './icon-previous';
 import $iconPreviousWord from './icon-previous-word';
+import $iconPuzzle from './icon-puzzle';
 import $iconQuestionMark from './icon-question-mark';
 import $iconRewind from './icon-rewind';
 import $iconSelect from './icon-select';
@@ -53,4 +54,4 @@ import $iconTextSize from './icon-text-size';
 import $iconVolume from './icon-volume';
 import $iconWordList from './icon-word-list';
 
-export { $iconAlignCenter, $iconAlignLeft, $iconAlignRight, $iconCardDefinition, $iconCardImage, $iconCardWord, $iconCheckIn, $iconCheckOut, $iconChevronDoubleLeft, $iconChevronDoubleRight, $iconChevronLeft, $iconChevronRight, $iconChevronUp, $iconClose, $iconCrosswordHint, $iconConfig, $iconFastForward, $iconGameCrossword, $iconGameHearing, $iconGameDefinition, $iconGameFinish, $iconGameImage, $iconGamePronunciation, $iconGameTest, $iconGameTranslate, $iconKeyboard, $iconMinimize, $iconMute, $iconNext, $iconNextWord, $iconOccurrence, $iconPalette, $iconPause, $iconPlayBuffer, $iconPlay, $iconPrevious, $iconPreviousWord, $iconQuestionMark, $iconRewind, $iconSelect, $iconShuffle, $iconSortAZ, $iconSortZA, $iconSort19, $iconSort91, $iconSortRandom, $iconSpeed, $iconSpy, $iconStar, $iconTextPlay, $iconWarning, $iconTextSize, $iconVolume, $iconWordList };
+export { $iconAlignCenter, $iconAlignLeft, $iconAlignRight, $iconCardDefinition, $iconCardImage, $iconCardWord, $iconCheckIn, $iconCheckOut, $iconChevronDoubleLeft, $iconChevronDoubleRight, $iconChevronLeft, $iconChevronRight, $iconChevronUp, $iconClose, $iconCrosswordHint, $iconConfig, $iconFastForward, $iconGameCrossword, $iconGameHearing, $iconGameDefinition, $iconGameFinish, $iconGameImage, $iconGamePronunciation, $iconGameTest, $iconGameTranslate, $iconKeyboard, $iconMinimize, $iconMute, $iconNext, $iconNextWord, $iconOccurrence, $iconPalette, $iconPause, $iconPlayBuffer, $iconPlay, $iconPrevious, $iconPreviousWord, $iconPuzzle, $iconQuestionMark, $iconRewind, $iconSelect, $iconShuffle, $iconSortAZ, $iconSortZA, $iconSort19, $iconSort91, $iconSortRandom, $iconSpeed, $iconSpy, $iconStar, $iconTextPlay, $iconWarning, $iconTextSize, $iconVolume, $iconWordList };

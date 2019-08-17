@@ -1,0 +1,482 @@
+@import "./../../../styles/rules";
+@import "./../../../styles/responsive";
+
+.game-container>.test .game-pages>.learn-page{
+  @extend %scrollbar;
+  overflow: auto;
+}
+
+.game-container>.test .game-pages>.learn-page .page-next {
+  bottom: 12px;
+  display: none;
+  height: 38px;
+  opacity: 0;
+  position: absolute;
+  right: 12px;
+  transition: opacity 0.15s ease-in-out;
+  width: 38px;
+  z-index: 7;
+
+  &.displayed {
+    display: block;
+  }
+
+  &.visible {
+    opacity: 1;
+  }
+
+  &>div {
+    @extend %hint-button;
+    height: 0px;
+    padding: 6px;
+    width: 0px;
+  }
+
+  &.visible>div {
+    height: 100%;
+    width: 100%;
+  }
+
+  &.visible:hover>div {
+    background-color: #00d8d9;
+    height: 48px;
+    padding: 8px;
+    width: 48px;
+  }
+
+  .icon {
+    display: block;
+    fill: white;
+    height: 100%;
+    width: 100%;
+  }
+}
+
+.game-container>.test .game-pages>.learn-page .section.clue {
+  padding: 6px 4px;
+
+  @media (min-width: $grid-small) {
+    padding: 6px 4px;
+  }
+
+  @media (min-width: $grid-medium) {
+    padding: 12px 6px;
+  }
+
+  &>div {
+    box-shadow: 2px 2px 6px #cccccc;
+    margin: auto;
+    padding: 0px;
+    padding-left: 30px;
+    position: relative;
+    width: 100%;
+
+    @media (min-width: $grid-small) {
+      width: 428px;
+    }
+
+    @media (min-width: $grid-medium) {
+      width: 628px;
+    }
+  }
+
+  .index {
+    background-color: #00c3cc;
+    height: 100%;
+    left: 0px;
+    position: absolute;
+    top: 0px;
+    width: 30px;
+  }
+
+  .index .icon {
+    @extend %center;
+    fill: white;
+    height: 22px;
+    stroke: white;
+    width: 22px;
+  }
+}
+
+.game-container>.test .game-pages>.learn-page .section.clue .content {
+  .word {
+    font-family: "Raleway", sans-serif;
+    font-size: 16px;
+    padding: 8px;
+  }
+
+  .meanings {
+    padding: 6px 0px;
+
+    &>li {
+      border: dotted 1px #00ac8f;
+      border-radius: 4px;
+      color: black;
+      display: inline-block;
+      font-family: "PT Sans", sans-serif;
+      font-size: 16px;
+      margin: 3px 6px;
+      padding: 2px 8px;
+    }
+  }
+
+  .definition-list {
+    margin-left: 28px;
+
+    &>li {
+      font-family: "Raleway", sans-serif;
+      font-size: 16px;
+      list-style-type: lower-alpha;
+    }
+    .definition{
+      padding: 4px;
+    }
+  }
+
+  .definition {
+    font-family: "Raleway", sans-serif;
+    font-size: 16px;
+    padding: 8px;
+
+    [data-keyword] {
+      display: inline-block;
+      font-weight: bold;
+      vertical-align: middle;
+      width: 42px;
+    }
+
+    [data-keyword] .icon {
+      display: block;
+    }
+  }
+
+  .audio {
+    padding: 6px 16px;
+  }
+
+  .audio .audio-button {
+    cursor: pointer;
+    display: block;
+    height: 26px;
+    transition: transform 0.15s ease-in-out;
+    width: 26px;
+
+    .icon {
+      fill: #008cab;
+      height: 100%;
+      transition: fill 0.15s ease-in-out;
+      width: 100%;
+    }
+  }
+
+  .audio .audio-button.playing {
+    transform: rotate(-45deg);
+
+    .icon {
+      fill: #05d8bc;
+    }
+  }
+
+  .type>span {
+    border-top: solid 1px #b4b4b4;
+    color: #9b9b9b;
+    display: block;
+    font-family: "Roboto", sans-serif;
+    font-size: 14px;
+    font-style: italic;
+    margin: 3px 8px;
+    overflow: hidden;
+    padding: 3px 0px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  @media (min-width: $grid-small) {
+
+    .definition-list>li,
+    .definition,
+    .word,
+    .meanings>li {
+      font-size: 18px;
+
+      [data-pronoun] {
+        font-size: 16px;
+      }
+
+      [data-explanation] {
+        font-size: 15px;
+      }
+    }
+
+    .definition [data-keyword] {
+      width: 46px;
+    }
+
+    .audio {
+      padding: 8px 16px;
+
+      .audio-button {
+        height: 30px;
+        width: 30px;
+      }
+    }
+  }
+
+  @media (min-width: $grid-medium) {
+
+    .definition-list>li,
+    .definition,
+    .word,
+    .meanings>li {
+      font-size: 20px;
+
+      [data-pronoun] {
+        font-size: 17px;
+      }
+
+      [data-explanation] {
+        font-size: 16px;
+      }
+    }
+
+    .definition [data-keyword] {
+      width: 52px;
+    }
+
+    .audio {
+      padding: 12px 16px;
+
+      .audio-button {
+        height: 36px;
+        width: 36px;
+      }
+    }
+
+    .type>span {
+      font-size: 16px;
+    }
+  }
+}
+
+.game-container>.test .game-pages>.learn-page .section.answers {
+  margin: 6px 4px;
+
+  &>ul {
+    margin: auto;
+    width: 100%;
+  }
+
+  .answer {
+    background-color: white;
+    box-shadow: 2px 2px 6px #cccccc;
+    cursor: pointer;
+    display: block;
+    font-family: "Raleway", sans-serif;
+    font-size: 18px;
+    margin: 6px auto;
+    min-height: auto;
+    padding-left: 36px;
+    padding-right: 38px;
+    position: relative;
+    transition-duration: 0.15s;
+    transition-property: background-color;
+    transition-timing-function: ease-in-out;
+
+    &:hover {
+      background-color: darken(white, 4%);
+    }
+  }
+
+  .answer>.index {
+    background-color: darken(white, 4%);
+    color: #00b8c6;
+    font-family: "Raleway", sans-serif;
+    font-size: 16px;
+    font-weight: normal;
+    float: left;
+    height: 100%;
+    left: 0px;
+    padding: 4px 0px;
+    position: absolute;
+    text-align: center;
+    top: 0px;
+    transition-duration: 0.15s;
+    transition-property: background-color, color;
+    transition-timing-function: ease-in-out;
+    width: 30px;
+  }
+
+  .answer:hover>.index {
+    background-color: darken(white, 8%);
+  }
+
+  .answer.correct {
+    $color: #aacc6b;
+
+    .index {
+      background-color: $color;
+      color: white;
+    }
+
+    &:hover .index {
+      background-color: darken($color, 5%);
+    }
+  }
+
+  .find {
+    border: none;
+    cursor: pointer;
+    display: block;
+    height: 100%;
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    width: 38px;
+
+    .icon {
+      @extend %center;
+      cursor: pointer;
+      fill: #00c3cc;
+      height: 0px;
+      stroke: #00c3cc;
+      transition-duration: 0.2s;
+      transition-property: width, height;
+      transition-timing-function: cubic-bezier(0.75, -0.15, 0, 2);
+      width: 0px;
+    }
+
+    &.visible .icon {
+      height: 22px;
+      width: 22px;
+
+      &:hover {
+        height: 28px;
+        width: 28px;
+      }
+    }
+  }
+
+  .answer.incorrect {
+    $color: #fc7c66;
+
+    .index {
+      background-color: $color;
+      color: white;
+    }
+
+    &:hover {
+      .index {
+        background-color: darken($color, 5%);
+      }
+    }
+  }
+
+  .content .word {
+    font-family: "Raleway", sans-serif;
+    font-size: 16px;
+    padding: 4px 0px;
+  }
+
+  .content .meanings>li {
+    border: dotted 1px #00ac8f;
+    border-radius: 4px;
+    color: black;
+    display: inline-block;
+    font-family: "PT Sans", sans-serif;
+    font-size: 16px;
+    margin: 3px 6px;
+    padding: 2px 8px;
+  }
+
+  @media (min-width: $grid-small) {
+    margin: 6px 4px;
+
+    &>ul {
+      width: 428px;
+    }
+
+    .answer {
+      margin: 8px auto;
+    }
+
+    .content .word,
+    .answer>.index {
+      font-size: 18px;
+      padding: 6px 0px;
+    }
+
+    .content .meanings>li {
+      font-size: 18px;
+    }
+  }
+
+  @media (min-width: $grid-medium) {
+    margin: 12px 6px;
+
+    &>ul {
+      width: 628px;
+    }
+
+    .answer {
+      margin: 12px auto;
+    }
+
+    .find.visible .icon {
+      height: 26px;
+      width: 26px;
+
+      &:hover {
+        height: 34px;
+        width: 34px;
+      }
+    }
+
+    .content .word,
+    .answer>.index {
+      font-size: 20px;
+      padding: 8px 0px;
+    }
+
+    .content .meanings>li {
+      font-size: 20px;
+    }
+  }
+}
+
+.game-container>.test .game-pages>.learn-page {
+
+  .section.clue,
+  .section.answers {
+
+    .content .word,
+    .content .meanings {
+      [data-pronoun] {
+        color: #748682;
+        display: none;
+        font-size: 15px;
+        font-style: italic;
+      }
+
+      [data-explanation] {
+        color: #039089;
+        display: none;
+        font-size: 14px;
+        font-style: italic;
+        margin: 0px 4px;
+      }
+    }
+  }
+
+  .container.solved .section.clue,
+  .container.solved .section.answers {
+
+    .content .word,
+    .content .meanings {
+
+      [data-pronoun],
+      [data-explanation] {
+        display: inline;
+      }
+    }
+  }
+}

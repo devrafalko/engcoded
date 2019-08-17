@@ -1,0 +1,127 @@
+@import "./../../../styles/responsive";
+
+@keyframes resolved {
+  0% {
+    font-size: 18px;
+  }
+
+  100% {
+    color: #a8f5f5;
+    font-size: 28px;
+  }
+}
+
+.game-container>.test {
+  height: 100%;
+  width: 100%;
+}
+
+.game-container>.test>.navigation-panel {
+  z-index: 1;
+}
+
+.game-container>.test .navigation-panel .controls * {
+  color: #2fe0e0;
+}
+
+.game-container>.test .navigation-panel {
+  &[data-page="config"] .controls.game .buttons.info {
+    display: none;
+  }
+}
+
+.game-container>.test>.navigation-panel .controls.game .buttons.info {
+  vertical-align: top;
+
+  li {
+    color: #01b9b9;
+    cursor: default;
+    font-size: 16px;
+    vertical-align: middle;
+    width: auto;
+  }
+}
+
+.game-container>.test>.navigation-panel .controls.game .buttons.info .output {
+  color: #2fe0e0;
+  font-size: 18px;
+  text-align: left;
+  width: 22px;
+
+  &.score {
+    text-align: right;
+  }
+
+  &.resolved {
+    animation-direction: alternate;
+    animation-duration: 0.2s;
+    animation-iteration-count: 6;
+    animation-name: resolved;
+    animation-timing-function: ease-in-out;
+  }
+
+  &.total.resolved {
+    animation-delay: 0.2s;
+    animation-iteration-count: 10;
+  }
+}
+
+.game-container>.test>.navigation-panel .controls.game {
+  padding: 0px 4px;
+
+  &>.buttons>li {
+    width: 26px;
+  }
+
+  .buttons.pages,
+  .buttons.info {
+    display: inline-block;
+  }
+
+  .buttons.info {
+    margin-left: 0px;
+  }
+
+  .buttons.info li {
+    line-height: $grid-nav-small;
+  }
+
+  @media (min-width: $grid-small) and (min-height: $grid-small) {
+    padding: 0px 8px;
+
+    .buttons.info li {
+      line-height: $grid-nav-medium;
+    }
+  }
+
+  @media (min-width: $grid-medium) and (min-height: $grid-medium) {
+    padding: 0px 12px;
+
+    &>.buttons>li {
+      width: 30px;
+    }
+
+    .buttons.info {
+      margin-left: 22px;
+    }
+
+    .buttons.info li {
+      line-height: $grid-nav-large;
+    }
+  }
+}
+
+.game-container>.test>.game-pages {
+  height: 100%;
+  position: relative;
+  z-index: 0;
+
+  &>li {
+    display: block;
+    height: 100%;
+  }
+
+  &>li.hidden {
+    display: none;
+  }
+}
