@@ -4,7 +4,7 @@ import './config.scss';
 import './test.scss';
 
 const { Slider } = $commons;
-const { $templater } = $utils;
+const { $templater, $shuffle } = $utils;
 const { $iconMinimize, $iconConfig, $iconGameTest, $iconWarning, $iconChevronDoubleRight,
   $iconOccurrence, $iconQuestionMark, $iconPuzzle, $iconVolume } = $icons;
 
@@ -245,7 +245,6 @@ class Task {
 
 }
 
-
 class Test {
   constructor(wordTest, { filtered, clues, number }) {
     this.wordTest = wordTest;
@@ -266,7 +265,7 @@ class Test {
     if (this.solved === this.total) return;
     const id = this.data.index.get(this.state.current);
     const clue = this.data.collection.get(id);
-    const answers = this._selectAnswers(id);
+    const answers = this._selectAnswers(id, clue);
     return new Task(this.wordTest, { id, clue, answers });
   }
 
@@ -285,43 +284,343 @@ class Test {
     const collection = [];
     for (let [index, set] of this.wordTest.ref.words.repetitions.global) {
       for (let id of set) {
-        if (this.data.filtered.has(id)) {
-          this.data.index.set(collection.length, id);
-          collection.push(id);
-        }
+        if (this.data.filtered.has(id)) collection.push(id);
         if (collection.length === this.data.number) {
+          $shuffle(collection);
           this.data.collection = this.wordTest.ref.words.sortByClueType(collection, this.data.clues);
+          let iter = 0;
+          for (let [id] of this.data.collection) this.data.index.set(iter++, id);
           return;
         }
       }
     }
   }
 
-  _selectAnswers(questionId) {
-    const records = this.wordTest.ref.words.records;
-    const answersSet = new Map();
-    let iterator = 0;
-    records.forEach((data, id) => {
-      if (questionId === id) return;
-      answersSet.set(iterator, id);
-      iterator++;
-    });
-    const randoms = this._randoms(0, answersSet.size - 1, 3);
+  _selectAnswers(id, clue) {
+    switch (clue) {
+      case 'img': return this._findImageMatches(id);
+      case 'audio': return this._findAudioMatches(id);
+      case 'meaning': return this._findMeaningMatches(id);
+      case 'word': return this._findWordMatches(id);
+      case 'definition': return this._findDefinitionMatches(id);
+    }
+  }
+
+  _findImageMatches(keyId) {
+    const words = this.wordTest.ref.words;
+    const keyWord = words.strings.get(keyId);
+    const { type: keyType, keymeaning: keyMeanings } = words.records.get(keyId);
+    const promotedAnswers = [];
+    const restAnswers = [];
     const answers = [];
-    randoms.forEach((index) => answers.push(answersSet.get(index)));
+
+    words.records.forEach(({ type: answerType, keymeaning: answerMeanings }, answerId) => {
+      if (answerId === keyId) return;
+      if (keyWord === words.strings.get(answerId)) return;
+      if (this._compareMeaningsSimilarity(keyMeanings, answerMeanings)) return;
+      if (keyType === answerType) promotedAnswers.push(answerId);
+      else restAnswers.push(answerId);
+    });
+
+    while (answers.length < 3) {
+      let collection = promotedAnswers.length ? promotedAnswers : restAnswers;
+      let random = Math.floor(Math.random() * collection.length);
+      let answer = collection.splice(random, 1)[0];
+      answers.push(answer);
+    }
     return answers;
   }
 
-  _randoms(min, max, count) {
-    let collection = new Set();
-    while (collection.size < count) {
-      let random = Math.floor(Math.random() * (max - min + 1)) + min;
-      if (collection.has(random)) continue;
-      else collection.add(random);
+  _findAudioMatches(keyId) {
+    const _this = this;
+    const words = this.wordTest.ref.words;
+    const answersRandomRange = 12;
+    const answersNumber = 3;
+    const keyWord = words.strings.get(keyId);
+    const keySegments = words.segments.get(keyId);
+    const promotedAnswers = new Map();
+    const restAnswers = [];
+    const selectedAnswers = [];
+    let sortedIdentifiers = [];
+
+    words.records.forEach((data, answerId) => {
+      let answerWord = words.strings.get(answerId);
+      if (answerId === keyId) return;
+      if (keyWord === answerWord) return;
+      let grade = 0;
+      grade += keySegments === words.segments.get(answerId) ? 1 : 0;
+      grade += hasSimilarLettersNumber(answerWord);
+      grade += hasSimilarParts(answerWord);
+      if (grade === 0) restAnswers.push(answerId);
+      else {
+        if (!promotedAnswers.has(grade)) promotedAnswers.set(grade, []);
+        promotedAnswers.get(grade).push(answerId);
+      }
+    });
+
+    const sortedGrades = [...promotedAnswers.keys()].sort((a, b) => b - a);
+    const preventStringDuplication = new Set();
+
+    for (let grade of sortedGrades) {
+      sortedIdentifiers = sortedIdentifiers.concat(promotedAnswers.get(grade));
+      if (sortedIdentifiers.length >= answersRandomRange) break;
     }
-    return collection;
+
+    while (sortedIdentifiers.length && selectedAnswers.length < answersNumber) {
+      let random = Math.floor(Math.random() * sortedIdentifiers.length);
+      let chosenId = sortedIdentifiers.splice(random, 1)[0];
+      let chosenWord = words.strings.get(chosenId);
+      if (preventStringDuplication.has(chosenWord)) continue;
+      preventStringDuplication.add(chosenWord);
+      selectedAnswers.push(chosenId);
+    }
+
+    if (selectedAnswers.length < answersNumber) {
+      const missing = answersNumber - selectedAnswers.length;
+      for (let i = 0; i < missing; i++) {
+        if (!restAnswers.length) break;
+        let random = Math.floor(Math.random() * restAnswers.length);
+        selectedAnswers.push(restAnswers.splice(random, 1)[0]);
+      }
+    }
+
+    return selectedAnswers;
+
+    function hasSimilarLettersNumber(answerWord) {
+      const maxDiff = 4;
+      const diff = Math.abs(keyWord.length - answerWord.length);
+      return diff >= maxDiff ? 0 : 1 - diff * (1 / maxDiff);
+    }
+
+    function hasSimilarParts(answerWord) {
+      const minLetters = 3;
+      const found = _this._compareWordsSimilarity(keyWord, answerWord, minLetters);
+      return found - minLetters <= 0 ? 0 : (found - (minLetters - 1)) * .5;
+    }
   }
+
+  _findMeaningMatches(keyId) {
+    const words = this.wordTest.ref.words;
+    const _this = this;
+    const answersRandomRange = 12;
+    const answersNumber = 3;
+    const keyWord = words.strings.get(keyId);
+    const { keymeaning: keyMeanings } = words.records.get(keyId);
+    const promotedAnswers = new Map();
+    const restAnswers = [];
+    const selectedAnswers = [];
+    let sortedIdentifiers = [];
+
+    words.records.forEach(({ keymeaning: answerMeanings }, answerId) => {
+      let answerWord = words.strings.get(answerId);
+      if (answerId === keyId) return;
+      if (answerWord === keyWord) return;
+      if (this._compareMeaningsSimilarity(keyMeanings, answerMeanings)) return;
+      let grade = hasSimilarParts(answerWord);
+      if (grade === 0) restAnswers.push(answerId);
+      else {
+        if (!promotedAnswers.has(grade)) promotedAnswers.set(grade, []);
+        promotedAnswers.get(grade).push(answerId);
+      }
+    });
+
+    const sortedGrades = [...promotedAnswers.keys()].sort((a, b) => b - a);
+    const preventStringDuplication = new Set();
+
+    for (let grade of sortedGrades) {
+      sortedIdentifiers = sortedIdentifiers.concat(promotedAnswers.get(grade));
+      if (sortedIdentifiers.length >= answersRandomRange) break;
+    }
+
+    while (sortedIdentifiers.length && selectedAnswers.length < answersNumber) {
+      let random = Math.floor(Math.random() * sortedIdentifiers.length);
+      let chosenId = sortedIdentifiers.splice(random, 1)[0];
+      let chosenWord = words.strings.get(chosenId);
+      if (preventStringDuplication.has(chosenWord)) continue;
+      preventStringDuplication.add(chosenWord);
+      selectedAnswers.push(chosenId);
+    }
+
+    if (selectedAnswers.length < answersNumber) {
+      const missing = answersNumber - selectedAnswers.length;
+      for (let i = 0; i < missing; i++) {
+        if (!restAnswers.length) break;
+        let random = Math.floor(Math.random() * restAnswers.length);
+        selectedAnswers.push(restAnswers.splice(random, 1)[0]);
+      }
+    }
+
+    return selectedAnswers;
+
+    function hasSimilarParts(answerWord) {
+      const allWords = [...keyMeanings, keyWord];
+      const minLetters = 3;
+      let highestFound = 0;
+      for (let word of allWords) {
+        let found = _this._compareWordsSimilarity(word, answerWord, minLetters);
+        if (found > highestFound) highestFound = found;
+      }
+      return highestFound - minLetters <= 0 ? 0 : (highestFound - (minLetters - 1)) * .5;
+    }
+  }
+
+  _findWordMatches(keyId) {
+    const words = this.wordTest.ref.words;
+    const _this = this;
+    const answersRandomRange = 12;
+    const answersNumber = 3;
+    const keyWord = words.strings.get(keyId);
+    const { keymeaning: keyMeanings, type: keyType } = words.records.get(keyId);
+    const promotedAnswers = new Map();
+    const restAnswers = [];
+    const selectedAnswers = [];
+    let sortedIdentifiers = [];
+
+    words.records.forEach(({ keymeaning: answerMeanings, type: answerType }, answerId) => {
+      let answerWord = words.strings.get(answerId);
+      if (answerId === keyId) return;
+      if (answerWord === keyWord) return;
+      if (this._compareMeaningsSimilarity(keyMeanings, answerMeanings)) return;
+      let grade = 0;
+      grade += hasSimilarParts([...answerMeanings, answerWord]);
+      grade += keyType === answerType ? 3 : 0;
+      if (grade === 0) restAnswers.push(answerId);
+      else {
+        if (!promotedAnswers.has(grade)) promotedAnswers.set(grade, []);
+        promotedAnswers.get(grade).push(answerId);
+      }
+    });
+
+    const sortedGrades = [...promotedAnswers.keys()].sort((a, b) => b - a);
+    const preventMeaningsDuplication = [];
+
+    for (let grade of sortedGrades) {
+      sortedIdentifiers = sortedIdentifiers.concat(promotedAnswers.get(grade));
+      if (sortedIdentifiers.length >= answersRandomRange) break;
+    }
+
+    while (sortedIdentifiers.length && selectedAnswers.length < answersNumber) {
+      let random = Math.floor(Math.random() * sortedIdentifiers.length);
+      let chosenId = sortedIdentifiers.splice(random, 1)[0];
+      let chosenMeanings = words.records.get(chosenId).keymeaning;
+      if (hasDuplicatedMeanings(chosenMeanings)) continue;
+      preventMeaningsDuplication.push(chosenMeanings);
+      selectedAnswers.push(chosenId);
+    }
+
+    if (selectedAnswers.length < answersNumber) {
+      const missing = answersNumber - selectedAnswers.length;
+      for (let i = 0; i < missing; i++) {
+        if (!restAnswers.length) break;
+        let random = Math.floor(Math.random() * restAnswers.length);
+        selectedAnswers.push(restAnswers.splice(random, 1)[0]);
+      }
+    }
+
+    return selectedAnswers;
+
+    function hasDuplicatedMeanings(b) {
+      for (let a of preventMeaningsDuplication) {
+        if (_this._compareMeaningsSimilarity(a, b)) return true;
+      }
+      return false;
+    }
+
+    function hasSimilarParts(allAnswerWords) {
+      const allKeyWords = [...keyMeanings, keyWord];
+      const minLetters = 3;
+      let highestFound = 0;
+      for (let meaning of allAnswerWords) {
+        for (let word of allKeyWords) {
+          let found = _this._compareWordsSimilarity(word, meaning, minLetters);
+          if (found > highestFound) highestFound = found;
+        }
+      }
+      return highestFound - minLetters <= 0 ? 0 : (highestFound - (minLetters - 1)) * .1;
+    }
+  }
+
+  _findDefinitionMatches(keyId) {
+    const words = this.wordTest.ref.words;
+    const answersRandomRange = 12;
+    const answersNumber = 3;
+    const keyWord = words.strings.get(keyId);
+    const keySegments = words.segments.get(keyId);
+    const { keymeaning: keyMeanings, type: keyType } = words.records.get(keyId);
+    const promotedAnswers = new Map();
+    const restAnswers = [];
+    const selectedAnswers = [];
+    let sortedIdentifiers = [];
+
+    words.records.forEach(({ keymeaning: answerMeanings, type: answerType }, answerId) => {
+      let answerWord = words.strings.get(answerId);
+      if (answerId === keyId) return;
+      if (keyWord === answerWord) return;
+      if (this._compareMeaningsSimilarity(keyMeanings, answerMeanings)) return;
+      let grade = 0;
+      grade += keySegments <= words.segments.get(answerId) ? 1 : 0;
+      grade += answerType === keyType ? 1 : 0;
+      if (grade === 0) restAnswers.push(answerId);
+      else {
+        if (!promotedAnswers.has(grade)) promotedAnswers.set(grade, []);
+        promotedAnswers.get(grade).push(answerId);
+      }
+    });
+
+    const sortedGrades = [...promotedAnswers.keys()].sort((a, b) => b - a);
+    const preventStringDuplication = new Set();
+
+    for (let grade of sortedGrades) {
+      sortedIdentifiers = sortedIdentifiers.concat(promotedAnswers.get(grade));
+      if (sortedIdentifiers.length >= answersRandomRange) break;
+    }
+
+    while (sortedIdentifiers.length && selectedAnswers.length < answersNumber) {
+      let random = Math.floor(Math.random() * sortedIdentifiers.length);
+      let chosenId = sortedIdentifiers.splice(random, 1)[0];
+      let chosenWord = words.strings.get(chosenId);
+      if (preventStringDuplication.has(chosenWord)) continue;
+      preventStringDuplication.add(chosenWord);
+      selectedAnswers.push(chosenId);
+    }
+
+    if (selectedAnswers.length < answersNumber) {
+      const missing = answersNumber - selectedAnswers.length;
+      for (let i = 0; i < missing; i++) {
+        if (!restAnswers.length) break;
+        let random = Math.floor(Math.random() * restAnswers.length);
+        selectedAnswers.push(restAnswers.splice(random, 1)[0]);
+      }
+    }
+
+    return selectedAnswers;
+  }
+
+  _compareMeaningsSimilarity(a, b) {
+    return a.some((x) => b.some((y) => x === y));
+  }
+
+  _compareWordsSimilarity(a, b, letters) {
+    let found = 0;
+    let shiftIndex = 0;
+
+    for (let x = letters; x <= a.length; x++) {
+      for (let y = shiftIndex; y <= a.length - x; y++) {
+        let sub = a.substr(y, x).toLowerCase();
+        let has = b.toLowerCase().includes(sub);
+        if (has) {
+          found = x;
+          shiftIndex = y;
+          break;
+        }
+      }
+      if (found < x) break;
+    }
+    return found;
+  }
+
 }
+
 
 class WordTest {
   constructor(dialog, words, games) {

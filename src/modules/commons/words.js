@@ -33,6 +33,11 @@ class Words {
     return this._map.strings;
   }
 
+  get segments() {
+    if (this._map.segments === null) this._buildCrosswordLettersMap();
+    return this._map.segments;
+  }
+
   get repetitions() {
     return this._repetition;
   }
@@ -94,7 +99,7 @@ class Words {
     return null;
   }
 
-  match({ before = Infinity, after = Infinity, characters, collection, excludes, game = null }) {
+  match({ before = Infinity, after = Infinity, characters, collection, excludes }) {
     before = before < 0 ? 0 : before;
     after = after < 0 ? 0 : after;
     const start = before === 0 ? '^(.{0})' : before === Infinity ? '^(.*)' : `^(.{0,${before}})`;
@@ -362,34 +367,37 @@ class Words {
   _buildCrosswordLettersMap() {
     this._map.strings = new Map();
     this._map.fixed = new Map();
+    this._map.segments = new Map();
     this._map.records.forEach((record, id) => {
       let parsed = parse(record.keyword);
       this._map.strings.set(id, parsed.string);
       this._map.fixed.set(id, parsed.total);
+      this._map.segments.set(id, parsed.segments);
     });
 
-    function parse(word, total = [], string = '') {
-      if (!word.length) return { total, string };
+    function parse(word, total = [], string = '', segments = 0) {
+      if (!word.length) return { total, string, segments };
 
       const letters = /^[A-Za-z]+/.exec(word);
       if (letters && letters.length) {
         total.push({ letters: letters[0] });
+        segments += 1;
         string += letters[0];
-        return parse(word.slice(letters[0].length), total, string);
+        return parse(word.slice(letters[0].length), total, string, segments);
       }
 
       const escape = /^\{(.+)\}/.exec(word);
       if (escape && escape.length) {
         total.push({ fixed: escape[1] });
         string += escape[1];
-        return parse(word.slice(escape[0].length), total, string);
+        return parse(word.slice(escape[0].length), total, string, segments);
       }
 
       const characters = /^[^A-Za-z{}]+/.exec(word);
       if (characters && characters.length) {
         total.push({ fixed: characters[0] });
         string += characters[0];
-        return parse(word.slice(characters[0].length), total, string);
+        return parse(word.slice(characters[0].length), total, string, segments);
       }
     }
   }

@@ -155,6 +155,7 @@ class Presentation {
   }
 
   get rows() {
+    const reps = this.ref.words.repetitions.iterator;
     return $templater(({ ref, child, list, on }) =>/*html*/`
       ${list(this.ref.words.records, ({ word, type, meaning }, id) =>/*html*/`
         <tr ${ref(`row.${id}`)}>
@@ -172,7 +173,7 @@ class Presentation {
             <p>${type}</p>
           </td>
           <td class="repetition">
-            <p ${ref(`repetition.${id}`)}>0</p>
+            <p ${ref(`repetition.${id}`)}>${reps.get(id)}</p>
           </td>
           <td data-find class="find">
             <span ${on(`find.${id}`, 'click')}>${child($iconOccurrence())}</span>

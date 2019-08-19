@@ -453,14 +453,12 @@
     .content .meanings {
       [data-pronoun] {
         color: #748682;
-        display: none;
         font-size: 15px;
         font-style: italic;
       }
 
       [data-explanation] {
         color: #039089;
-        display: none;
         font-size: 14px;
         font-style: italic;
         margin: 0px 4px;
@@ -468,7 +466,20 @@
     }
   }
 
-  .container.solved .section.clue,
+  .section.answers {
+
+    .content .word,
+    .content .meanings {
+      [data-pronoun] {
+        display: none;
+      }
+
+      [data-explanation] {
+        display: none;
+      }
+    }
+  }
+
   .container.solved .section.answers {
 
     .content .word,
