@@ -1,0 +1,70 @@
+@import "./../../../styles/rules";
+
+.picture.area {
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.picture.loading {
+  background-color: rgba(255, 255, 255, 0);
+  display: block;
+  height: 100%;
+  left: 0px;
+  position: absolute;
+  top: 0px;
+  transition: background-color 1s ease-in-out;
+  width: 100%;
+
+  &.displayed {
+    display: block;
+  }
+
+  &.visible {
+    background-color: rgba(255, 255, 255, 1);
+  }
+
+  p {
+    @extend %vertical-center;
+    height: 86px;
+    opacity: 0;
+    transition: opacity .25s ease-in-out;
+    width: 100%;
+
+    &.visible {
+      opacity: 1;
+    }
+  }
+
+  p span {
+    display: block;
+    font-family: "Open Sans", sans-serif;
+    text-align: center;
+
+    &.progress {
+      color: #26505f;
+      font-size: 42px;
+    }
+
+    &.label {
+      color: #2a7e99;
+      font-size: 16px;
+    }
+  }
+
+}
+
+.picture.content {
+  display: none;
+  height: 100%;
+  width: 100%;
+
+  &.displayed {
+    display: block;
+  }
+
+  img {
+    width: 100%;
+  }
+}

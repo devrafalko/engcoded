@@ -6,7 +6,8 @@ export default {
   id: '538e54zsjyioja4i',
   thumbnail: '538e56q0jy1knrd8',
   header: `${w('Humans', 0)} ${w('Need Not', 1)} ${w('Apply', 2)}`,
-  url: 'https://www.youtube.com/watch?v=7Pq-S557XQU',
+  author: { name: 'CGP Grey', url: 'https://www.youtube.com/channel/UC2C_jShtL725hvbm1arSV9w' },
+  link: { name: 'Youtube', url: 'https://www.youtube.com/watch?v=7Pq-S557XQU' },
   id: '7Pq-S557XQU',
   subtitles: new Map([
     ['00:03', `${w('Every', 3)} ${w('human', 4)} ${w('used to', 5)} ${w('have to', 6)} ${w('hunt', 7)} or ${w('gather', 8)} to ${w('survive', 9)}. But ${w('humans', 10)} are ${w('smart...ly', 11)} ${w('lazy', 12)} so`],

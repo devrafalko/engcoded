@@ -6,7 +6,8 @@ export default {
   id: '538e52qojyioj45w',
   thumbnail: '538e55r4jy1knh08',
   header: `Is ${w('Ketosis', 0)} ${w('Dangerous', 1)}? (${w('Science', 2)} of ${w('Fasting', 3)} & ${w('Low Carb', 4)} ${w('Keto', 5)})`,
-  url: 'https://www.youtube.com/watch?v=Dan8qtgQRi8',
+  author: { name: "What I've Learned", url: 'https://www.youtube.com/channel/UCqYPhGiB9tkShZorfgcL2lA' },
+  link: { name: 'Youtube', url: 'https://www.youtube.com/watch?v=Dan8qtgQRi8' },
   id: 'Dan8qtgQRi8',
   subtitles: new Map([
     ['00:02', `${w('Recently', 6)}, ${w('low carb', 7)} ${w('diets', 8)}, ${w('intermittent', 9)} ${w('fasting', 10)} and ${w('even', 11)} ${w('prolonged', 12)} ${w('fasting', 13)} ${w('have become', 14)} ${w('very', 15)}`],

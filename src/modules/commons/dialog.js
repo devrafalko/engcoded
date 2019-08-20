@@ -50,7 +50,16 @@ class Dialog {
     classes[value ? 'add' : 'remove']('displayed');
   }
 
-  load({ name, container, content, contentData, cardArea, loaded, onClose, beforeClose, onStopSpy, viewSubtitles = true }) {
+  get text() {
+    return this.classes.get('section').get('fonts');
+  }
+
+  set text(value) {
+    const classes = this.classes.get('section').get('fonts');
+    classes[value ? 'add' : 'remove']('displayed');
+  }
+
+  load({ name, container, content, contentData, cardArea, loaded, onClose, beforeClose, onStopSpy, showSubtitles = true, showText = true }) {
     const dialog = this.dom.get('dialog-box');
     if (this.state.currentContentData !== contentData) {
       dialog.setAttribute('data-dialog', name);
@@ -65,7 +74,8 @@ class Dialog {
     container.appendChild(dialog);
     this.state.name = name;
     this.state.opened = true;
-    this.subtitles = viewSubtitles;
+    this.subtitles = showSubtitles;
+    this.text = showText;
     if (type(loaded, Function)) loaded();
     if (type(onClose, Function)) this.events.onClose = onClose;
     if (type(beforeClose, Function)) this.events.beforeClose = beforeClose;
@@ -236,7 +246,7 @@ class Dialog {
                 <li ${on('button.align.center', 'click')} ${classes('button.align.center')}>${child($iconAlignCenter())}</li>
                 <li ${on('button.spy-subtitles', 'click')} ${classes('button.spy-subtitles')}>${child($iconSpy())}</li>
               </ul>
-              <ul class="section-font">
+              <ul ${classes('section.fonts')} class="section-font">
                 <li ${on('button.color-text', 'click')} ${classes('button.color-text')}>${child($iconPalette())}</li>
                 <li class="font-select">
                   <select ${on('button.font', 'change')} ${ref('button.font-select')}>

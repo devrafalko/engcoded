@@ -7,7 +7,8 @@ export default {
   id: '538e56z4jyiohhz1',
   thumbnail: '538e51vcjy1koik0',
   header: `10 ${w('things', 0)} we ${w('learned', 1)} about the ${w('brain', 2)} in 2018`,
-  url: 'https://www.livescience.com/64345-amazing-brain-2018.html',
+  author: { name: 'Yasemin Saplakoglu', url: 'https://www.livescience.com/author/yasemin-saplakoglu' },
+  link: { name: 'Live Science', url: 'https://www.livescience.com/64345-amazing-brain-2018.html' },
   text: [ //${w('', 0)}
     header(`The ${w('amazing', 3)} ${w('brain', 4)}`),
     paragraph(`The ${w('brain', 5)} ${w('sculpts', 6)} ${w('not only', 7)} who we are ${w('but also', 7)} the ${w('world', 9)} that we ${w('experience', 10)}. It ${w('tells', 11)} us what to ${w('see', 12)}, what to ${w('hear', 13)} and what to ${w('say', 14)}. It ${w('expands', 15)} to ${w('accommodate', 16)} a new ${w('language', 17)} or ${w('skill', 18)} that we ${w('learn', 19)}. It ${w('tells', 20)} ${w('stories', 21)} when we're ${w('sleeping', 22)}. It ${w('sends', 23)} ${w('alarm', 24)} ${w('signals', 25)}, and it ${w('spurs', 26)} the ${w('body', 27)} to ${w('run', 28)} or ${w('fight', 29)} when it ${w('senses', 30)} ${w('danger', 31)}. The ${w('brain', 32)} ${w('adapts to', 33)} ${w('environments', 34)} so we aren't ${w('annoyed by', 35)} a ${w('constant', 36)} ${w('smell', 37)} in an ${w('old', 38)} ${w('house', 39)} or the ${w('constant', 40)} ${w('hum', 41)} of the ${('air conditioning', 42)}. Our ${w('brains', 43)} ${w('look to', 44)} the ${w('sun', 45)} and ${w('tell', 46)} our ${w('body', 47)} what ${w('time', 48)} it is. The ${w('brain', 49)} ${w('stores', 50)} ${w('memories', 51)}, ${w('both', 52)} ${w('painful', 53)} ${w('and', 52)} ${w('pleasant', 54)}.`),

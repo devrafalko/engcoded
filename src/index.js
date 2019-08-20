@@ -87,7 +87,9 @@ class View {
   _runPictures(name, element) {
     if (this.instances[name]) return;
     this.instances[name] = new PicturesController({
-
+      pictures,
+      page: element,
+      navigation: this.navigation
     });
   }
 

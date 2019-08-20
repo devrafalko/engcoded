@@ -1,7 +1,8 @@
+import type from 'of-type';
 import './items.scss';
 
 const { $templater } = $utils;
-const { $images } = $data;
+const { $thumbs } = $data;
 
 class Items {
   constructor({ id, items, open }) {
@@ -29,22 +30,27 @@ class Items {
   }
 
   _renderView() {
-    const template = $templater(({ ref, list, on }) =>/*html*/`
+    const template = $templater(({ ref, list, on, when }) =>/*html*/`
       <div ${ref('items-container')} class="items-container">
         <ul class="centered">
-          ${list(this.data.items, ({ thumbnail, title, url }, name, iter) =>/*html*/`
+          ${list(this.data.items, ({ thumbnail, title, author, link }, name, iter) =>/*html*/`
             <li ${on(`item.${name}`, 'click')} class="item">
               <div class="outline">
                 <header>
                   <div class="image-container">
-                    <img src="${$images.get(thumbnail)}"/>
+                    <img src="${$thumbs.get(thumbnail)}"/>
                   </div>
-                  <h1>${title}</h1>
+                  ${when(type(title, String), () =>/*html*/`
+                    <h1>${title}</h1>
+                  `)}
                 </header>
                 <footer>
-                  <address>
-                    <a class="url" href="${url}" target="_blank">${(new URL(url)).hostname}</a>
-                  </address>
+                  ${when(type(author, Object), () =>/*html*/`
+                    <address>by <a class="url" href="${author.url}" target="_blank">${author.name}</a></address>
+                  `)}
+                  ${when(type(link, Object), () =>/*html*/`
+                    <address>from <a class="url" href="${link.url}" target="_blank">${link.name}</a></address>
+                  `)}
                 </footer>
               </div>
             </li>

@@ -7,7 +7,8 @@ export default {
   id: '538e57j8jyiojgle',
   thumbnail: '538e52ggjy1ko092',
   header: `Why does ${w('time', 0)} ${w('fly', 1)} when you're ${w('having fun', 2)}?`,
-  url: 'https://www.livescience.com/64901-time-fly-having-fun.html',
+  author: { name: 'Yasemin Saplakoglu', url: 'https://www.livescience.com/author/yasemin-saplakoglu' },
+  link: { name: 'Live Science', url: 'https://www.livescience.com/64901-time-fly-having-fun.html' },
   text: [ //${w('', 0)}
     paragraph(`The ${w('world', 3)}'s most ${w('precise', 4)} ${w('clocks', 5)} ${w('run', 6)} at a ${w('steady', 7)} ${w('pace', 8)}, ${w('messing up', 9)} by ${w('only', 10)} ${w('about', 11)} 1 ${w('second', 12)} ${w('every', 13)} 300 ${w('million', 14)} ${w('years', 15)}.`),
     paragraph(`But the ${w('brain', 16)} ${w('takes', 17)} those ${w('rhythmic', 18)} ${w('seconds', 19)} and ${w('makes', 20)} its own ${w('sense', 21)} of ${w('time', 22)} — ${w('stretching', 23)} the ${w('ticks', 24)} and ${w('scrunching', 25)} the ${w('tocks', 26)}. But why can't the ${w('brain', 27)} ${w('keep', 28)} ${w('time', 29)} ${w('like', 30)} a ${w('regular', 31)} ${w('clock', 32)}? ${w('In other words', 33)}, why does ${w('time', 34)} ${w('fly', 35)} when you're ${w('having fun', 36)}, and why does it ${w('plod along', 37)} when you're ${w('bored', 38)}?`),

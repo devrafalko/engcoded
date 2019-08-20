@@ -1,6 +1,4 @@
-import path from 'path';
 import type from 'of-type';
-import typeProperties from 'typeof-properties';
 import './../commons.scss';
 import './youtube.scss';
 
@@ -33,21 +31,6 @@ class YouTube {
     this.data.movies = {};
     movies.keys().forEach((_path) => {
       let module = movies(_path).default;
-      let name = path.basename(_path, '.js');
-      if (!type(module, Object)) {
-        throw new TypeError(`Invalid '${name}' module: The module should export the default [Object] object.`);
-      }
-      const types = {
-        header: String,
-        url: String,
-        id: String,
-        subtitles: Map,
-        words: Array
-      };
-
-      typeProperties(module, types, ({ message }) => {
-        throw new TypeError(`Invalid '${name}' youtube movie: ${message}`);
-      });
       this.data.movies[module.id] = module;
     });
     for (let id in this.data.movies) this.countWordsNumber(this.data.movies[id]);
@@ -176,7 +159,7 @@ class YouTube {
       content: this.views[movieId].template,
       cardArea: this.views[movieId].references.get('subtitles'),
       contentData: this.instances[movieId],
-      viewSubtitles: true,
+      showSubtitles: true,
       onStopSpy: () => this.instances[movieId].scroller.break(),
       onClose: () => {
         Timer.stop();

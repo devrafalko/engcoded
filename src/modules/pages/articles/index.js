@@ -1,6 +1,3 @@
-import path from 'path';
-import type from 'of-type';
-import typeProperties from 'typeof-properties';
 import './../commons.scss';
 import './articles.scss';
 
@@ -23,19 +20,6 @@ class Articles {
     this.data.articles = {};
     articles.keys().forEach((_path) => {
       let module = articles(_path).default;
-      let name = path.basename(_path, '.js');
-      if (!type(module, Object)) {
-        throw new TypeError(`Invalid '${name}' module: The module should export the default [Object] object.`);
-      }
-      const types = {
-        header: String,
-        url: String,
-        text: [String, Array],
-        words: Array
-      };
-      typeProperties(module, types, ({ message }) => {
-        throw new TypeError(`Invalid '${name}' article: ${message}`);
-      });
       this.data.articles[module.id] = module;
     });
   }
@@ -61,15 +45,15 @@ class Articles {
       content: this.views[articleId].template,
       cardArea: this.views[articleId].references.get('scrollable'),
       contentData: this.instances[articleId],
-      viewSubtitles: false
+      showSubtitles: false
     });
   }
 
   renderContentData(articleId) {
-    this.instances[articleId] = { games: {} };
-    const instance = this.instances[articleId];
-    const article = this.data.articles[articleId];
-    instance.words = new Words(article.words);
+    this.instances[articleId] = { 
+      games: {},
+      words: new Words(this.data.articles[articleId].words)
+    };
   }
 
   renderArticle(articleId) {

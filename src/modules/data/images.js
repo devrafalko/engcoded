@@ -1,10 +1,10 @@
 import path from 'path';
 
-const images = require.context('./../../../db/images', false, /\.png$/);
+const images = require.context('./../../../db/images', false, /\.jpg$/);
 const imagesMap = new Map();
 
 images.keys().forEach((_path) => {
-  let id = path.basename(_path, '.png');
+  let id = path.basename(_path, '.jpg');
   let imagePath = images(_path);
   imagesMap.set(id, imagePath);
 });

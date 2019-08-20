@@ -131,16 +131,13 @@ $grid-youtube-hide-point: 561px;
     }
   }
 
-  .section-subtitles {
+  .section-subtitles,
+  .section-font {
     display: none;
 
     &.displayed {
       display: inline-block;
     }
-  }
-
-  .section-font {
-    display: inline-block;
   }
 }
 

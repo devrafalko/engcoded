@@ -7,6 +7,8 @@ export default {
   thumbnail: '538e570kjy1kn0ac',
   header: `The ${w('Truth', 0)} about ${w('Hydrogen', 1)}`,
   url: 'https://www.youtube.com/watch?v=f7MzFfuNOtY',
+  author: { name: 'Real Engineering', url: 'https://www.youtube.com/channel/UCR1IuLEqb6UEA_zQ81kwXfg' },
+  link: { name: 'Youtube', url: 'https://www.youtube.com/watch?v=f7MzFfuNOtY' },
   id: 'f7MzFfuNOtY',
   subtitles: new Map([
     ['00:00', `This ${w('episode', 2)} of ${w('Real', 3)} ${w('Engineering', 4)} is ${w('brought', 5)} to you by Skillshare, ${w('home', 6)} to ${w('over', 7)} ${w('twenty', 8)}`],

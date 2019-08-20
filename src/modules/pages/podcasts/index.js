@@ -1,12 +1,10 @@
-import path from 'path';
 import type from 'of-type';
-import typeProperties from 'typeof-properties';
 import Player from './player';
 import './../commons.scss';
 import './podcasts.scss';
 
 const { Items, Dialog, Card, Timer, Scroller, Words } = $commons;
-const { $templater, $loopParents } = $utils;
+const { $templater } = $utils;
 const { $iconTextPlay } = $icons;
 
 class Podcasts {
@@ -27,21 +25,6 @@ class Podcasts {
     this.data.podcasts = {};
     podcasts.keys().forEach((_path) => {
       let module = podcasts(_path).default;
-      let name = path.basename(_path, '.js');
-      if (!type(module, Object)) {
-        throw new TypeError(`Invalid '${name}' module: The module should export the default [Object] object.`);
-      }
-      const types = {
-        header: String,
-        url: String,
-        source: String,
-        subtitles: Map,
-        words: Array
-      };
-
-      typeProperties(module, types, ({ message }) => {
-        throw new TypeError(`Invalid '${name}' podcast: ${message}`);
-      });
       this.data.podcasts[module.id] = module;
     });
     for (let id in this.data.podcasts) this.countWordsNumber(this.data.podcasts[id]);
@@ -110,7 +93,7 @@ class Podcasts {
       content: this.views[id].template,
       cardArea: this.views[id].references.get('subtitles'),
       contentData: this.instances[id],
-      viewSubtitles: true,
+      showSubtitles: true,
       onStopSpy: () => this.instances[id].scroller.break(),
       onClose: () => {
         Player.reset();

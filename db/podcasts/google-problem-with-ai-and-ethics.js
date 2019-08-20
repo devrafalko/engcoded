@@ -6,7 +6,8 @@ export default {
   id: '538e56jgjyioijou',
   thumbnail: '538e5y0jy1kmha3',
   header: `Google's ${w('problem', 0)} with AI and ${w('ethics', 1)}`,
-  url: 'https://www.theguardian.com/technology/audio/2019/may/06/googles-problem-with-ai-and-ethics-chips-with-everything-podcast',
+  author: { name: 'Jordan Erica Webber', url: 'https://www.theguardian.com/profile/jordan-erica-webber' },
+  link: { name: 'Chips with everything - The Guardian', url: 'https://www.theguardian.com/technology/audio/2019/may/06/googles-problem-with-ai-and-ethics-chips-with-everything-podcast' },
   source: 'https://flex.acast.com/audio.guim.co.uk/2019/05/03-52177-gnl.chips.05052019.ds.ai_ethic.mp3',
   subtitles: new Map([
     ['00:01', `The Guardian`],
