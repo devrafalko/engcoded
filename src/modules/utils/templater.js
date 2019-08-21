@@ -98,6 +98,7 @@ class Classes {
     this._data = {
       element,
       identifier,
+      swings: new Set(),
       collection: new Map(),
       classNames: new Map()
     };
@@ -135,6 +136,7 @@ class Classes {
   clear() {
     const classes = [...arguments];
     if (!classes.length) classes.push(...this._data.classNames.keys());
+    this._data.swings.forEach((interval) => clearInterval(interval));
     classes.forEach((name) => {
       const collection = this._data.classNames.get(name);
       if (collection) collection.forEach((arr, index) => {
@@ -143,6 +145,25 @@ class Classes {
     });
     return this;
   }
+
+  swing(a, b, time, repetitions = Infinity) {
+    let repetition = 0;
+    let side = true;
+    const move = () => {
+      if (side) this.add(a).remove(b);
+      if (!side) this.add(b).remove(a);
+      side = !side;
+    };
+    move();
+    const interval = setInterval(() => {
+      if (++repetition === repetitions) {
+        clearInterval(interval);
+        this._data.swings.delete(interval);
+      } else move();
+    }, time);
+    this._data.swings.add(interval);
+  }
+
 }
 
 class Events {
@@ -206,8 +227,8 @@ class Events {
     const paths = data ? data.paths : this._parseId(id);
 
     this._traverse(paths, ({ element, action }) => {
-      let actions = type(action,Array) ? action:[action];
-      for(let _action of actions){
+      let actions = type(action, Array) ? action : [action];
+      for (let _action of actions) {
         if (!this._handlers.has(_action)) this._handlers.set(_action, new Map());
         const handler = this._handlers.get(_action);
         if (!handler.has(element)) handler.set(element, paths);

@@ -41,11 +41,11 @@ class Articles {
     if (!this.views[articleId]) this.renderArticle(articleId);
     Dialog.load({
       name: 'articles',
+      mode: 'articles',
       container: this.dom.container,
       content: this.views[articleId].template,
       cardArea: this.views[articleId].references.get('scrollable'),
-      contentData: this.instances[articleId],
-      showSubtitles: false
+      contentData: this.instances[articleId]
     });
   }
 

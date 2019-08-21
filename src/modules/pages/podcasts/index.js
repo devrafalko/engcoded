@@ -89,11 +89,11 @@ class Podcasts {
     };
     Dialog.load({
       name: 'podcasts',
+      mode: 'podcasts',
       container: this.dom.container,
       content: this.views[id].template,
       cardArea: this.views[id].references.get('subtitles'),
       contentData: this.instances[id],
-      showSubtitles: true,
       onStopSpy: () => this.instances[id].scroller.break(),
       onClose: () => {
         Player.reset();

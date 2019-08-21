@@ -1,4 +1,5 @@
 import type from 'of-type';
+const { $casteljau } = $utils;
 
 export default class Scroller {
   constructor({ container, scrollTime, fps, offset, vertically = true, horizontally = false }) {
@@ -104,24 +105,10 @@ export default class Scroller {
 
     function step(current) {
       const time = (1 / intervalsNumber) * current;
-      this.state.currentTime = time;
-      return deCasteljau.call(this, time);
-    }
-
-    function deCasteljau(time) {
       const coords = [0, 0, 0, this.state.breakTime, 1, 1, 1, 1];
-      const res = reduce(coords);
-      return res[1];
-      function reduce(coords) {
-        const reduced = [];
-        for (let i = 0; i < coords.length - 3; i += 2) {
-          reduced.push(coords[i] + ((coords[i + 2] - coords[i]) * time));
-          reduced.push(coords[i + 1] + ((coords[i + 3] - coords[i + 1]) * time));
-        }
-        return reduced.length > 2 ? reduce(reduced) : reduced;
-      }
+      this.state.currentTime = time;
+      return $casteljau(coords, time);
     }
-
   }
 
 }

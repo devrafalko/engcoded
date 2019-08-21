@@ -44,12 +44,11 @@ class Pictures {
     const instance = this.instances[pictureId];
     Dialog.load({
       name: 'pictures',
+      mode: 'pictures',
       container: this.dom.container,
       content: this.views[pictureId].template,
       cardArea: this.views[pictureId].references.get('picture-area'),
-      contentData: instance,
-      showSubtitles: false,
-      showText: false
+      contentData: instance
     });
     if (instance.loaded === false && instance.pending === false) this._loadPicture(pictureId);
   }
@@ -58,7 +57,7 @@ class Pictures {
     const picture = this.data.pictures[pictureId];
     this.instances[pictureId] = {
       words: new Words(picture.words),
-      viewer: new Viewer(),
+      viewer: new Viewer({ output: Dialog.dom.get('viewer').get('output') }),
       games: {},
       loaded: false,
       pending: false

@@ -9,13 +9,14 @@
 
 .picture.loading {
   background-color: rgba(255, 255, 255, 0);
-  display: block;
+  display: none;
   height: 100%;
   left: 0px;
   position: absolute;
   top: 0px;
   transition: background-color 1s ease-in-out;
   width: 100%;
+  z-index: 2;
 
   &.displayed {
     display: block;
@@ -59,6 +60,7 @@
   display: none;
   height: 100%;
   width: 100%;
+  z-index: 1;
 
   &.displayed {
     display: block;
@@ -66,5 +68,40 @@
 
   img {
     width: 100%;
+  }
+}
+
+.picture.content .viewer {
+  &.container {
+    background-color: #171914;
+    height: 100%;
+    position: relative;
+    width: 100%;
+  }
+
+  &.content {
+    position: relative;
+  }
+
+  &.image {
+    @extend %no-select;
+    width: 100%;
+  }
+
+  &.label {
+    cursor: pointer;
+    position: absolute;
+    transform-origin: 50% 5%;
+    transform: rotate(0deg);
+    transition: transform .3s ease-in-out;
+    width: 42px;
+  }
+
+  &.label.left {
+    transform: rotate(-45deg);
+  }
+
+  &.label.right {
+    transform: rotate(45deg);
   }
 }

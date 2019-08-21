@@ -7,7 +7,8 @@ import Test from './../games/test/index';
 const { Card } = $commons;
 const { $templater } = $utils;
 const { $iconGameCrossword, $iconGameTest, $iconWordList, $iconAlignLeft,
-  $iconAlignCenter, $iconSpy, $iconPalette, $iconTextSize, $iconClose } = $icons;
+  $iconAlignCenter, $iconSpy, $iconPalette, $iconTextSize, $iconClose,
+  $iconPrevious, $iconNext, $iconResize, $iconLabels } = $icons;
 
 class Dialog {
   constructor() {
@@ -59,7 +60,16 @@ class Dialog {
     classes[value ? 'add' : 'remove']('displayed');
   }
 
-  load({ name, container, content, contentData, cardArea, loaded, onClose, beforeClose, onStopSpy, showSubtitles = true, showText = true }) {
+  get pictures() {
+    return this.classes.get('controls').get('pictures');
+  }
+
+  set pictures(value) {
+    const classes = this.classes.get('controls').get('pictures');
+    classes[value ? 'add' : 'remove']('displayed');
+  }
+
+  load({ name, container, content, contentData, cardArea, loaded, onClose, beforeClose, onStopSpy, mode }) {
     const dialog = this.dom.get('dialog-box');
     if (this.state.currentContentData !== contentData) {
       dialog.setAttribute('data-dialog', name);
@@ -74,8 +84,7 @@ class Dialog {
     container.appendChild(dialog);
     this.state.name = name;
     this.state.opened = true;
-    this.subtitles = showSubtitles;
-    this.text = showText;
+    this._navigationMode(mode);
     if (type(loaded, Function)) loaded();
     if (type(onClose, Function)) this.events.onClose = onClose;
     if (type(beforeClose, Function)) this.events.beforeClose = beforeClose;
@@ -92,6 +101,31 @@ class Dialog {
     this.state.opened = false;
     this.state.name = null;
     if (this.events.onClose) this.events.onClose(dialog);
+  }
+
+  _navigationMode(mode) {
+    switch (mode) {
+      case 'articles':
+        this.subtitles = false;
+        this.text = true;
+        this.pictures = false;
+        break;
+      case 'youtube':
+        this.subtitles = true;
+        this.text = true;
+        this.pictures = false;
+        break;
+      case 'podcasts':
+        this.subtitles = true;
+        this.text = true;
+        this.pictures = false;
+        break;
+      case 'pictures':
+        this.subtitles = false;
+        this.text = false;
+        this.pictures = true;
+        break;
+    }
   }
 
   _findWordElements(content, words) {
@@ -130,6 +164,15 @@ class Dialog {
       classes.remove('hidden');
     });
 
+    $on('button.viewer', ({ last }) => {
+      const { viewer } = this.state.currentContentData;
+      if (last === 'previous') return viewer.previous();
+      if (last === 'next') return viewer.next();
+      if (last === 'resize') return viewer.adjust();
+      if (last === 'spy') this._togglePictureSpy(viewer);
+      if (last === 'labels') this._togglePictureLabels(viewer);
+    });
+
     $on('button', ({ id, last, data, target }) => {
       if (id.startsWith('button.size')) this._fontSize(data, last);
       if (id.startsWith('button.align')) this._subtitlesAlign(last);
@@ -149,6 +192,20 @@ class Dialog {
         contentData: this.state.currentContentData
       });
     });
+  }
+
+  _togglePictureSpy(viewer) {
+    const classes = this.classes.get('button').get('viewer').get('spy');
+    const isSpied = classes.has('active');
+    classes.toggle('active');
+    viewer.spy(!isSpied);
+  }
+
+  _togglePictureLabels(viewer) {
+    const classes = this.classes.get('button').get('viewer').get('labels');
+    const areVisible = classes.has('active');
+    classes.toggle('active');
+    viewer.labels(!areVisible);
   }
 
   _setInitialState() {
@@ -238,6 +295,21 @@ class Dialog {
                 <li ${on('button.game.presentation', 'click', { data: { name: 'presentation', instance: Presentation } })}>${child($iconWordList())}</li>
                 <li ${on('button.game.word-test', 'click', { data: { name: 'test', instance: Test } })}>${child($iconGameTest())}</li>
                 <li ${on('button.game.crossword', 'click', { data: { name: 'crossword', instance: Crossword } })}>${child($iconGameCrossword())}</li>
+              </ul>
+            </div>
+            <div class="controls pictures section-pictures" ${classes('controls.pictures')}>
+              <ul>
+                <li ${on('button.viewer.previous', 'click')}>${child($iconPrevious())}</li>
+                <li ${on('button.viewer.next', 'click')}>${child($iconNext())}</li>
+                <li ${on('button.viewer.spy', 'click')} ${classes('button.viewer.spy', ['active'])}>${child($iconSpy())}</li>
+                <li ${on('button.viewer.resize', 'click')}>${child($iconResize())}</li>
+                <li ${on('button.viewer.labels', 'click')} ${classes('button.viewer.labels', ['active'])}>${child($iconLabels())}</li>
+              </ul>
+              <ul class="info">
+                <li>Word:</li>
+                <li ${ref('viewer.output.current')} class="output score">1</li>
+                <li>/</li>
+                <li ${ref('viewer.output.total')} class="output total">22</li>
               </ul>
             </div>
             <div class="controls text">

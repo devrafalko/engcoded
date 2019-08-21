@@ -4,6 +4,7 @@
 $dialog-margin: 12px;
 $grid-articles-hide-point: 391px;
 $grid-youtube-hide-point: 561px;
+$grid-pictures-hide-point: 428px;
 
 .dialog-box {
   background-color: white;
@@ -68,6 +69,7 @@ $grid-youtube-hide-point: 561px;
   }
 
   &.game,
+  &.pictures,
   &.text {
     height: 100%;
   }
@@ -76,6 +78,7 @@ $grid-youtube-hide-point: 561px;
     float: left;
   }
 
+  &.pictures,
   &.text {
     float: right;
   }
@@ -132,6 +135,7 @@ $grid-youtube-hide-point: 561px;
   }
 
   .section-subtitles,
+  &.section-pictures,
   .section-font {
     display: none;
 
@@ -148,8 +152,8 @@ $grid-youtube-hide-point: 561px;
   position: relative;
 
   &.active .icon {
-    fill: #39f3f3;
-    stroke: #39f3f3;
+    fill: #39f3f3 !important;
+    stroke: #39f3f3 !important;
   }
 
   &.disabled {
@@ -206,10 +210,12 @@ $grid-youtube-hide-point: 561px;
 .dialog-box>.navigation-panel .controls {
 
   &.text,
+  &.pictures,
   &.game {
     padding: 0px 4px;
   }
 
+  &.pictures>ul>li,
   &.game>ul>li {
     width: 26px;
   }
@@ -255,9 +261,36 @@ $grid-youtube-hide-point: 561px;
     }
   }
 
+  &.pictures .info {
+    margin-left: 4px;
+    vertical-align: top;
+
+    li {
+      color: #01b9b9;
+      cursor: default !important;
+      font-size: 16px;
+      line-height: $grid-nav-small;
+      margin: 0px;
+      vertical-align: middle;
+      width: auto;
+    }
+
+    .output {
+      color: #2fe0e0;
+      font-size: 18px;
+      text-align: left;
+      width: 22px;
+
+      &.score {
+        text-align: right;
+      }
+    }
+  }
+
   @media (min-width: $grid-small) and (min-height: $grid-small) {
 
     &.text,
+    &.pictures,
     &.game {
       padding: 0px 8px;
     }
@@ -274,15 +307,25 @@ $grid-youtube-hide-point: 561px;
         height: 28px;
       }
     }
+
+    &.pictures .info {
+      margin-left: 12px;
+    }
+
+    &.pictures .info li {
+      line-height: $grid-nav-medium;
+    }
   }
 
   @media (min-width: $grid-medium) and (min-height: $grid-medium) {
 
     &.text,
+    &.pictures,
     &.game {
       padding: 0px 12px;
     }
 
+    &.pictures>ul>li,
     &.game>ul>li {
       width: 30px;
     }
@@ -326,6 +369,14 @@ $grid-youtube-hide-point: 561px;
         }
       }
     }
+
+    &.pictures .info {
+      margin-left: 16px;
+    }
+
+    &.pictures .info li {
+      line-height: $grid-nav-large;
+    }
   }
 }
 
@@ -365,10 +416,6 @@ $grid-youtube-hide-point: 561px;
     }
 
     &>.navigation-panel .controls {
-      &.text .section-font {
-        display: block;
-      }
-
       &.text {
         float: left;
       }
@@ -402,6 +449,39 @@ $grid-youtube-hide-point: 561px;
     }
   }
 }
+
+.dialog-box[data-dialog="pictures"] {
+  @media (max-width: $grid-pictures-hide-point) {
+    &>.navigation-panel {
+      padding-top: $grid-nav-small;
+    }
+
+    &>.navigation-panel .controls {
+
+      &.pictures>ul {
+        display: block;
+      }
+
+      &.pictures {
+        float: left;
+      }
+
+      &.navigation .toggle-menu {
+        display: block;
+      }
+
+      &.game,
+      &.navigation,
+      &.pictures>ul {
+        display: block;
+        height: $grid-nav-small;
+        float: none;
+      }
+
+    }
+  }
+}
+
 
 .dialog-box .content-container {
   height: 100%;

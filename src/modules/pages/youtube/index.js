@@ -155,11 +155,11 @@ class YouTube {
 
     Dialog.load({
       name: 'youtube',
+      mode: 'youtube',
       container: this.dom.container,
       content: this.views[movieId].template,
       cardArea: this.views[movieId].references.get('subtitles'),
       contentData: this.instances[movieId],
-      showSubtitles: true,
       onStopSpy: () => this.instances[movieId].scroller.break(),
       onClose: () => {
         Timer.stop();
