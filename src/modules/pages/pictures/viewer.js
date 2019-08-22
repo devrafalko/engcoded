@@ -2,9 +2,10 @@ const { $templater, $casteljau } = $utils;
 const { $iconPictureLabel } = $icons;
 
 class Viewer {
-  constructor({ output }) {
+  constructor({ output, words }) {
     this.data = {
       output,
+      words,
       zoom: 0.02,
       shiftLimit: .33
     };
@@ -42,7 +43,6 @@ class Viewer {
     const ratio = val > 1 ? 1 : val < initialZoom ? initialZoom : val;
     this.state.zoom = ratio;
     this.width = this.image.naturalWidth * ratio;
-    this.content.style.width = `${this.state.width}px`;
   }
 
   get width() {
@@ -51,6 +51,7 @@ class Viewer {
 
   set width(v) {
     this.state.width = v;
+    this.content.style.width = `${v}px`;
   }
 
   get height() {
@@ -98,9 +99,9 @@ class Viewer {
   }
 
   adjust() {
-    this.content.style.width = `${this.image.naturalWidth * this.initialZoom}px`;
-    this.content.style.left = `${this.initialX}px`;
-    this.content.style.top = `${this.initialY}px`;
+    this.zoom = this.initialZoom;
+    this.left = this.initialX;
+    this.top = this.initialY;
   }
 
   previous() {
@@ -116,15 +117,19 @@ class Viewer {
   }
 
   labels(action) {
-
+    this.html.classes.get('content')[action ? 'add' : 'remove']('visible');
   }
 
   _renderView() {
-    const templater = $templater(({ ref, on, child, classes }) =>/*html*/`
+    const templater = $templater(({ ref, on, child, classes, list }) =>/*html*/`
       <div ${ref('container')} ${on('container', ['mousedown', 'mouseup', 'wheel', 'mousemove', 'mouseout'])} class="viewer container">
-        <div ${ref('content')} class="viewer content">
+        <div ${ref('content')} class="viewer content" ${classes('content', ['visible'])}>
           <img ${ref('image')} ${on('image', ['dragstart'])} class="viewer image"/>
-          <span ${on('label', ['mouseenter', 'mouseleave'])} ${classes('label')} class="viewer label" style="top:20%; left:20%">${child($iconPictureLabel())}</span>
+          ${list(this.data.words.indeces, ({ id, x, y }, key, index) =>/*html*/`
+            <div ${on(`label.${index}`, ['mouseenter', 'mouseleave', 'click'], { capture: true, data: id })} ${classes(`label.${index}`)} class="viewer label" style="top:${y * 100}%; left:${x * 100}%">
+              ${child($iconPictureLabel())}
+            </div>
+          `)}
         </div>
       </div>
     `);
@@ -137,13 +142,14 @@ class Viewer {
   _addListeners() {
     const { $on, classes } = this.html;
 
-    $on('label', ({ type, target, event }) => {
+    $on('label', ({ type, target, last }) => {
+      if (event.target !== target) return;
       if (type === 'mouseenter') {
-        classes.get('label').swing('left', 'right', 300);
+        classes.get('label').get(last).swing('left', 'right', 300);
       }
       if (type === 'mouseleave') {
-        classes.get('label').clear();
-        classes.get('label').wait(200).remove('left', 'right');
+        classes.get('label').get(last).clear();
+        classes.get('label').get(last).wait(200).remove('left', 'right');
       }
     });
 

@@ -55,9 +55,10 @@ class Pictures {
 
   _renderContentData(pictureId) {
     const picture = this.data.pictures[pictureId];
+    const words = new Words(picture.words);
     this.instances[pictureId] = {
-      words: new Words(picture.words),
-      viewer: new Viewer({ output: Dialog.dom.get('viewer').get('output') }),
+      words,
+      viewer: new Viewer({ words, output: Dialog.dom.get('viewer').get('output') }),
       games: {},
       loaded: false,
       pending: false

@@ -226,44 +226,47 @@ class Events {
     const data = this._identifiers.get(id);
     const paths = data ? data.paths : this._parseId(id);
 
-    this._traverse(paths, ({ element, action }) => {
+    this._traverse(paths, (data) => {
+      let { element, action, capture } = data;
       let actions = type(action, Array) ? action : [action];
       for (let _action of actions) {
         if (!this._handlers.has(_action)) this._handlers.set(_action, new Map());
         const handler = this._handlers.get(_action);
-        if (!handler.has(element)) handler.set(element, paths);
-        else if (paths.length > handler.get(element).length) handler.set(element, paths);
+        if (!handler.has(element)) handler.set(element, { paths, capture });
+        else if (paths.length > handler.get(element).paths.length) handler.set(element, { paths, capture });
       }
     });
+    const { captureMode, bubbleMode } = this._findCommonParents(paths);
+    for (let [commons, useCapture] of [[captureMode, true], [bubbleMode, false]]) {
+      commons.forEach((element, action) => {
+        element.addEventListener(action, (event) => {
+          const handlers = this._handlers.get(action);
+          const collection = [];
+          $loopParents(event.target, (node, stop) => {
+            if (handlers.has(node) && handlers.get(node).paths === paths) {
+              collection.unshift(this._elements.get(node));
+            }
+            if (event.target === element) stop();
+          });
 
-    const commons = this._findCommonParents(paths);
-    commons.forEach((element, action) => {
-      element.addEventListener(action, (event) => {
-        const handlers = this._handlers.get(action);
-        const collection = [];
-        $loopParents(event.target, (node, stop) => {
-          if (handlers.has(node) && handlers.get(node) === paths) {
-            collection.unshift(this._elements.get(node));
+          if (!collection.length) return;
+          for (let i = 0; i < collection.length; i++) {
+            let data = collection[i];
+            if (data.capture) {
+              this._prepareCallback(event, element, action, data, callback);
+              collection.splice(i, 1);
+              i--;
+            }
           }
-          if (event.target === element) stop();
-        });
 
-        if (!collection.length) return;
-        for (let i = 0; i < collection.length; i++) {
-          let data = collection[i];
-          if (data.bubble) {
+          for (let i = collection.length - 1; i >= 0; i--) {
+            let data = collection[i];
             this._prepareCallback(event, element, action, data, callback);
-            collection.splice(i, 1);
-            i--;
           }
-        }
-
-        for (let i = collection.length - 1; i >= 0; i--) {
-          let data = collection[i];
-          this._prepareCallback(event, element, action, data, callback);
-        }
+        }, useCapture);
       });
-    });
+    }
+
   }
 
   join(added, main) {
@@ -306,10 +309,12 @@ class Events {
   }
 
   _findCommonParents(pathsA) {
-    const commons = new Map();
+    const captureMode = new Map();
+    const bubbleMode = new Map();
     let range = document.createRange();
     this._handlers.forEach((map, _action) => {
-      map.forEach((pathsB, node) => {
+      map.forEach(({ paths: pathsB, capture }, node) => {
+        let commons = capture ? captureMode : bubbleMode;
         if (pathsA === pathsB) {
           range.setStart(commons.get(_action) || node, 0);
           range.setEnd(node, 0);
@@ -317,7 +322,7 @@ class Events {
         }
       });
     });
-    return commons;
+    return { captureMode, bubbleMode };
   }
 }
 
@@ -330,9 +335,9 @@ export default function (callback) {
   const stringContent = callback({
     ref: (name) => `data-reference="${name}"`,
     on: (name, action, _data = {}) => {
-      const { bubble = false, data } = _data;
+      const { capture = false, data } = _data;
       const dataDefined = _data.hasOwnProperty('data');
-      events.reference(name, { name, action, dataDefined, data, bubble });
+      events.reference(name, { name, action, dataDefined, data, capture });
       return `data-action="${name}"`;
     },
     child: (nodes) => {

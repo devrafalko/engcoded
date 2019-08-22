@@ -90,18 +90,28 @@
 
   &.label {
     cursor: pointer;
+    display: none;
     position: absolute;
-    transform-origin: 50% 5%;
-    transform: rotate(0deg);
-    transition: transform .3s ease-in-out;
+    transform: translate(-21px, 0px);
     width: 42px;
   }
 
-  &.label.left {
+  &.label>.icon {
+    transform: rotate(0deg);
+    transform-origin: 50% 5%;
+    transition: transform .3s ease-in-out;
+  }
+
+  &.label.left>.icon {
     transform: rotate(-45deg);
   }
 
-  &.label.right {
+  &.label.right>.icon {
     transform: rotate(45deg);
   }
+
+  &.content.visible .label {
+    display: block;
+  }
+
 }
