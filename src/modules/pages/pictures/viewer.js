@@ -3,19 +3,25 @@ const { $iconPictureLabel } = $icons;
 
 class Viewer {
   constructor({ dialog, words }) {
+    this.config = {
+      zoom: 0.02,
+      shiftLimit: .33,
+      spyMargin: .1,
+      moveFrameTime: 28,
+      moveCoords: [0, 0, 0.8, 0.8, 0.9, 0.9, 1, 1]
+    };
     this.data = {
       navLabel: dialog.classes.get('button').get('viewer').get('labels'),
       navOutput: dialog.dom.get('viewer').get('output'),
-      words,
-      zoom: 0.02,
-      shiftLimit: .33,
-      spyMargin: .1
+      words
     };
     this.state = {
       move: false,
       spy: true,
       currentWord: null,
-      currentLabel: null
+      currentLabel: null,
+      currentMove: null,
+      pendingDimensions: {}
     };
     this._renderView();
     this._addListeners();
@@ -40,28 +46,29 @@ class Viewer {
   }
 
   get zoom() {
-    return this.state.zoom || this.initialZoom;
+    return this.state.zoom || { next: this.initialZoom, prev: this.initialZoom, diff: 0 };
   }
 
   set zoom(val) {
     const initialZoom = this.initialZoom;
     const ratio = val > 1 ? 1 : val < initialZoom ? initialZoom : val;
-    this.state.zoom = ratio;
-    this.width = this.image.naturalWidth * ratio;
+    this.state.zoom = { next: ratio, prev: this.zoom.next, diff: ratio - this.zoom.next };
   }
 
   get width() {
-    return this.state.width || this.image.naturalWidth * this.initialZoom;
+    const initial = this.image.naturalWidth * this.initialZoom;
+    return this.state.width || { next: initial, prev: initial, diff: 0 };
   }
 
   set width(v) {
-    this.state.width = v;
-    this.content.style.width = `${v}px`;
+    this.state.width = { next: v, prev: this.width.next, diff: v - this.width.next };
   }
 
   get height() {
     const ratio = this.image.naturalHeight / this.image.naturalWidth;
-    return this.width * ratio;
+    const next = this.width.next * ratio
+    const prev = this.width.prev * ratio
+    return { next, prev, diff: next - prev };
   }
 
   set height(v) {
@@ -69,27 +76,25 @@ class Viewer {
   }
 
   get top() {
-    return this.state.top || this.content.offsetTop;
+    return this.state.top || { next: this.content.offsetTop, prev: this.content.offsetTop, diff: 0 };
   }
 
   set top(v) {
-    const topLimit = this.container.clientHeight - this.container.clientHeight * this.data.shiftLimit;
-    const bottomLimit = this.container.clientHeight * this.data.shiftLimit - this.height;
+    const topLimit = this.container.clientHeight - this.container.clientHeight * this.config.shiftLimit;
+    const bottomLimit = this.container.clientHeight * this.config.shiftLimit - this.height.next;
     const limited = v > topLimit ? topLimit : v < bottomLimit ? bottomLimit : v;
-    this.state.top = limited;
-    this.content.style.top = `${limited}px`;
+    this.state.top = { next: limited, prev: this.top.next, diff: limited - this.top.next };
   }
 
   get left() {
-    return this.state.left || this.content.offsetLeft;
+    return this.state.left || { next: this.content.offsetLeft, prev: this.content.offsetLeft, diff: 0 };
   }
 
   set left(v) {
-    const leftLimit = this.container.clientWidth - this.container.clientWidth * this.data.shiftLimit;
-    const rightLimit = this.container.clientWidth * this.data.shiftLimit - this.width;
+    const leftLimit = this.container.clientWidth - this.container.clientWidth * this.config.shiftLimit;
+    const rightLimit = this.container.clientWidth * this.config.shiftLimit - this.width.next;
     const limited = v > leftLimit ? leftLimit : v < rightLimit ? rightLimit : v;
-    this.state.left = limited;
-    this.content.style.left = `${limited}px`;
+    this.state.left = { next: limited, prev: this.left.next, diff: limited - this.left.next };
   }
 
   get currentWord() {
@@ -120,21 +125,74 @@ class Viewer {
       if (this.image.naturalWidth > 0 && this.image.naturalHeight) {
         clearInterval(interval);
         if (callback) callback();
-        this.reset();
+        this.reset(false);
       }
     }, 20);
   }
 
-  reset() {
-    this.resize();
+  reset(smooth = true) {
+    this.resize(smooth);
     this.currentWord = null;
     this.currentLabel = null;
   }
 
-  resize() {
+  resize(smooth = true) {
+    this._unmountAnimation();
     this.zoom = this.initialZoom;
+    this.width = this.image.naturalWidth * this.zoom.next;
     this.left = this.initialX;
     this.top = this.initialY;
+    this._update({ smooth, time: 400 });
+  }
+
+  _update({ zoom = true, top = true, left = true, smooth = true, time } = {}) {
+    const dims = this.state.pendingDimensions;
+    if (smooth === false) {
+      dims.zoom = this.zoom.next;
+      dims.width = this.width.next;
+      dims.left = this.left.next;
+      dims.top = this.top.next;
+      render.call(this);
+    } else {
+      this._mountAnimation(time, (volume) => {
+        dims.zoom = this.zoom.prev + this.zoom.diff * volume;
+        dims.width = this.width.prev + this.width.diff * volume;
+        dims.left = this.left.prev + this.left.diff * volume;
+        dims.top = this.top.prev + this.top.diff * volume;
+        render.call(this);
+      });
+    }
+
+    function render() {
+      const styles = this.content.style;
+      if (zoom) styles.width = `${dims.width}px`;
+      if (left) styles.left = `${dims.left}px`;
+      if (top) styles.top = `${dims.top}px`;
+    }
+
+  }
+
+  _mountAnimation(time, callback) {
+    const frame = this.config.moveFrameTime;
+    const coords = this.config.moveCoords;
+    let totalTime = 0;
+
+    this.state.currentMove = setInterval(() => {
+      callback($casteljau(coords, totalTime / time));
+      if (totalTime >= time) return this._unmountAnimation();
+      totalTime += frame;
+    }, frame);
+  }
+
+  _unmountAnimation() {
+    if (this.state.currentMove !== null) {
+      clearInterval(this.state.currentMove);
+      this.state.currentMove = null;
+      this.zoom = this.state.pendingDimensions.zoom;
+      this.width = this.state.pendingDimensions.width;
+      this.left = this.state.pendingDimensions.left;
+      this.top = this.state.pendingDimensions.top;
+    }
   }
 
   previous() {
@@ -144,7 +202,6 @@ class Viewer {
     this.currentLabel = labelIndex;
     if (this.state.spy) this._adjust(labelIndex);
     else this.resize();
-    this.labels(false);
   }
 
   next() {
@@ -165,7 +222,9 @@ class Viewer {
   }
 
   goTo(labelIndex, id) {
-    this.currentWord = this.data.words.iterators.get(id);
+    const nextWord = this.data.words.iterators.get(id);
+    if (nextWord === this.currentWord) return;
+    else this.currentWord = nextWord;
     this.currentLabel = labelIndex;
     if (this.state.spy) this._adjust(labelIndex);
     else this.resize();
@@ -184,7 +243,7 @@ class Viewer {
 
   _adjust(index) {
     const { t, l, b, r } = this.data.words.indeces.get(index);
-    const margin = this.data.spyMargin;
+    const margin = this.config.spyMargin;
     const containerWidth = this.container.clientWidth;
     const containerHeight = this.container.clientHeight;
     const boxWidth = this.image.naturalWidth * (r - l + margin * 2);
@@ -193,12 +252,12 @@ class Viewer {
     const boxTop = this.image.naturalHeight * (t - margin);
     const zoomX = containerWidth / boxWidth;
     const zoomY = containerHeight / boxHeight;
+    this._unmountAnimation();
     this.zoom = Math.min(zoomX, zoomY);
-
-    const boxCenterX = (boxLeft + boxWidth / 2) * this.zoom;
-    const boxCenterY = (boxTop + boxHeight / 2) * this.zoom;
-    this.left = containerWidth / 2 - boxCenterX;
-    this.top = containerHeight / 2 - boxCenterY;
+    this.width = this.image.naturalWidth * this.zoom.next;
+    this.left = containerWidth / 2 - ((boxLeft + boxWidth / 2) * this.zoom.next);
+    this.top = containerHeight / 2 - ((boxTop + boxHeight / 2) * this.zoom.next);
+    this._update({ time: 400 });
   }
 
   _renderView() {
@@ -250,22 +309,25 @@ class Viewer {
   }
 
   _zoom(event) {
-    let width = this.width;
-    let height = this.height;
-    let top = this.top;
-    let left = this.left;
-    let zoom = this.zoom;
+    const initialZoom = this.initialZoom;
+    const width = this.width.next;
+    const height = this.height.next;
+    const top = this.top.next;
+    const left = this.left.next;
+    const prevZoom = this.zoom.next;
+    let nextZoom;
 
     if (event.deltaY < 0) {
-      if (this.zoom === 1) return;
-      this.zoom += this.data.zoom;
+      if (prevZoom === 1) return;
+      nextZoom = prevZoom + this.config.zoom;
     } else if (event.deltaY > 0) {
-      if (this.zoom === this.initialZoom) return;
-      this.zoom -= this.data.zoom;
+      if (prevZoom === initialZoom) return;
+      nextZoom = prevZoom - this.config.zoom;
     }
 
-    const zoomShiftX = this.image.naturalWidth * (this.zoom - zoom);
-    const zoomShiftY = this.image.naturalHeight * (this.zoom - zoom);
+    const limitZoom = nextZoom > 1 ? 1 : nextZoom < initialZoom ? initialZoom : nextZoom;
+    const zoomShiftX = this.image.naturalWidth * (limitZoom - prevZoom);
+    const zoomShiftY = this.image.naturalHeight * (limitZoom - prevZoom);
     const { x, y } = this._coords(event);
     const imageX = x - left;
     const imageY = y - top;
@@ -274,15 +336,18 @@ class Viewer {
     const outside = _imagePercX < 0 || _imagePercX > 1 || _imagePercY < 0 || _imagePercY > 1;
     const imagePercX = outside ? .5 : _imagePercX;
     const imagePercY = outside ? .5 : _imagePercY;
-
+    this._unmountAnimation();
+    this.zoom = limitZoom;
+    this.width = this.image.naturalWidth * this.zoom.next;
     this.left = left - zoomShiftX * imagePercX;
     this.top = top - zoomShiftY * imagePercY;
+    this._update({ time: 150 });
   }
 
   _moveStart(event) {
     const { x, y } = this._coords(event);
-    this.state.moveX = x - this.left;
-    this.state.moveY = y - this.top;
+    this.state.moveX = x - this.state.pendingDimensions.left;
+    this.state.moveY = y - this.state.pendingDimensions.top;
     this.state.move = true;
   }
 
@@ -292,8 +357,10 @@ class Viewer {
 
   _move(event) {
     const { x, y } = this._coords(event);
+    this._unmountAnimation();
     this.left = x - this.state.moveX;
     this.top = y - this.state.moveY;
+    this._update({ smooth: false });
   }
 
   _coords(event) {
