@@ -168,7 +168,7 @@ class Dialog {
       const { viewer } = this.state.currentContentData;
       if (last === 'previous') return viewer.previous();
       if (last === 'next') return viewer.next();
-      if (last === 'resize') return viewer.adjust();
+      if (last === 'resize') return viewer.reset();
       if (last === 'spy') this._togglePictureSpy(viewer);
       if (last === 'labels') this._togglePictureLabels(viewer);
     });
@@ -307,9 +307,9 @@ class Dialog {
               </ul>
               <ul class="info">
                 <li>Word:</li>
-                <li ${ref('viewer.output.current')} class="output score">1</li>
+                <li ${ref('viewer.output.current')} class="output score"></li>
                 <li>/</li>
-                <li ${ref('viewer.output.total')} class="output total">22</li>
+                <li ${ref('viewer.output.total')} class="output total"></li>
               </ul>
             </div>
             <div class="controls text">

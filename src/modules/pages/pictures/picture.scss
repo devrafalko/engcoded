@@ -110,6 +110,15 @@
     transform: rotate(45deg);
   }
 
+  &.label.active {
+    display: block;
+
+    &>.icon .label {
+      stroke: #00c5cd;
+      fill: white;
+    }
+  }
+
   &.content.visible .label {
     display: block;
   }

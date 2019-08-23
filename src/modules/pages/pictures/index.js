@@ -58,7 +58,7 @@ class Pictures {
     const words = new Words(picture.words);
     this.instances[pictureId] = {
       words,
-      viewer: new Viewer({ words, output: Dialog.dom.get('viewer').get('output') }),
+      viewer: new Viewer({ words, dialog: Dialog }),
       games: {},
       loaded: false,
       pending: false

@@ -2,15 +2,20 @@ const { $templater, $casteljau } = $utils;
 const { $iconPictureLabel } = $icons;
 
 class Viewer {
-  constructor({ output, words }) {
+  constructor({ dialog, words }) {
     this.data = {
-      output,
+      navLabel: dialog.classes.get('button').get('viewer').get('labels'),
+      navOutput: dialog.dom.get('viewer').get('output'),
       words,
       zoom: 0.02,
-      shiftLimit: .33
+      shiftLimit: .33,
+      spyMargin: .1
     };
     this.state = {
-      move: false
+      currentLabelIndex: null,
+      move: false,
+      spy: true,
+      current: null
     };
     this._renderView();
     this._addListeners();
@@ -87,37 +92,100 @@ class Viewer {
     this.content.style.left = `${limited}px`;
   }
 
+  get current() {
+    return this.state.current;
+  }
+
+  set current(next) {
+    const labels = this.html.classes.get('label');
+    const prev = this.state.current;
+    if (prev !== null) labels.get(String(prev)).remove('active');
+    if (next !== null) labels.get(String(next)).add('active');
+    this.data.navOutput.get('current').innerHTML = next === null ? '-' : next + 1;
+    this.data.navOutput.get('total').innerHTML = this.data.words.size;
+    this.state.current = next;
+  }
+
   render(src, callback) {
     this.image.src = src;
     const interval = setInterval(() => {
       if (this.image.naturalWidth > 0 && this.image.naturalHeight) {
         clearInterval(interval);
         if (callback) callback();
-        this.adjust();
+        this.reset();
       }
     }, 20);
   }
 
-  adjust() {
+  reset() {
+    this.resize();
+    this.current = null;
+    this.state.currentLabelIndex = null;
+    this.labels(true);
+  }
+
+  resize() {
     this.zoom = this.initialZoom;
     this.left = this.initialX;
     this.top = this.initialY;
   }
 
   previous() {
-
+    this.current = this.current === null || this.current - 1 < 0 ? this.data.words.size - 1 : this.current - 1;
+    const id = this.data.words.iterators.get(this.current);
+    const labelIndex = this.data.words.identifiers.get(id)[0];
+    this.state.currentLabelIndex = labelIndex;
+    if (this.state.spy) this._adjust(labelIndex);
+    else this.resize();
+    this.labels(false);
   }
 
   next() {
+    this.current = this.current === null || this.current + 1 === this.data.words.size ? 0 : this.current + 1;
+    const id = this.data.words.iterators.get(this.current);
+    const labelIndex = this.data.words.identifiers.get(id)[0];
+    this.state.currentLabelIndex = labelIndex;
+    if (this.state.spy) this._adjust(labelIndex);
+    else this.resize();
+    this.labels(false);
+  }
 
+  goTo(labelIndex, id) {
+    this.current = this.data.words.iterators.get(id);
+    this.state.currentLabelIndex = labelIndex;
+    if (this.state.spy) this._adjust(labelIndex);
+    else this.resize();
+    this.labels(false);
   }
 
   spy(action) {
-
+    this.state.spy = action;
+    if (action === false) return this.resize();
+    if (this.state.currentLabelIndex !== null) this._adjust(this.state.currentLabelIndex);
   }
 
   labels(action) {
     this.html.classes.get('content')[action ? 'add' : 'remove']('visible');
+    this.data.navLabel[action ? 'add' : 'remove']('active');
+  }
+
+  _adjust(index) {
+    const { t, l, b, r } = this.data.words.indeces.get(index);
+    const margin = this.data.spyMargin;
+    const containerWidth = this.container.clientWidth;
+    const containerHeight = this.container.clientHeight;
+    const boxWidth = this.image.naturalWidth * (r - l + margin * 2);
+    const boxHeight = this.image.naturalHeight * (b - t + margin * 2);
+    const boxLeft = this.image.naturalWidth * (l - margin);
+    const boxTop = this.image.naturalHeight * (t - margin);
+    const zoomX = containerWidth / boxWidth;
+    const zoomY = containerHeight / boxHeight;
+    this.zoom = Math.min(zoomX, zoomY);
+
+    const boxCenterX = (boxLeft + boxWidth / 2) * this.zoom;
+    const boxCenterY = (boxTop + boxHeight / 2) * this.zoom;
+    this.left = containerWidth / 2 - boxCenterX;
+    this.top = containerHeight / 2 - boxCenterY;
   }
 
   _renderView() {
@@ -125,9 +193,9 @@ class Viewer {
       <div ${ref('container')} ${on('container', ['mousedown', 'mouseup', 'wheel', 'mousemove', 'mouseout'])} class="viewer container">
         <div ${ref('content')} class="viewer content" ${classes('content', ['visible'])}>
           <img ${ref('image')} ${on('image', ['dragstart'])} class="viewer image"/>
-          ${list(this.data.words.indeces, ({ id, x, y }, key, index) =>/*html*/`
-            <div ${on(`label.${index}`, ['mouseenter', 'mouseleave', 'click'], { capture: true, data: id })} ${classes(`label.${index}`)} class="viewer label" style="top:${y * 100}%; left:${x * 100}%">
-              ${child($iconPictureLabel())}
+          ${list(this.data.words.indeces, ({ id, index, x, y }) =>/*html*/`
+            <div ${on(`label.${index}`, ['mouseenter', 'mouseleave', 'click'], { capture: true, data: { index, id } })} ${classes(`label.${index}`)} class="viewer label" style="top:${y * 100}%; left:${x * 100}%">
+              ${child($iconPictureLabel(index))}
             </div>
           `)}
         </div>
@@ -142,9 +210,11 @@ class Viewer {
   _addListeners() {
     const { $on, classes } = this.html;
 
-    $on('label', ({ type, target, last }) => {
+    $on('label', ({ type, target, last, data }) => {
+      if (type === 'click') return this.goTo(data.index, data.id);
       if (event.target !== target) return;
       if (type === 'mouseenter') {
+        classes.get('label').get(last).clear();
         classes.get('label').get(last).swing('left', 'right', 300);
       }
       if (type === 'mouseleave') {
