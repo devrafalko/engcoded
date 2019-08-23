@@ -83,6 +83,7 @@ class Dialog {
     }
     container.appendChild(dialog);
     this.state.name = name;
+    this.state.mode = mode;
     this.state.opened = true;
     this._navigationMode(mode);
     if (type(loaded, Function)) loaded();
@@ -270,12 +271,18 @@ class Dialog {
   }
 
   seekOccurrence(id) {
-    Card.refresh({
-      container: this.state.currentContentElements.cardArea,
-      scroll: true,
-      index: this.state.currentContentData.words.identifiers.get(id)[0],
-      contentData: this.state.currentContentData
-    });
+    switch(this.state.mode){
+      case 'pictures':
+        this.state.currentContentData.viewer.seek(id);
+        break;
+      default:
+        Card.refresh({
+          container: this.state.currentContentElements.cardArea,
+          scroll: true,
+          index: this.state.currentContentData.words.identifiers.get(id)[0],
+          contentData: this.state.currentContentData
+        });
+    }
   }
 
   spySubtitles(action) {

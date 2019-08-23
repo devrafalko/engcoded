@@ -12,10 +12,10 @@ class Viewer {
       spyMargin: .1
     };
     this.state = {
-      currentLabelIndex: null,
       move: false,
       spy: true,
-      current: null
+      currentWord: null,
+      currentLabel: null
     };
     this._renderView();
     this._addListeners();
@@ -92,18 +92,26 @@ class Viewer {
     this.content.style.left = `${limited}px`;
   }
 
-  get current() {
-    return this.state.current;
+  get currentWord() {
+    return this.state.currentWord;
   }
 
-  set current(next) {
-    const labels = this.html.classes.get('label');
-    const prev = this.state.current;
-    if (prev !== null) labels.get(String(prev)).remove('active');
-    if (next !== null) labels.get(String(next)).add('active');
+  set currentWord(next) {
     this.data.navOutput.get('current').innerHTML = next === null ? '-' : next + 1;
     this.data.navOutput.get('total').innerHTML = this.data.words.size;
-    this.state.current = next;
+    this.state.currentWord = next;
+  }
+
+  get currentLabel() {
+    return this.state.currentLabel;
+  }
+
+  set currentLabel(next) {
+    const labels = this.html.classes.get('label');
+    const prev = this.state.currentLabel;
+    if (prev !== null) labels.get(String(prev)).remove('active');
+    if (next !== null) labels.get(String(next)).add('active');
+    this.state.currentLabel = next;
   }
 
   render(src, callback) {
@@ -119,9 +127,8 @@ class Viewer {
 
   reset() {
     this.resize();
-    this.current = null;
-    this.state.currentLabelIndex = null;
-    this.labels(true);
+    this.currentWord = null;
+    this.currentLabel = null;
   }
 
   resize() {
@@ -131,37 +138,43 @@ class Viewer {
   }
 
   previous() {
-    this.current = this.current === null || this.current - 1 < 0 ? this.data.words.size - 1 : this.current - 1;
-    const id = this.data.words.iterators.get(this.current);
+    this.currentWord = this.currentWord === null || this.currentWord - 1 < 0 ? this.data.words.size - 1 : this.currentWord - 1;
+    const id = this.data.words.iterators.get(this.currentWord);
     const labelIndex = this.data.words.identifiers.get(id)[0];
-    this.state.currentLabelIndex = labelIndex;
+    this.currentLabel = labelIndex;
     if (this.state.spy) this._adjust(labelIndex);
     else this.resize();
     this.labels(false);
   }
 
   next() {
-    this.current = this.current === null || this.current + 1 === this.data.words.size ? 0 : this.current + 1;
-    const id = this.data.words.iterators.get(this.current);
+    this.currentWord = this.currentWord === null || this.currentWord + 1 === this.data.words.size ? 0 : this.currentWord + 1;
+    const id = this.data.words.iterators.get(this.currentWord);
     const labelIndex = this.data.words.identifiers.get(id)[0];
-    this.state.currentLabelIndex = labelIndex;
+    this.currentLabel = labelIndex;
     if (this.state.spy) this._adjust(labelIndex);
     else this.resize();
-    this.labels(false);
+  }
+
+  seek(id) {
+    const labelIndex = this.data.words.identifiers.get(id)[0];
+    this.currentWord = this.data.words.iterators.get(id);
+    this.currentLabel = labelIndex;
+    if (this.state.spy) this._adjust(labelIndex);
+    else this.resize();
   }
 
   goTo(labelIndex, id) {
-    this.current = this.data.words.iterators.get(id);
-    this.state.currentLabelIndex = labelIndex;
+    this.currentWord = this.data.words.iterators.get(id);
+    this.currentLabel = labelIndex;
     if (this.state.spy) this._adjust(labelIndex);
     else this.resize();
-    this.labels(false);
   }
 
   spy(action) {
     this.state.spy = action;
     if (action === false) return this.resize();
-    if (this.state.currentLabelIndex !== null) this._adjust(this.state.currentLabelIndex);
+    if (this.currentLabel !== null) this._adjust(this.currentLabel);
   }
 
   labels(action) {
