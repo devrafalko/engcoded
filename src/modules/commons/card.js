@@ -3,13 +3,11 @@ import './card.scss';
 
 const { Slider, Scroller } = $commons;
 const { $loopParents, $templater } = $utils;
-const { $images, $words } = $data;
 const { $iconCardDefinition, $iconCardImage, $iconCardWord, $iconClose, $iconVolume, $iconNextWord, $iconPreviousWord } = $icons;
 
 class Card {
   constructor() {
     this.slider = new Slider();
-    this.data = { words: $words, images: $images };
     this.state = { opened: false, active: null, currentContainer: null, currentIndex: null, currentWords: null };
     this.events = {};
     this._renderView();
@@ -64,10 +62,8 @@ class Card {
 
     if (!contentData.words.indeces.has(index)) return;
     const { id, meaning: meanings } = contentData.words.indeces.get(index);
-
-    if (!this.data.words.has(id)) return;
-    const { word, definition, meaning, audio, img } = this.data.words.get(id);
-
+    if (!contentData.words.records.has(id)) return;
+    const { word, definition, meaning, audio, img } = contentData.words.records.get(id);
     this.hide(true);
     this._renderWordPage(word, meaning, audio, meanings, (wordPage) => {
       this.dom.get('page').get('word').innerHTML = '';
@@ -171,7 +167,7 @@ class Card {
       if (last === 'player' && type === 'pause') this.state.currentPlayerClasses.remove('sound-on');
     });
 
-    $on('page.word',({current, event})=>{
+    $on('page.word', ({ current, event }) => {
       $loopParents(event.target, (element, stop) => {
         if (element === current) return stop();
         if (element.hasAttribute('data-mp3')) {
@@ -261,10 +257,8 @@ class Card {
     if (button.has('disabled')) return;
 
     if (this.state.active) {
-      let _button = this.classes.get('button').get(this.state.active);
-      let _card = this.classes.get('page').get(this.state.active);
-      _button.remove('active');
-      _card.remove('active');
+      this.classes.get('button').get(this.state.active).remove('active');
+      this.classes.get('page').get(this.state.active).remove('active');
     }
 
     button.add('active');
@@ -275,7 +269,7 @@ class Card {
 
   _renderWordPage(words, meanings, audioSource, meaningOrder, callback) {
     const singular = type(audioSource, String);
-    const definitions = prepareDefinitions(meanings, meaningOrder);
+    const translations = orderTranslations(meanings, meaningOrder);
     const { template, classes } = $templater(({ when, classes, list, child }) => /*html*/`
       <div>
         <ul class="section word">
@@ -294,7 +288,7 @@ class Card {
           `)}
         </ul>
         <ul class="section translation">
-          ${list(definitions, (key, word) =>/*html*/`
+          ${list(translations, (key, word) =>/*html*/`
             <li ${when(key, () => `data-keyword="true"`)} class="translation-tab">${word}</li>
           `)}
         </ul>
@@ -304,7 +298,7 @@ class Card {
     this.state.currentPlayerClasses = classes.get('player');
     callback(template);
 
-    function prepareDefinitions(meanings, meaningOrder) {
+    function orderTranslations(meanings, meaningOrder) {
       const collection = new Map();
       for (let index of meaningOrder) collection.set(meanings[index], true);
       for (let x = 0; x < meanings.length; x++) {
@@ -354,7 +348,7 @@ class Card {
         </nav>
         <main class="card content">
           <ul>
-            <li ${ref('page.word')} ${on('page.word','click')} ${classes('page.word')} class="page word"></li>
+            <li ${ref('page.word')} ${on('page.word', 'click')} ${classes('page.word')} class="page word"></li>
             <li ${ref('page.definition')} ${classes('page.definition')} class="page definition"></li>
             <li ${ref('page.image')} ${classes('page.image')} class="page image">
               ${child(this.slider.view)}

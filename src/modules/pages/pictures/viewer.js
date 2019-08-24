@@ -1,8 +1,244 @@
-const { $templater, $casteljau } = $utils;
-const { $iconPictureLabel } = $icons;
+import type from 'of-type';
+
+import './hint.scss';
+
+const { Slider } = $commons;
+const { $templater, $casteljau, $loopParents } = $utils;
+const { $iconPictureLabel, $iconQuestionMark, $iconClose, $iconCardWord, $iconCardDefinition,
+  $iconCardImage, $iconPreviousWord, $iconNextWord, $iconVolume } = $icons;
+
+class Hint {
+  constructor(viewer, words) {
+    this.viewer = viewer;
+    this.words = words;
+    this.slider = new Slider();
+    this.state = {
+      opened: false,
+      currentIndex: null,
+      activePage: null,
+      definitionDisabled: false,
+      imageDisabled: false,
+    };
+    this._renderView();
+    this._addListeners();
+  }
+
+  get view() {
+    return this.html.template;
+  }
+
+  switch(action) {
+    const classes = this.html.classes.get('container');
+    switch (action) {
+      case 'open':
+        if (this.state.opened === true) return;
+        if (this.state.currentIndex === null) return;
+        this.state.opened = true;
+        return classes.clear().add('displayed').wait(10).add('visible');
+      case 'close':
+        if (this.state.opened === false) return;
+        this.state.opened = false;
+        return classes.clear().remove('visible').wait(480).remove('displayed');
+      case 'toggle':
+        return this.switch(classes.has('displayed') ? 'close' : 'open');
+    }
+  }
+
+  refresh(index) {
+    if (this.state.currentIndex === index) return this.switch('toggle');
+    if (index === null) {
+      this.state.currentIndex = null;
+      this.switch('close');
+      return;
+    }
+    if (!this.words.indeces.has(index)) return;
+    const { id, meaning: meanings } = this.words.indeces.get(index);
+    if (!this.words.records.has(id)) return;
+    const { word, definition, meaning, audio, img } = this.words.records.get(id);
+
+    this._renderWordPage(word, meaning, audio, meanings, (view) => {
+      this.dom.get('page').get('word').innerHTML = '';
+      this.dom.get('page').get('word').appendChild(view);
+    });
+
+    this._renderDefinitionPage(definition, (empty, view) => {
+      this.state.definitionDisabled = empty;
+      this.classes.get('button').get('definition')[empty ? 'add' : 'remove']('disabled');
+      if (empty && this.state.active === 'definition') this._switchPage('word');
+      if (empty) return;
+      this.dom.get('page').get('definition').innerHTML = '';
+      this.dom.get('page').get('definition').appendChild(view);
+    });
+
+    this._renderImagePage(img, (empty) => {
+      this.classes.get('button').get('image')[empty ? 'add' : 'remove']('disabled');
+      if (empty && this.state.active === 'image') this._switchPage('word');
+    });
+
+    this.classes.get('section').get('control')[this.words.identifiers.get(id).length > 1 ? 'add' : 'remove']('multiple');
+    this.state.currentIndex = index;
+    this.switch('open');
+  }
+
+  _switchPage(page) {
+    if (page === this.state.activePage) return;
+    if (page === 'definition' && this.state.definitionDisabled) return;
+    if (page === 'image' && this.state.imageDisabled) return;
+
+    if (this.state.activePage !== null) {
+      this.classes.get('button').get(this.state.activePage).remove('active');
+      this.classes.get('page').get(this.state.activePage).remove('active');
+    }
+
+    this.classes.get('button').get(page).add('active');
+    this.classes.get('page').get(page).add('active');
+    this.state.activePage = page;
+  }
+
+  _renderView() {
+    const templater = $templater(({ ref, on, classes, child }) =>/*html*/`
+    <ul ${ref('container')} ${classes('container')} class="hint container">
+      <li ${on('button.open', 'click')} class="button open">
+        <div>
+          <ul class="sprite">
+            <li class="open">${child($iconQuestionMark())}</li>
+            <li class="close">${child($iconClose())}</li>
+          </ul>
+        </div>
+      </li>
+      <li class="dialog">
+        <ul>
+          <li ${ref('page.word')} ${on('page.word', 'click')} ${classes('page.word')} class="page word"></li>
+          <li ${ref('page.definition')} ${classes('page.definition')} class="page definition"></li>
+          <li ${ref('page.image')} ${classes('page.image')} class="page image">${child(this.slider.view)}</li>
+        </ul>
+        <nav class="navigation">
+          <ul class="section pages">
+            <li ${on('button.switch.word', 'click')} ${classes('button.word')} class="button">${child($iconCardWord())}</li>
+            <li ${on('button.switch.definition', 'click')} ${classes('button.definition')} class="button">${child($iconCardDefinition())}</li>
+            <li ${on('button.switch.image', 'click')} ${classes('button.image')} class="button">${child($iconCardImage())}</li>
+          </ul>
+          <ul class="section control" ${classes('section.control')}>
+            <li ${on('button.nav.previous', 'click')} class="button nav previous">${child($iconPreviousWord())}</li>
+            <li ${on('button.nav.next', 'click')} class="button nav next">${child($iconNextWord())}</li>
+          </ul>
+        </nav>
+        <audio ${ref('audio')} ${on('audio', ['play', 'pause'])}></audio>
+      </li>
+    </ul>
+    `);
+    this.html = templater;
+    this.dom = templater.references;
+    this.classes = templater.classes;
+  }
+
+  _renderWordPage(words, meanings, audioSource, meaningOrder, callback) {
+    const isAudioSingle = type(audioSource, String);
+    const translations = orderTranslations(meanings, meaningOrder);
+    const { template, classes } = $templater(({ when, classes, list, child }) => /*html*/`
+      <div>
+        <ul class="section word">
+          <li class="player" ${when(isAudioSingle, () => `data-mp3="${audioSource}"`)} ${classes('player')}>
+            ${child($iconVolume())}
+          </li>
+          ${when(isAudioSingle, () =>/*html*/`
+            <li class="tab word">${words}</li>
+          `)}
+          ${when(!isAudioSingle, () =>/*html*/`
+            ${list(audioSource, (item, index) =>/*html*/`
+              <li class="tab word" ${when(type(item, Array), () => `data-mp3="${item[1]}"`)}>
+                ${type(item, String) ? item : item[0]}
+              </li>
+            `)}
+          `)}
+        </ul>
+        <ul class="section translation">
+          ${list(translations, (key, word) =>/*html*/`
+            <li ${when(key, () => `data-keyword="true"`)} class="tab translation">${word}</li>
+          `)}
+        </ul>
+      </div>
+    `);
+
+    this.state.currentPlayerClasses = classes.get('player');
+    callback(template);
+
+    function orderTranslations(meanings, meaningOrder) {
+      const collection = new Map();
+      for (let index of meaningOrder) collection.set(meanings[index], true);
+      for (let x = 0; x < meanings.length; x++) {
+        if (meaningOrder.some((item) => item === x)) continue;
+        collection.set(meanings[x], false);
+      }
+      return collection;
+    }
+  }
+
+  _renderDefinitionPage($definition, callback) {
+    if (!$definition) return callback(true, null);
+    const definitions = type($definition, Array) ? $definition : [$definition];
+    const { template } = $templater(({ list }) => /*html*/`
+      <ul>
+        ${list(definitions, (definition) =>/*html*/`
+          <li class="sentence"><p>${definition}</p></li>
+        `)}
+      </ul>
+    `);
+    callback(false, template);
+  }
+
+  _renderImagePage($images, callback) {
+    const images = type($images, Array) && $images.length ? $images : type($images, String) && $images.length ? [$images] : null;
+    if (images === null) return callback(true);
+    this.slider.update(images);
+    callback(false);
+  }
+
+  _switchOccurrence(side) {
+    const { id } = this.words.indeces.get(this.state.currentIndex);
+    const ocurrances = this.words.identifiers.get(id);
+    if (ocurrances.length === 1) return;
+    const current = ocurrances.findIndex((index) => index === this.state.currentIndex);
+    let next = side === 'next' ? current + 1 : current - 1;
+    if (next < 0) next = ocurrances.length - 1;
+    if (next === ocurrances.length) next = 0;
+
+    this.viewer.goTo(ocurrances[next], id);
+    this.state.currentIndex = ocurrances[next];
+  }
+
+  _addListeners() {
+    const { $on } = this.html;
+    this._switchPage('word');
+
+    $on('button', ({ last, id }) => {
+      if (last === 'open') this.switch('toggle');
+      if (id.startsWith('button.switch')) this._switchPage(last);
+      if (id.startsWith('button.nav')) this._switchOccurrence(last);
+    });
+
+    $on('page.word', ({ current, event }) => {
+      $loopParents(event.target, (element, stop) => {
+        if (element === current) return stop();
+        if (element.hasAttribute('data-mp3')) {
+          const audio = this.dom.get('audio');
+          audio.src = element.getAttribute('data-mp3');
+          audio.play();
+          return stop();
+        }
+      });
+    });
+
+    $on('audio', ({ type }) => {
+      if (type === 'play') this.state.currentPlayerClasses.add('on');
+      if (type === 'pause') this.state.currentPlayerClasses.remove('on');
+    });
+  }
+}
 
 class Viewer {
   constructor({ dialog, words }) {
+    this.hint = new Hint(this, words);
     this.config = {
       zoom: 0.02,
       shiftLimit: .33,
@@ -134,6 +370,7 @@ class Viewer {
     this.resize(smooth);
     this.currentWord = null;
     this.currentLabel = null;
+    this.hint.refresh(this.currentWord);
   }
 
   resize(smooth = true) {
@@ -201,7 +438,7 @@ class Viewer {
     const labelIndex = this.data.words.identifiers.get(id)[0];
     this.currentLabel = labelIndex;
     if (this.state.spy) this._adjust(labelIndex);
-    else this.resize();
+    this.hint.refresh(this.currentWord);
   }
 
   next() {
@@ -210,7 +447,7 @@ class Viewer {
     const labelIndex = this.data.words.identifiers.get(id)[0];
     this.currentLabel = labelIndex;
     if (this.state.spy) this._adjust(labelIndex);
-    else this.resize();
+    this.hint.refresh(this.currentWord);
   }
 
   seek(id) {
@@ -218,16 +455,14 @@ class Viewer {
     this.currentWord = this.data.words.iterators.get(id);
     this.currentLabel = labelIndex;
     if (this.state.spy) this._adjust(labelIndex);
-    else this.resize();
+    this.hint.refresh(this.currentWord);
   }
 
-  goTo(labelIndex, id) {
-    const nextWord = this.data.words.iterators.get(id);
-    if (nextWord === this.currentWord) return;
-    else this.currentWord = nextWord;
-    this.currentLabel = labelIndex;
-    if (this.state.spy) this._adjust(labelIndex);
-    else this.resize();
+  goTo(nextLabel, id) {
+    if (nextLabel === this.currentLabel) return;
+    this.currentWord = this.data.words.iterators.get(id);
+    this.currentLabel = nextLabel;
+    if (this.state.spy) this._adjust(nextLabel);
   }
 
   spy(action) {
@@ -263,6 +498,7 @@ class Viewer {
   _renderView() {
     const templater = $templater(({ ref, on, child, classes, list }) =>/*html*/`
       <div ${ref('container')} ${on('container', ['mousedown', 'mouseup', 'wheel', 'mousemove', 'mouseout'])} class="viewer container">
+        ${child(this.hint.view)}
         <div ${ref('content')} class="viewer content" ${classes('content', ['visible'])}>
           <img ${ref('image')} ${on('image', ['dragstart'])} class="viewer image"/>
           ${list(this.data.words.indeces, ({ id, index, x, y }) =>/*html*/`
@@ -280,10 +516,17 @@ class Viewer {
   }
 
   _addListeners() {
-    const { $on, classes } = this.html;
+    const { $on, classes, references } = this.html;
+    const image = references.get('image');
+    const container = references.get('container');
 
     $on('label', ({ type, target, last, data }) => {
-      if (type === 'click') return this.goTo(data.index, data.id);
+      if (type === 'click') {
+        this.hint.refresh(data.index);
+        this.goTo(data.index, data.id);
+        return
+      }
+
       if (event.target !== target) return;
       if (type === 'mouseenter') {
         classes.get('label').get(last).clear();
@@ -301,10 +544,10 @@ class Viewer {
 
     $on('container', ({ type, event }) => {
       if (type === 'wheel') return this._zoom(event);
-      if (type === 'mousedown') return this._moveStart(event);
+      if (type === 'mousedown' && (event.target === image || event.target === container)) return this._moveStart(event);
       if (type === 'mouseup') return this._moveStop();
       if (type === 'mouseleave') return this._moveStop();
-      if (type === 'mousemove' && this.state.move) this._move(event);
+      if (type === 'mousemove' && this.state.move) return this._move(event);
     });
   }
 
