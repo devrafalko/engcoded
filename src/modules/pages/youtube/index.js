@@ -68,7 +68,7 @@ class YouTube {
 
   addListeners() {
     window.addEventListener('blur', () => setTimeout(() => window.focus(), 20));
-    window.addEventListener('resize', () => this.resizeIframe());
+    window.addEventListener('resize', () => this._resetZip());
     window.addEventListener('keydown', (event) => {
       if (Dialog.name !== 'youtube') return;
       if (Dialog.state.gameActive !== null) return;
@@ -130,15 +130,6 @@ class YouTube {
     const newVolume = this.data.player.getVolume() - 10;
     const limitedVolume = newVolume < 0 ? 0 : newVolume;
     this.data.player.setVolume(limitedVolume);
-  }
-
-  resizeIframe() {
-    if (Dialog.name === 'youtube') {
-      const dialog = Dialog.contentContainer;
-      const zip = this.views[this.state.currentMovieId].references.get('zip');
-      const movieHeight = (zip.getBoundingClientRect().top - 0) - dialog.getBoundingClientRect().top;
-      this.data.player.setSize('100%', movieHeight);
-    }
   }
 
   openMovie(movieId) {
@@ -206,7 +197,7 @@ class YouTube {
       this.data.player.cueVideoById(this.data.movies[movieId].id);
       zip.remove('hidden');
       if (!this.instances[movieId].zipHandler) this.addZipHandler(movieId);
-      else this.resizeIframe();
+      else this._resetZip();
     }
 
     this.events.state = (event) => {
@@ -281,25 +272,33 @@ class YouTube {
     let shift;
 
     const moveZip = (event) => {
-      this.moveZip(event.clientY, shift, dialog, zipDimensions, subtitles);
+      let y = event.clientY ? event.clientY : event.touches[0].clientY;
+      this.moveZip(y, shift, dialog, zipDimensions, subtitles);
     };
 
     const mouseDown = (event) => {
       zipDimensions = zip.getBoundingClientRect();
       dialog = Dialog.contentContainer.getBoundingClientRect();
-      shift = event.clientY - zipDimensions.top;
+      let y = event.clientY ? event.clientY : event.touches[0].clientY;
+      shift = y - zipDimensions.top;
       mask.add('block');
       window.addEventListener('mousemove', moveZip);
+      window.addEventListener('touchmove', moveZip);
       window.addEventListener('mouseup', mouseUp);
+      window.addEventListener('touchend', mouseUp);
     };
 
     const mouseUp = () => {
       mask.remove('block');
       window.removeEventListener('mousemove', moveZip);
+      window.removeEventListener('touchmove', moveZip);
       window.removeEventListener('mouseup', mouseUp);
+      window.removeEventListener('touchend', mouseUp);
     }
 
     zip.addEventListener('mousedown', mouseDown);
+    zip.addEventListener('touchstart', mouseDown);
+
     this.moveZip(zipDimensions.top, 0, dialog, zipDimensions, subtitles);
     this.instances[movieId].zipHandler = true;
 
@@ -322,6 +321,16 @@ class YouTube {
     const subtitlesHeight = bottomEdge - (position - shift);
     subtitles.style.height = `calc(${(subtitlesHeight / dialog.height) * 100}% - ${zip.height}px)`;
     this.data.player.setSize('100%', movieHeight);
+  }
+
+  _resetZip() {
+    if (Dialog.name !== 'youtube') return;
+    const refs = this.views[this.state.currentMovieId].references;
+    const subtitles = refs.get('subtitles');
+    const zip = refs.get('zip');
+    const zipDimensions = zip.getBoundingClientRect();
+    const dialog = Dialog.contentContainer.getBoundingClientRect();
+    this.moveZip(zipDimensions.top, 0, dialog, zipDimensions, subtitles);
   }
 
   renderMovie(movieId) {
@@ -430,9 +439,6 @@ class YouTube {
     if (!Dialog.state.spySubtitles) return;
     this.instances[movieId].scroller.scroll(element);
   }
-
 }
 
 export default YouTube;
-
-

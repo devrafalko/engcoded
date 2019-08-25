@@ -537,6 +537,84 @@ body *,
     text-indent: 0px; }
   .card .page.definition .sentence [data-keyword] {
     font-weight: bold; }
+button.switch-button > span {
+  bottom: -0%;
+  margin: auto;
+  position: absolute;
+  top: -0%; }
+
+button.setting-button {
+  background-color: white;
+  border: solid 1px #00abbe;
+  border-radius: 2px;
+  box-shadow: 1px 1px 3px rgba(155, 155, 155, 0.5);
+  cursor: pointer;
+  font-family: "PT Sans", sans-serif;
+  font-size: 20px;
+  font-variant: small-caps;
+  margin: 6px 0px;
+  outline: none;
+  overflow: hidden;
+  transition-duration: 0.1s;
+  transition-property: border, box-shadow;
+  transition-timing-function: ease-in-out; }
+  button.setting-button ul,
+  button.setting-button span {
+    border-bottom: solid 4px #00abbe;
+    bottom: -4px;
+    color: #00abbe;
+    display: block;
+    height: 100%;
+    padding: 4px 12px;
+    position: relative;
+    transition-duration: 0.1s;
+    transition-property: color, bottom;
+    transition-timing-function: ease-in-out; }
+  button.setting-button span .icon,
+  button.setting-button ul .icon {
+    fill: #00abbe;
+    stroke: #00abbe; }
+  button.setting-button.disabled {
+    border: solid 1px #c9caca;
+    cursor: not-allowed; }
+    button.setting-button.disabled span,
+    button.setting-button.disabled ul {
+      color: #c9caca; }
+    button.setting-button.disabled svg {
+      fill: #c9caca;
+      stroke: #c9caca; }
+  button.setting-button:not(.disabled):hover {
+    box-shadow: 0px 0px 3px #00abbe; }
+  button.setting-button:not(.disabled):hover, button.setting-button:not(.disabled).on {
+    border: solid 1px #00b8b8; }
+    button.setting-button:not(.disabled):hover span,
+    button.setting-button:not(.disabled):hover ul, button.setting-button:not(.disabled).on span,
+    button.setting-button:not(.disabled).on ul {
+      bottom: 0px;
+      color: #00b8b8; }
+
+button.switch-button {
+  background: linear-gradient(to bottom, #00a8bc, #0095b1);
+  border: solid 2px #00abbe;
+  border-radius: 10px;
+  cursor: pointer;
+  display: inline-block;
+  height: 20px;
+  margin: 0px 4px;
+  outline: 0px;
+  position: relative;
+  width: 40px; }
+  button.switch-button > span {
+    background-color: #008cab;
+    border-radius: 50%;
+    box-shadow: 0px 0px 3px 0px rgba(88, 88, 88, 0.6) inset;
+    height: 100%;
+    left: 20px;
+    transition: left 0.15s ease-in-out, background-color 0.15s 0.15s ease-in-out;
+    width: 16px; }
+  button.switch-button.on > span {
+    background-color: white;
+    left: 0px; }
 .game-container .config-page section.shortcuts {
   text-align: center; }
   .game-container .config-page section.shortcuts > ul {
@@ -962,84 +1040,6 @@ h2 {
     .dialog-box .content-container.color-text [data-word].active {
       background-color: #00bac7;
       color: white; }
-button.switch-button > span {
-  bottom: -0%;
-  margin: auto;
-  position: absolute;
-  top: -0%; }
-
-button.setting-button {
-  background-color: white;
-  border: solid 1px #00abbe;
-  border-radius: 2px;
-  box-shadow: 1px 1px 3px rgba(155, 155, 155, 0.5);
-  cursor: pointer;
-  font-family: "PT Sans", sans-serif;
-  font-size: 20px;
-  font-variant: small-caps;
-  margin: 6px 0px;
-  outline: none;
-  overflow: hidden;
-  transition-duration: 0.1s;
-  transition-property: border, box-shadow;
-  transition-timing-function: ease-in-out; }
-  button.setting-button ul,
-  button.setting-button span {
-    border-bottom: solid 4px #00abbe;
-    bottom: -4px;
-    color: #00abbe;
-    display: block;
-    height: 100%;
-    padding: 4px 12px;
-    position: relative;
-    transition-duration: 0.1s;
-    transition-property: color, bottom;
-    transition-timing-function: ease-in-out; }
-  button.setting-button span .icon,
-  button.setting-button ul .icon {
-    fill: #00abbe;
-    stroke: #00abbe; }
-  button.setting-button.disabled {
-    border: solid 1px #c9caca;
-    cursor: not-allowed; }
-    button.setting-button.disabled span,
-    button.setting-button.disabled ul {
-      color: #c9caca; }
-    button.setting-button.disabled svg {
-      fill: #c9caca;
-      stroke: #c9caca; }
-  button.setting-button:not(.disabled):hover {
-    box-shadow: 0px 0px 3px #00abbe; }
-  button.setting-button:not(.disabled):hover, button.setting-button:not(.disabled).on {
-    border: solid 1px #00b8b8; }
-    button.setting-button:not(.disabled):hover span,
-    button.setting-button:not(.disabled):hover ul, button.setting-button:not(.disabled).on span,
-    button.setting-button:not(.disabled).on ul {
-      bottom: 0px;
-      color: #00b8b8; }
-
-button.switch-button {
-  background: linear-gradient(to bottom, #00a8bc, #0095b1);
-  border: solid 2px #00abbe;
-  border-radius: 10px;
-  cursor: pointer;
-  display: inline-block;
-  height: 20px;
-  margin: 0px 4px;
-  outline: 0px;
-  position: relative;
-  width: 40px; }
-  button.switch-button > span {
-    background-color: #008cab;
-    border-radius: 50%;
-    box-shadow: 0px 0px 3px 0px rgba(88, 88, 88, 0.6) inset;
-    height: 100%;
-    left: 20px;
-    transition: left 0.15s ease-in-out, background-color 0.15s 0.15s ease-in-out;
-    width: 16px; }
-  button.switch-button.on > span {
-    background-color: white;
-    left: 0px; }
 .game-container {
   background-color: white;
   height: 100%;
@@ -1240,6 +1240,100 @@ body {
     z-index: 1; }
   #pages-container .navigation-page.none {
     display: none; }
+.subtitles-container {
+  scrollbar-color: #39aac2 white;
+  scrollbar-width: thin; }
+  .subtitles-container::-webkit-scrollbar {
+    background: white;
+    height: 14px;
+    width: 14px; }
+
+@media screen and (max-width: 992px) {
+  .subtitles-container::-webkit-scrollbar {
+    height: 10px;
+    width: 10px; } }
+  .subtitles-container::-webkit-scrollbar-corner {
+    background-color: white; }
+  .subtitles-container::-webkit-scrollbar-thumb {
+    background: #39aac2;
+    border-radius: 6px;
+    box-shadow: 0px 0px 3px 0px rgba(255, 255, 255, 0.3) inset; }
+    .subtitles-container::-webkit-scrollbar-thumb:hover {
+      box-shadow: 0px 0px 4px 2px rgba(255, 255, 255, 0.3) inset; }
+
+.subtitles-container {
+  overflow-y: auto;
+  overflow-x: auto;
+  overflow: auto;
+  position: relative; }
+
+.subtitles-container .subtitles-content li {
+  background-color: white;
+  transition: background-color 0.1s ease-in-out; }
+
+.subtitles-container .subtitles-content li[data-current],
+.subtitles-container .subtitles-content li:hover:not([data-header]) {
+  background-color: #f0f0f0; }
+
+.subtitles-container .subtitles-content h1 {
+  padding-left: 54px;
+  padding-bottom: 16px; }
+
+.subtitles-container .subtitles-content li p {
+  display: inline-block;
+  margin: 0px;
+  padding: 8px;
+  width: calc(100% - 54px); }
+
+.subtitles-container .subtitles-content li .jump-to-button {
+  vertical-align: top;
+  cursor: pointer;
+  height: 100%;
+  width: 38px;
+  display: inline-block;
+  visibility: hidden; }
+  @media (min-width: 768px) and (min-height: 768px) {
+    .subtitles-container .subtitles-content li .jump-to-button {
+      width: 46px; } }
+  .subtitles-container .subtitles-content li .jump-to-button .icon {
+    fill: #686868;
+    height: 22px;
+    margin: 8px;
+    margin-top: 10px;
+    transition: fill 0.15s ease-in-out;
+    width: 22px; }
+    @media (min-width: 768px) and (min-height: 768px) {
+      .subtitles-container .subtitles-content li .jump-to-button .icon {
+        margin: 8px;
+        height: 26px;
+        width: 26px; } }
+  .subtitles-container .subtitles-content li .jump-to-button:hover .icon {
+    fill: #1581ac; }
+
+.subtitles-container .subtitles-content li:hover .jump-to-button {
+  visibility: visible; }
+
+.subtitles-container .subtitles-content li[data-current] .jump-to-button {
+  visibility: visible; }
+  .subtitles-container .subtitles-content li[data-current] .jump-to-button .icon {
+    fill: #00bac7; }
+
+.text-content {
+  width: 100%;
+  margin: auto;
+  padding: 6px; }
+
+@media screen and (max-width: 768px) {
+  .text-content {
+    width: 100%; } }
+
+@media screen and (min-width: 769px) and (max-width: 992px) {
+  .text-content {
+    width: 734px; } }
+
+@media screen and (min-width: 993px) {
+  .text-content {
+    width: 947px; } }
 @keyframes resolved {
   0% {
     font-size: 18px; }
@@ -1413,100 +1507,6 @@ body {
     height: 100%; }
   .game-container > .crossword > .game-pages > li.hidden {
     display: none; }
-.subtitles-container {
-  scrollbar-color: #39aac2 white;
-  scrollbar-width: thin; }
-  .subtitles-container::-webkit-scrollbar {
-    background: white;
-    height: 14px;
-    width: 14px; }
-
-@media screen and (max-width: 992px) {
-  .subtitles-container::-webkit-scrollbar {
-    height: 10px;
-    width: 10px; } }
-  .subtitles-container::-webkit-scrollbar-corner {
-    background-color: white; }
-  .subtitles-container::-webkit-scrollbar-thumb {
-    background: #39aac2;
-    border-radius: 6px;
-    box-shadow: 0px 0px 3px 0px rgba(255, 255, 255, 0.3) inset; }
-    .subtitles-container::-webkit-scrollbar-thumb:hover {
-      box-shadow: 0px 0px 4px 2px rgba(255, 255, 255, 0.3) inset; }
-
-.subtitles-container {
-  overflow-y: auto;
-  overflow-x: auto;
-  overflow: auto;
-  position: relative; }
-
-.subtitles-container .subtitles-content li {
-  background-color: white;
-  transition: background-color 0.1s ease-in-out; }
-
-.subtitles-container .subtitles-content li[data-current],
-.subtitles-container .subtitles-content li:hover:not([data-header]) {
-  background-color: #f0f0f0; }
-
-.subtitles-container .subtitles-content h1 {
-  padding-left: 54px;
-  padding-bottom: 16px; }
-
-.subtitles-container .subtitles-content li p {
-  display: inline-block;
-  margin: 0px;
-  padding: 8px;
-  width: calc(100% - 54px); }
-
-.subtitles-container .subtitles-content li .jump-to-button {
-  vertical-align: top;
-  cursor: pointer;
-  height: 100%;
-  width: 38px;
-  display: inline-block;
-  visibility: hidden; }
-  @media (min-width: 768px) and (min-height: 768px) {
-    .subtitles-container .subtitles-content li .jump-to-button {
-      width: 46px; } }
-  .subtitles-container .subtitles-content li .jump-to-button .icon {
-    fill: #686868;
-    height: 22px;
-    margin: 8px;
-    margin-top: 10px;
-    transition: fill 0.15s ease-in-out;
-    width: 22px; }
-    @media (min-width: 768px) and (min-height: 768px) {
-      .subtitles-container .subtitles-content li .jump-to-button .icon {
-        margin: 8px;
-        height: 26px;
-        width: 26px; } }
-  .subtitles-container .subtitles-content li .jump-to-button:hover .icon {
-    fill: #1581ac; }
-
-.subtitles-container .subtitles-content li:hover .jump-to-button {
-  visibility: visible; }
-
-.subtitles-container .subtitles-content li[data-current] .jump-to-button {
-  visibility: visible; }
-  .subtitles-container .subtitles-content li[data-current] .jump-to-button .icon {
-    fill: #00bac7; }
-
-.text-content {
-  width: 100%;
-  margin: auto;
-  padding: 6px; }
-
-@media screen and (max-width: 768px) {
-  .text-content {
-    width: 100%; } }
-
-@media screen and (min-width: 769px) and (max-width: 992px) {
-  .text-content {
-    width: 734px; } }
-
-@media screen and (min-width: 993px) {
-  .text-content {
-    width: 947px; } }
 .crossword-page > div .crossword {
   scrollbar-color: #39aac2 white;
   scrollbar-width: thin; }
@@ -2629,6 +2629,42 @@ div > span {
       left: 4px; }
   .game-container > .test .config-page section.warnings .warning > .controls {
     margin: 8px 0px; }
+.youtube-container {
+  height: 100%;
+  overflow: hidden;
+  width: 100%; }
+
+.movie-box {
+  background-color: #000000;
+  overflow: hidden;
+  position: relative; }
+  .movie-box iframe {
+    display: block;
+    margin: auto;
+    width: 100%; }
+  .movie-box .mask {
+    background-color: transparent;
+    display: none;
+    height: 100%;
+    left: 0px;
+    position: absolute;
+    top: 0px;
+    width: 100%; }
+    .movie-box .mask.block {
+      display: block; }
+
+.movie-zip {
+  background: linear-gradient(to bottom, #292929, #0c0c0c);
+  box-shadow: 0px 0px 0px 0px rgba(255, 255, 255, 0) inset;
+  cursor: row-resize;
+  display: block;
+  height: 12px;
+  transition: box-shadow 0.15s ease-in-out;
+  width: 100%; }
+  .movie-zip:hover {
+    box-shadow: 0px -10px 8px -8px rgba(255, 255, 255, 0.6) inset; }
+  .movie-zip.hidden {
+    display: block; }
 .dialog-box[data-dialog="articles"] .content-container .article-scroll {
   scrollbar-color: #39aac2 white;
   scrollbar-width: thin; }
@@ -2671,42 +2707,6 @@ div > span {
 
 .dialog-box .content-container .article-content p {
   text-indent: 1em; }
-.youtube-container {
-  height: 100%;
-  overflow: hidden;
-  width: 100%; }
-
-.movie-box {
-  background-color: #000000;
-  overflow: hidden;
-  position: relative; }
-  .movie-box iframe {
-    display: block;
-    margin: auto;
-    width: 100%; }
-  .movie-box .mask {
-    background-color: transparent;
-    display: none;
-    height: 100%;
-    left: 0px;
-    position: absolute;
-    top: 0px;
-    width: 100%; }
-    .movie-box .mask.block {
-      display: block; }
-
-.movie-zip {
-  background: linear-gradient(to bottom, #292929, #0c0c0c);
-  box-shadow: 0px 0px 0px 0px rgba(255, 255, 255, 0) inset;
-  cursor: row-resize;
-  display: block;
-  height: 12px;
-  transition: box-shadow 0.15s ease-in-out;
-  width: 100%; }
-  .movie-zip:hover {
-    box-shadow: 0px -10px 8px -8px rgba(255, 255, 255, 0.6) inset; }
-  .movie-zip.hidden {
-    display: block; }
 .game-container > .test .game-pages > .learn-page .page-next > div {
   bottom: -0%;
   margin: auto;
