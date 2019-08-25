@@ -1,3 +1,4 @@
+module.exports.Selector = require('./selector').default;
 module.exports.Slider = require('./slider').default;
 module.exports.Scroller = require('./scroller').default;
 module.exports.Items = require('./items').default;

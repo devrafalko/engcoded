@@ -1,122 +1,143 @@
-@import url(https://fonts.googleapis.com/css?family=Open+Sans|PT+Sans|Raleway|Roboto|Source+Sans+Pro|Cardo|EB+Garamond|PT+Serif);.game-container > .crossword .config-page section.warnings .warning > .prompt .icon {
-  bottom: -0%;
-  margin: auto;
-  position: absolute;
-  top: -0%; }
-
-.game-container > .crossword .config-page {
+@import url(https://fonts.googleapis.com/css?family=Open+Sans|PT+Sans|Raleway|Roboto|Source+Sans+Pro|Cardo|EB+Garamond|PT+Serif);.crossword-page > div .crossword {
   scrollbar-color: #39aac2 white;
   scrollbar-width: thin; }
-  .game-container > .crossword .config-page::-webkit-scrollbar {
+  .crossword-page > div .crossword::-webkit-scrollbar {
     background: white;
     height: 14px;
     width: 14px; }
 
 @media screen and (max-width: 992px) {
-  .game-container > .crossword .config-page::-webkit-scrollbar {
+  .crossword-page > div .crossword::-webkit-scrollbar {
     height: 10px;
     width: 10px; } }
-  .game-container > .crossword .config-page::-webkit-scrollbar-corner {
+  .crossword-page > div .crossword::-webkit-scrollbar-corner {
     background-color: white; }
-  .game-container > .crossword .config-page::-webkit-scrollbar-thumb {
+  .crossword-page > div .crossword::-webkit-scrollbar-thumb {
     background: #39aac2;
     border-radius: 6px;
     box-shadow: 0px 0px 3px 0px rgba(255, 255, 255, 0.3) inset; }
-    .game-container > .crossword .config-page::-webkit-scrollbar-thumb:hover {
+    .crossword-page > div .crossword::-webkit-scrollbar-thumb:hover {
       box-shadow: 0px 0px 4px 2px rgba(255, 255, 255, 0.3) inset; }
 
-.game-container > .crossword .config-page {
-  overflow: auto;
-  padding: 12px; }
-  .game-container > .crossword .config-page section {
-    text-align: center;
-    margin: 22px 0px; }
-    .game-container > .crossword .config-page section > div {
-      display: inline-block;
-      text-align: center; }
-
-.game-container > .crossword .config-page section.settings {
-  font-family: "Open Sans", sans-serif;
-  font-size: 16px; }
-  @media (min-width: 480px) and (min-height: 480px) {
-    .game-container > .crossword .config-page section.settings {
-      font-size: 17px; } }
-  @media (min-width: 768px) and (min-height: 768px) {
-    .game-container > .crossword .config-page section.settings {
-      font-size: 18px; } }
-  .game-container > .crossword .config-page section.settings > div {
-    border-bottom: solid 1px #00abbe;
-    padding-bottom: 22px;
-    text-align: left; }
-  .game-container > .crossword .config-page section.settings p {
-    margin: 6px; }
-  .game-container > .crossword .config-page section.settings .selection-list {
-    padding-left: 16px; }
-    .game-container > .crossword .config-page section.settings .selection-list > li {
-      margin: 6px; }
-    .game-container > .crossword .config-page section.settings .selection-list > li > span {
-      vertical-align: top; }
-  .game-container > .crossword .config-page section.settings .setting-buttons {
-    display: inline-block;
-    margin-bottom: 8px;
-    vertical-align: top; }
-  .game-container > .crossword .config-page section.settings button.setting-button {
-    font-size: 18px;
-    min-width: 30px;
-    vertical-align: top; }
-    .game-container > .crossword .config-page section.settings button.setting-button span {
-      padding: 2px 3px; }
-  .game-container > .crossword .config-page section.settings .output {
-    display: inline-block;
-    font-size: 24px;
-    font-weight: bold;
-    margin: 0px 8px;
-    min-width: 35px; }
-
-.game-container > .crossword .config-page section.warnings .warning {
+#crossword-table td.letter-cell > div > span, #crossword-table td.clue-cell > div > ul {
+  background-color: white;
+  bottom: 1px;
+  border: solid 1px #008cab;
+  height: 31px;
+  line-height: 30px;
+  position: absolute;
+  right: 1px;
   text-align: center;
-  display: none; }
-  .game-container > .crossword .config-page section.warnings .warning.visible {
-    display: block; }
-  .game-container > .crossword .config-page section.warnings .warning > .prompt {
-    border: solid 1px #f1664d;
-    display: inline-block;
-    font-family: "PT Sans", sans-serif;
-    font-size: 16px;
-    margin: 8px 0px;
-    padding: 8px;
-    padding-left: 30px;
-    position: relative;
-    max-width: 520px;
-    text-align: justify; }
-    .game-container > .crossword .config-page section.warnings .warning > .prompt .icon {
-      left: 4px; }
-  .game-container > .crossword .config-page section.warnings .warning > .controls {
-    margin: 8px 0px; }
+  transition-duration: 0.05s;
+  transition-property: bottom, right, width, height, color, line-height;
+  transition-timing-function: ease-in-out;
+  width: 31px;
+  z-index: 0; }
 
-.game-container > .crossword .config-page section.shortcuts {
-  text-align: center; }
-  .game-container > .crossword .config-page section.shortcuts > ul {
-    display: inline-block;
-    text-align: left; }
-  .game-container > .crossword .config-page section.shortcuts > ul > li {
-    margin: 8px 0px; }
-  .game-container > .crossword .config-page section.shortcuts .key {
-    border: solid 1px grey;
-    border-radius: 4px;
-    color: #929292;
-    cursor: default;
-    display: inline-block;
-    font-family: "Raleway", sans-serif;
-    font-size: 16px;
-    padding: 4px;
-    min-width: 26px;
-    text-align: center; }
-  .game-container > .crossword .config-page section.shortcuts .action {
-    color: #929292;
-    font-family: "Roboto", sans-serif;
-    font-size: 17px;
-    margin: 0px 12px; }
+#crossword-table td.letter-cell > div > span:hover, #crossword-table td.letter-cell.active > div > span:hover, #crossword-table td.clue-cell > div > ul:hover {
+  bottom: -2px;
+  height: 37px;
+  right: -2px;
+  width: 37px;
+  z-index: 4 !important; }
+
+@keyframes highlight {
+  from {
+    background-color: #3ecce2; }
+  to {
+    background-color: #009bb4; } }
+
+.crossword-page > div {
+  height: 100%;
+  position: relative;
+  width: 100%; }
+  .crossword-page > div .crossword {
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: auto;
+    padding: 22px;
+    width: 100%; }
+  .crossword-page > div .buttons {
+    width: 100%; }
+
+#crossword-table {
+  border-collapse: collapse; }
+  #crossword-table td {
+    min-width: 30px;
+    height: 30px; }
+  #crossword-table td > div {
+    display: block;
+    height: 100%;
+    position: relative;
+    width: 100%; }
+
+div > span {
+  font-family: "Roboto", sans-serif; }
+  #crossword-table td.letter-cell.active > div > span {
+    border: dashed 1px #008cab;
+    bottom: -1px;
+    height: 35px;
+    right: -1px;
+    width: 35px;
+    z-index: 2; }
+    #crossword-table td.letter-cell.active > div > span:empty {
+      color: #585858;
+      line-height: 46px; }
+    #crossword-table td.letter-cell.active > div > span:not(:empty) {
+      color: #585858;
+      line-height: 33px; }
+  #crossword-table td.letter-cell.fixed > div > span {
+    background-color: #009bb4;
+    border-color: #56bdd4;
+    color: white;
+    transition: background-color 0.2s 0.1s ease-in-out, color 0.1s ease-in-out;
+    z-index: 1; }
+  #crossword-table td.letter-cell.highlight > div > span {
+    animation-duration: 0.4s;
+    animation-name: highlight;
+    animation-timing-function: ease-out; }
+
+#crossword-table td.clue-cell > div > ul {
+  border-color: #56bdd4;
+  cursor: pointer;
+  z-index: 3; }
+
+#crossword-table td.clue-cell .cell {
+  background-color: #008cab;
+  fill: white;
+  height: 100%;
+  padding: 2px;
+  transition: background 0.15s ease-in-out; }
+
+#crossword-table td.clue-cell .arrow {
+  position: absolute;
+  margin: auto; }
+  #crossword-table td.clue-cell .arrow svg {
+    display: block;
+    fill: #008cab;
+    stroke: #56bdd4;
+    stroke-width: 12px;
+    transition: fill 0.15s ease-in-out; }
+
+#crossword-table td.clue-cell.vertical .arrow {
+  height: 7px;
+  left: 0;
+  right: 0;
+  top: 100%;
+  width: 14px; }
+
+#crossword-table td.clue-cell.horizontal .arrow {
+  bottom: 0;
+  height: 14px;
+  left: 100%;
+  top: 0;
+  width: 7px; }
+
+#crossword-table td.clue-cell.active .cell {
+  background-color: #05d8bc; }
+
+#crossword-table td.clue-cell.active .arrow svg {
+  fill: #05d8bc; }
 body *,
 * {
   background-color: transparent;
@@ -171,6 +192,102 @@ body *,
       background-color: #00d6d6;
       height: 20px;
       width: 20px; }
+.selector .header, .selector .header > .header-icon, .selector .list .switch-button {
+  bottom: -0%;
+  margin: auto;
+  position: absolute;
+  top: -0%; }
+
+.selector {
+  position: relative; }
+  .selector .header {
+    border: solid 1px #01b9b9;
+    cursor: pointer;
+    height: 26px;
+    left: 0px;
+    padding: 2px;
+    padding-right: 18px;
+    width: 100%; }
+  .selector .header > .header-content {
+    color: #39f3f3;
+    display: inline-block;
+    font-family: "Open Sans", sans-serif;
+    font-size: 15px;
+    line-height: 20px;
+    overflow: hidden;
+    padding: 0px 4px;
+    text-overflow: ellipsis;
+    width: 100%; }
+  .selector .header > .header-icon {
+    height: 26px;
+    right: 3px;
+    width: 12px; }
+  .selector .options {
+    max-width: 220px;
+    position: fixed;
+    z-index: 1; }
+  .selector .list {
+    background-color: white;
+    border-radius: 6px;
+    box-shadow: 2px 2px 5px 2px rgba(80, 80, 80, 0.5);
+    display: none;
+    max-width: 240px;
+    min-width: 160px;
+    opacity: 0;
+    padding: 6px 4px;
+    position: relative;
+    top: -6px;
+    transition-duration: 0.15s;
+    transition-property: top, opacity;
+    transition-timing-function: ease-in-out; }
+  .selector .options.displayed .list {
+    display: block; }
+  .selector .options.visible .list {
+    opacity: 1;
+    top: 0px; }
+  .selector .list > li {
+    border-bottom: solid 1px #dcdcdc;
+    margin: 0px 0px;
+    padding: 2px 0px;
+    padding-right: 44px;
+    position: relative; }
+  .selector .list .label {
+    color: #01b9b9;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%; }
+  .selector .list .switch-button {
+    position: absolute;
+    right: 0px; }
+  @media (min-width: 480px) and (min-height: 480px) {
+    .selector {
+      padding: 0px 4px;
+      width: 142px; }
+      .selector .header {
+        height: 30px;
+        padding-right: 24px; }
+      .selector .header > .header-content {
+        font-size: 17px;
+        line-height: 24px; }
+      .selector .header > .header-icon {
+        height: 30px;
+        width: 14px; } }
+  @media (min-width: 768px) and (min-height: 768px) {
+    .selector {
+      padding: 0px 6px; }
+      .selector .header {
+        height: 36px; }
+      .selector .header > .header-content {
+        font-size: 18px;
+        line-height: 30px; }
+      .selector .header > .header-icon {
+        height: 30px;
+        width: 14px; }
+      .selector .list > li {
+        margin: 6px 0px;
+        padding: 4px 0px; } }
 .items-container {
   scrollbar-color: #39aac2 white;
   scrollbar-width: thin; }
@@ -534,7 +651,7 @@ button.switch-button {
   button.switch-button.on > span {
     background-color: white;
     left: 0px; }
-.dialog-box .navigation-panel .controls .icon, .dialog-box .navigation-panel .controls.text .font-select select {
+.dialog-box .navigation-panel .controls .icon, .dialog-box .navigation-panel .controls.text .font-select .selector {
   bottom: -0%;
   margin: auto;
   position: absolute;
@@ -711,18 +828,12 @@ button.switch-button {
   transition-duration: 0.1s;
   transition-timing-function: ease-in-out; }
 
-.dialog-box .navigation-panel .controls.text .font-select select {
-  border: solid 1px #01b9b9;
+.dialog-box .navigation-panel .controls.text .font-select .selector {
   color: #39f3f3;
   left: 0px;
   outline-width: 0px;
   padding: 2px;
   width: 100%; }
-  .dialog-box .navigation-panel .controls.text .font-select select > option {
-    background-color: #20667e;
-    color: #39f3f3; }
-    .dialog-box .navigation-panel .controls.text .font-select select > option:checked {
-      background-color: #388fac; }
 
 .dialog-box > .navigation-panel .controls.text, .dialog-box > .navigation-panel .controls.pictures, .dialog-box > .navigation-panel .controls.game {
   padding: 0px 4px; }
@@ -736,7 +847,7 @@ button.switch-button {
 
 .dialog-box > .navigation-panel .controls.text .font-select {
   width: 100px; }
-  .dialog-box > .navigation-panel .controls.text .font-select select {
+  .dialog-box > .navigation-panel .controls.text .font-select .selector {
     font-size: 16px;
     height: 26px; }
 
@@ -783,7 +894,7 @@ button.switch-button {
     width: 22px; }
   .dialog-box > .navigation-panel .controls.text .font-select {
     width: 120px; }
-    .dialog-box > .navigation-panel .controls.text .font-select select {
+    .dialog-box > .navigation-panel .controls.text .font-select .selector {
       font-size: 18px;
       height: 28px; }
   .dialog-box > .navigation-panel .controls.pictures .info {
@@ -801,7 +912,7 @@ button.switch-button {
     width: 24px; }
   .dialog-box > .navigation-panel .controls.text .font-select {
     width: 140px; }
-    .dialog-box > .navigation-panel .controls.text .font-select select {
+    .dialog-box > .navigation-panel .controls.text .font-select .selector {
       height: 36px; }
   .dialog-box > .navigation-panel .controls.text .font-size-button.text-small {
     width: 14px; }
@@ -834,7 +945,9 @@ button.switch-button {
     display: block;
     float: none; }
   .dialog-box[data-dialog="articles"] > .navigation-panel .controls.navigation .toggle-menu {
-    display: block; } }
+    display: block; }
+  .dialog-box[data-dialog="articles"] > .navigation-panel:not(.opened) .selector .options {
+    display: none !important; } }
 
 @media (max-width: 561px) {
   .dialog-box[data-dialog="youtube"] > .navigation-panel,
@@ -869,6 +982,11 @@ button.switch-button {
   .dialog-box[data-dialog="podcasts"] > .navigation-panel .controls.text > .section-subtitles,
   .dialog-box[data-dialog="podcasts"] > .navigation-panel .controls.text > .section-font {
     height: 42px; } }
+
+@media (max-width: 561px) {
+  .dialog-box[data-dialog="youtube"] > .navigation-panel:not(.opened) .selector .options,
+  .dialog-box[data-dialog="podcasts"] > .navigation-panel:not(.opened) .selector .options {
+    display: none !important; } }
 
 @media (max-width: 428px) {
   .dialog-box[data-dialog="pictures"] > .navigation-panel {
@@ -1400,227 +1518,125 @@ body {
 @media screen and (min-width: 993px) {
   .text-content {
     width: 947px; } }
-.crossword-page > div .crossword {
+.game-container > .crossword .config-page section.warnings .warning > .prompt .icon {
+  bottom: -0%;
+  margin: auto;
+  position: absolute;
+  top: -0%; }
+
+.game-container > .crossword .config-page {
   scrollbar-color: #39aac2 white;
   scrollbar-width: thin; }
-  .crossword-page > div .crossword::-webkit-scrollbar {
+  .game-container > .crossword .config-page::-webkit-scrollbar {
     background: white;
     height: 14px;
     width: 14px; }
 
 @media screen and (max-width: 992px) {
-  .crossword-page > div .crossword::-webkit-scrollbar {
+  .game-container > .crossword .config-page::-webkit-scrollbar {
     height: 10px;
     width: 10px; } }
-  .crossword-page > div .crossword::-webkit-scrollbar-corner {
+  .game-container > .crossword .config-page::-webkit-scrollbar-corner {
     background-color: white; }
-  .crossword-page > div .crossword::-webkit-scrollbar-thumb {
+  .game-container > .crossword .config-page::-webkit-scrollbar-thumb {
     background: #39aac2;
     border-radius: 6px;
     box-shadow: 0px 0px 3px 0px rgba(255, 255, 255, 0.3) inset; }
-    .crossword-page > div .crossword::-webkit-scrollbar-thumb:hover {
+    .game-container > .crossword .config-page::-webkit-scrollbar-thumb:hover {
       box-shadow: 0px 0px 4px 2px rgba(255, 255, 255, 0.3) inset; }
 
-#crossword-table td.letter-cell > div > span, #crossword-table td.clue-cell > div > ul {
-  background-color: white;
-  bottom: 1px;
-  border: solid 1px #008cab;
-  height: 31px;
-  line-height: 30px;
-  position: absolute;
-  right: 1px;
-  text-align: center;
-  transition-duration: 0.05s;
-  transition-property: bottom, right, width, height, color, line-height;
-  transition-timing-function: ease-in-out;
-  width: 31px;
-  z-index: 0; }
+.game-container > .crossword .config-page {
+  overflow: auto;
+  padding: 12px; }
+  .game-container > .crossword .config-page section {
+    text-align: center;
+    margin: 22px 0px; }
+    .game-container > .crossword .config-page section > div {
+      display: inline-block;
+      text-align: center; }
 
-#crossword-table td.letter-cell > div > span:hover, #crossword-table td.letter-cell.active > div > span:hover, #crossword-table td.clue-cell > div > ul:hover {
-  bottom: -2px;
-  height: 37px;
-  right: -2px;
-  width: 37px;
-  z-index: 4 !important; }
-
-@keyframes highlight {
-  from {
-    background-color: #3ecce2; }
-  to {
-    background-color: #009bb4; } }
-
-.crossword-page > div {
-  height: 100%;
-  position: relative;
-  width: 100%; }
-  .crossword-page > div .crossword {
-    height: 100%;
-    overflow-y: auto;
-    overflow-x: auto;
-    padding: 22px;
-    width: 100%; }
-  .crossword-page > div .buttons {
-    width: 100%; }
-
-#crossword-table {
-  border-collapse: collapse; }
-  #crossword-table td {
-    min-width: 30px;
-    height: 30px; }
-  #crossword-table td > div {
-    display: block;
-    height: 100%;
-    position: relative;
-    width: 100%; }
-
-div > span {
-  font-family: "Roboto", sans-serif; }
-  #crossword-table td.letter-cell.active > div > span {
-    border: dashed 1px #008cab;
-    bottom: -1px;
-    height: 35px;
-    right: -1px;
-    width: 35px;
-    z-index: 2; }
-    #crossword-table td.letter-cell.active > div > span:empty {
-      color: #585858;
-      line-height: 46px; }
-    #crossword-table td.letter-cell.active > div > span:not(:empty) {
-      color: #585858;
-      line-height: 33px; }
-  #crossword-table td.letter-cell.fixed > div > span {
-    background-color: #009bb4;
-    border-color: #56bdd4;
-    color: white;
-    transition: background-color 0.2s 0.1s ease-in-out, color 0.1s ease-in-out;
-    z-index: 1; }
-  #crossword-table td.letter-cell.highlight > div > span {
-    animation-duration: 0.4s;
-    animation-name: highlight;
-    animation-timing-function: ease-out; }
-
-#crossword-table td.clue-cell > div > ul {
-  border-color: #56bdd4;
-  cursor: pointer;
-  z-index: 3; }
-
-#crossword-table td.clue-cell .cell {
-  background-color: #008cab;
-  fill: white;
-  height: 100%;
-  padding: 2px;
-  transition: background 0.15s ease-in-out; }
-
-#crossword-table td.clue-cell .arrow {
-  position: absolute;
-  margin: auto; }
-  #crossword-table td.clue-cell .arrow svg {
-    display: block;
-    fill: #008cab;
-    stroke: #56bdd4;
-    stroke-width: 12px;
-    transition: fill 0.15s ease-in-out; }
-
-#crossword-table td.clue-cell.vertical .arrow {
-  height: 7px;
-  left: 0;
-  right: 0;
-  top: 100%;
-  width: 14px; }
-
-#crossword-table td.clue-cell.horizontal .arrow {
-  bottom: 0;
-  height: 14px;
-  left: 100%;
-  top: 0;
-  width: 7px; }
-
-#crossword-table td.clue-cell.active .cell {
-  background-color: #05d8bc; }
-
-#crossword-table td.clue-cell.active .arrow svg {
-  fill: #05d8bc; }
-@keyframes resolved {
-  0% {
-    font-size: 18px; }
-  100% {
-    color: #a8f5f5;
-    font-size: 28px; } }
-
-.game-container > .test {
-  height: 100%;
-  width: 100%; }
-
-.game-container > .test > .navigation-panel {
-  z-index: 1; }
-
-.game-container > .test .navigation-panel .controls * {
-  color: #2fe0e0; }
-
-.game-container > .test .navigation-panel[data-page="config"] .controls.game .buttons.info {
-  display: none; }
-
-.game-container > .test > .navigation-panel .controls.game .buttons.info {
-  vertical-align: top; }
-  .game-container > .test > .navigation-panel .controls.game .buttons.info li {
-    color: #01b9b9;
-    cursor: default;
-    font-size: 16px;
-    vertical-align: middle;
-    width: auto; }
-
-.game-container > .test > .navigation-panel .controls.game .buttons.info .output {
-  color: #2fe0e0;
-  font-size: 18px;
-  text-align: left;
-  width: 22px; }
-  .game-container > .test > .navigation-panel .controls.game .buttons.info .output.score {
-    text-align: right; }
-  .game-container > .test > .navigation-panel .controls.game .buttons.info .output.resolved {
-    animation-direction: alternate;
-    animation-duration: 0.2s;
-    animation-iteration-count: 6;
-    animation-name: resolved;
-    animation-timing-function: ease-in-out; }
-  .game-container > .test > .navigation-panel .controls.game .buttons.info .output.total.resolved {
-    animation-delay: 0.2s;
-    animation-iteration-count: 10; }
-
-.game-container > .test > .navigation-panel .controls.game {
-  padding: 0px 4px; }
-  .game-container > .test > .navigation-panel .controls.game > .buttons > li {
-    width: 26px; }
-  .game-container > .test > .navigation-panel .controls.game .buttons.pages,
-  .game-container > .test > .navigation-panel .controls.game .buttons.info {
-    display: inline-block; }
-  .game-container > .test > .navigation-panel .controls.game .buttons.info {
-    margin-left: 0px; }
-  .game-container > .test > .navigation-panel .controls.game .buttons.info li {
-    line-height: 34px; }
+.game-container > .crossword .config-page section.settings {
+  font-family: "Open Sans", sans-serif;
+  font-size: 16px; }
   @media (min-width: 480px) and (min-height: 480px) {
-    .game-container > .test > .navigation-panel .controls.game {
-      padding: 0px 8px; }
-      .game-container > .test > .navigation-panel .controls.game .buttons.info li {
-        line-height: 42px; } }
+    .game-container > .crossword .config-page section.settings {
+      font-size: 17px; } }
   @media (min-width: 768px) and (min-height: 768px) {
-    .game-container > .test > .navigation-panel .controls.game {
-      padding: 0px 12px; }
-      .game-container > .test > .navigation-panel .controls.game > .buttons > li {
-        width: 30px; }
-      .game-container > .test > .navigation-panel .controls.game .buttons.info {
-        margin-left: 22px; }
-      .game-container > .test > .navigation-panel .controls.game .buttons.info li {
-        line-height: 52px; } }
+    .game-container > .crossword .config-page section.settings {
+      font-size: 18px; } }
+  .game-container > .crossword .config-page section.settings > div {
+    border-bottom: solid 1px #00abbe;
+    padding-bottom: 22px;
+    text-align: left; }
+  .game-container > .crossword .config-page section.settings p {
+    margin: 6px; }
+  .game-container > .crossword .config-page section.settings .selection-list {
+    padding-left: 16px; }
+    .game-container > .crossword .config-page section.settings .selection-list > li {
+      margin: 6px; }
+    .game-container > .crossword .config-page section.settings .selection-list > li > span {
+      vertical-align: top; }
+  .game-container > .crossword .config-page section.settings .setting-buttons {
+    display: inline-block;
+    margin-bottom: 8px;
+    vertical-align: top; }
+  .game-container > .crossword .config-page section.settings button.setting-button {
+    font-size: 18px;
+    min-width: 30px;
+    vertical-align: top; }
+    .game-container > .crossword .config-page section.settings button.setting-button span {
+      padding: 2px 3px; }
+  .game-container > .crossword .config-page section.settings .output {
+    display: inline-block;
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0px 8px;
+    min-width: 35px; }
 
-.game-container > .test > .game-pages {
-  height: 100%;
-  position: relative;
-  z-index: 0; }
-  .game-container > .test > .game-pages > li {
-    display: block;
-    height: 100%; }
-  .game-container > .test > .game-pages > li.hidden {
-    display: none; }
+.game-container > .crossword .config-page section.warnings .warning {
+  text-align: center;
+  display: none; }
+  .game-container > .crossword .config-page section.warnings .warning.visible {
+    display: block; }
+  .game-container > .crossword .config-page section.warnings .warning > .prompt {
+    border: solid 1px #f1664d;
+    display: inline-block;
+    font-family: "PT Sans", sans-serif;
+    font-size: 16px;
+    margin: 8px 0px;
+    padding: 8px;
+    padding-left: 30px;
+    position: relative;
+    max-width: 520px;
+    text-align: justify; }
+    .game-container > .crossword .config-page section.warnings .warning > .prompt .icon {
+      left: 4px; }
+  .game-container > .crossword .config-page section.warnings .warning > .controls {
+    margin: 8px 0px; }
+
+.game-container > .crossword .config-page section.shortcuts {
+  text-align: center; }
+  .game-container > .crossword .config-page section.shortcuts > ul {
+    display: inline-block;
+    text-align: left; }
+  .game-container > .crossword .config-page section.shortcuts > ul > li {
+    margin: 8px 0px; }
+  .game-container > .crossword .config-page section.shortcuts .key {
+    border: solid 1px grey;
+    border-radius: 4px;
+    color: #929292;
+    cursor: default;
+    display: inline-block;
+    font-family: "Raleway", sans-serif;
+    font-size: 16px;
+    padding: 4px;
+    min-width: 26px;
+    text-align: center; }
+  .game-container > .crossword .config-page section.shortcuts .action {
+    color: #929292;
+    font-family: "Roboto", sans-serif;
+    font-size: 17px;
+    margin: 0px 12px; }
 .hint-box .hint-button > div,
 .keyboard-box .keyboard-button > div, .hint-box .hint-dialog .find-occurrence > div {
   bottom: -0%;
@@ -1956,7 +1972,183 @@ div > span {
         height: 28px;
         margin: 0px 2px;
         width: 28px; } }
-.page-top > div, .game-container .presentation .controls.game .search .search-box, .game-container .presentation .controls.game .search .icon-box, .game-container .presentation .controls.game .select .select-box, .game-container .presentation .controls.game .select .header .icon-box, .game-container .presentation .controls.game .select .list .switch-button, .game-container .presentation .navigation-table .controls.pages .go-page .go-page-box, .game-container .presentation .navigation-table .controls.pages .go-page button.setting-button, .game-container .presentation .table-box > table th.head .button-set {
+@keyframes resolved {
+  0% {
+    font-size: 18px; }
+  100% {
+    color: #a8f5f5;
+    font-size: 28px; } }
+
+.game-container > .test {
+  height: 100%;
+  width: 100%; }
+
+.game-container > .test > .navigation-panel {
+  z-index: 1; }
+
+.game-container > .test .navigation-panel .controls * {
+  color: #2fe0e0; }
+
+.game-container > .test .navigation-panel[data-page="config"] .controls.game .buttons.info {
+  display: none; }
+
+.game-container > .test > .navigation-panel .controls.game .buttons.info {
+  vertical-align: top; }
+  .game-container > .test > .navigation-panel .controls.game .buttons.info li {
+    color: #01b9b9;
+    cursor: default;
+    font-size: 16px;
+    vertical-align: middle;
+    width: auto; }
+
+.game-container > .test > .navigation-panel .controls.game .buttons.info .output {
+  color: #2fe0e0;
+  font-size: 18px;
+  text-align: left;
+  width: 22px; }
+  .game-container > .test > .navigation-panel .controls.game .buttons.info .output.score {
+    text-align: right; }
+  .game-container > .test > .navigation-panel .controls.game .buttons.info .output.resolved {
+    animation-direction: alternate;
+    animation-duration: 0.2s;
+    animation-iteration-count: 6;
+    animation-name: resolved;
+    animation-timing-function: ease-in-out; }
+  .game-container > .test > .navigation-panel .controls.game .buttons.info .output.total.resolved {
+    animation-delay: 0.2s;
+    animation-iteration-count: 10; }
+
+.game-container > .test > .navigation-panel .controls.game {
+  padding: 0px 4px; }
+  .game-container > .test > .navigation-panel .controls.game > .buttons > li {
+    width: 26px; }
+  .game-container > .test > .navigation-panel .controls.game .buttons.pages,
+  .game-container > .test > .navigation-panel .controls.game .buttons.info {
+    display: inline-block; }
+  .game-container > .test > .navigation-panel .controls.game .buttons.info {
+    margin-left: 0px; }
+  .game-container > .test > .navigation-panel .controls.game .buttons.info li {
+    line-height: 34px; }
+  @media (min-width: 480px) and (min-height: 480px) {
+    .game-container > .test > .navigation-panel .controls.game {
+      padding: 0px 8px; }
+      .game-container > .test > .navigation-panel .controls.game .buttons.info li {
+        line-height: 42px; } }
+  @media (min-width: 768px) and (min-height: 768px) {
+    .game-container > .test > .navigation-panel .controls.game {
+      padding: 0px 12px; }
+      .game-container > .test > .navigation-panel .controls.game > .buttons > li {
+        width: 30px; }
+      .game-container > .test > .navigation-panel .controls.game .buttons.info {
+        margin-left: 22px; }
+      .game-container > .test > .navigation-panel .controls.game .buttons.info li {
+        line-height: 52px; } }
+
+.game-container > .test > .game-pages {
+  height: 100%;
+  position: relative;
+  z-index: 0; }
+  .game-container > .test > .game-pages > li {
+    display: block;
+    height: 100%; }
+  .game-container > .test > .game-pages > li.hidden {
+    display: none; }
+.game-container > .test .config-page section.warnings .warning > .prompt .icon {
+  bottom: -0%;
+  margin: auto;
+  position: absolute;
+  top: -0%; }
+
+.game-container > .test .config-page {
+  scrollbar-color: #39aac2 white;
+  scrollbar-width: thin; }
+  .game-container > .test .config-page::-webkit-scrollbar {
+    background: white;
+    height: 14px;
+    width: 14px; }
+
+@media screen and (max-width: 992px) {
+  .game-container > .test .config-page::-webkit-scrollbar {
+    height: 10px;
+    width: 10px; } }
+  .game-container > .test .config-page::-webkit-scrollbar-corner {
+    background-color: white; }
+  .game-container > .test .config-page::-webkit-scrollbar-thumb {
+    background: #39aac2;
+    border-radius: 6px;
+    box-shadow: 0px 0px 3px 0px rgba(255, 255, 255, 0.3) inset; }
+    .game-container > .test .config-page::-webkit-scrollbar-thumb:hover {
+      box-shadow: 0px 0px 4px 2px rgba(255, 255, 255, 0.3) inset; }
+
+.game-container > .test .config-page {
+  overflow: auto;
+  padding: 12px; }
+  .game-container > .test .config-page section {
+    margin: 22px 0px;
+    text-align: center; }
+    .game-container > .test .config-page section > div {
+      display: inline-block;
+      text-align: center; }
+
+.game-container > .test .config-page section.settings {
+  font-family: "Open Sans", sans-serif;
+  font-size: 16px; }
+  @media (min-width: 480px) and (min-height: 480px) {
+    .game-container > .test .config-page section.settings {
+      font-size: 17px; } }
+  @media (min-width: 768px) and (min-height: 768px) {
+    .game-container > .test .config-page section.settings {
+      font-size: 18px; } }
+  .game-container > .test .config-page section.settings > div {
+    border-bottom: solid 1px #00abbe;
+    padding-bottom: 22px;
+    text-align: left; }
+  .game-container > .test .config-page section.settings p {
+    margin: 6px; }
+  .game-container > .test .config-page section.settings .selection-list {
+    padding-left: 16px; }
+    .game-container > .test .config-page section.settings .selection-list > li {
+      margin: 6px; }
+    .game-container > .test .config-page section.settings .selection-list > li > span {
+      vertical-align: top; }
+  .game-container > .test .config-page section.settings .setting-buttons {
+    display: inline-block;
+    margin-bottom: 8px;
+    vertical-align: top; }
+  .game-container > .test .config-page section.settings button.setting-button {
+    font-size: 18px;
+    min-width: 30px;
+    vertical-align: top; }
+    .game-container > .test .config-page section.settings button.setting-button span {
+      padding: 2px 3px; }
+  .game-container > .test .config-page section.settings .output {
+    display: inline-block;
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0px 8px;
+    min-width: 35px; }
+
+.game-container > .test .config-page section.warnings .warning {
+  display: none;
+  text-align: center; }
+  .game-container > .test .config-page section.warnings .warning.visible {
+    display: block; }
+  .game-container > .test .config-page section.warnings .warning > .prompt {
+    border: solid 1px #f1664d;
+    display: inline-block;
+    font-family: "PT Sans", sans-serif;
+    font-size: 16px;
+    margin: 8px 0px;
+    max-width: 520px;
+    padding: 8px;
+    padding-left: 30px;
+    position: relative;
+    text-align: justify; }
+    .game-container > .test .config-page section.warnings .warning > .prompt .icon {
+      left: 4px; }
+  .game-container > .test .config-page section.warnings .warning > .controls {
+    margin: 8px 0px; }
+.page-top > div, .game-container .presentation .controls.game .search .search-box, .game-container .presentation .controls.game .search .icon-box, .game-container .presentation .controls.game .select-container .select-box, .game-container .presentation .controls.game .select-container .header .icon-box, .game-container .presentation .controls.game .select-container .list .switch-button, .game-container .presentation .navigation-table .controls.pages .go-page .go-page-box, .game-container .presentation .navigation-table .controls.pages .go-page button.setting-button, .game-container .presentation .table-box > table th.head .button-set {
   bottom: -0%;
   margin: auto;
   position: absolute;
@@ -2076,14 +2268,17 @@ div > span {
         height: 36px;
         width: 24px; } }
 
-.game-container .presentation .controls.game .select {
+.game-container .presentation .controls.game .selector-container .selector {
+  height: 100%; }
+
+.game-container .presentation .controls.game .select-container {
   float: left;
   padding: 0px 2px;
   width: 40%; }
-  .game-container .presentation .controls.game .select > div {
+  .game-container .presentation .controls.game .select-container > div {
     height: 100%;
     position: relative; }
-  .game-container .presentation .controls.game .select .select-box {
+  .game-container .presentation .controls.game .select-container .select-box {
     border: solid 1px #01b9b9;
     cursor: pointer;
     height: 26px;
@@ -2091,7 +2286,7 @@ div > span {
     padding: 2px;
     padding-right: 18px;
     width: 100%; }
-  .game-container .presentation .controls.game .select .header .text-box {
+  .game-container .presentation .controls.game .select-container .header .text-box {
     color: #39f3f3;
     display: inline-block;
     font-family: "Open Sans", sans-serif;
@@ -2101,15 +2296,15 @@ div > span {
     padding: 0px 4px;
     text-overflow: ellipsis;
     width: 100%; }
-  .game-container .presentation .controls.game .select .header .icon-box {
+  .game-container .presentation .controls.game .select-container .header .icon-box {
     height: 26px;
     right: 3px;
     width: 12px; }
-  .game-container .presentation .controls.game .select .list-box {
+  .game-container .presentation .controls.game .select-container .list-box {
     max-width: 220px;
     position: fixed;
     z-index: 1; }
-  .game-container .presentation .controls.game .select .list {
+  .game-container .presentation .controls.game .select-container .list {
     background-color: white;
     border-radius: 6px;
     box-shadow: 2px 2px 5px 2px rgba(80, 80, 80, 0.5);
@@ -2123,52 +2318,52 @@ div > span {
     transition-duration: 0.15s;
     transition-property: top, opacity;
     transition-timing-function: ease-in-out; }
-  .game-container .presentation .controls.game .select .list-box.displayed .list {
+  .game-container .presentation .controls.game .select-container .list-box.displayed .list {
     display: block; }
-  .game-container .presentation .controls.game .select .list-box.visible .list {
+  .game-container .presentation .controls.game .select-container .list-box.visible .list {
     opacity: 1;
     top: 0px; }
-  .game-container .presentation .controls.game .select .list > li {
+  .game-container .presentation .controls.game .select-container .list > li {
     border-bottom: solid 1px #dcdcdc;
     margin: 0px 0px;
     padding: 2px 0px;
     padding-right: 44px;
     position: relative; }
-  .game-container .presentation .controls.game .select .list .text-box {
+  .game-container .presentation .controls.game .select-container .list .text-box {
     color: #01b9b9;
     display: inline-block;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     width: 100%; }
-  .game-container .presentation .controls.game .select .list .switch-button {
+  .game-container .presentation .controls.game .select-container .list .switch-button {
     position: absolute;
     right: 0px; }
   @media (min-width: 480px) and (min-height: 480px) {
-    .game-container .presentation .controls.game .select {
+    .game-container .presentation .controls.game .select-container {
       padding: 0px 4px;
       width: 142px; }
-      .game-container .presentation .controls.game .select .select-box {
+      .game-container .presentation .controls.game .select-container .select-box {
         height: 30px;
         padding-right: 24px; }
-      .game-container .presentation .controls.game .select .header .text-box {
+      .game-container .presentation .controls.game .select-container .header .text-box {
         font-size: 17px;
         line-height: 24px; }
-      .game-container .presentation .controls.game .select .header .icon-box {
+      .game-container .presentation .controls.game .select-container .header .icon-box {
         height: 30px;
         width: 14px; } }
   @media (min-width: 768px) and (min-height: 768px) {
-    .game-container .presentation .controls.game .select {
+    .game-container .presentation .controls.game .select-container {
       padding: 0px 6px; }
-      .game-container .presentation .controls.game .select .select-box {
+      .game-container .presentation .controls.game .select-container .select-box {
         height: 36px; }
-      .game-container .presentation .controls.game .select .header .text-box {
+      .game-container .presentation .controls.game .select-container .header .text-box {
         font-size: 18px;
         line-height: 30px; }
-      .game-container .presentation .controls.game .select .header .icon-box {
+      .game-container .presentation .controls.game .select-container .header .icon-box {
         height: 30px;
         width: 14px; }
-      .game-container .presentation .controls.game .select .list > li {
+      .game-container .presentation .controls.game .select-container .list > li {
         margin: 6px 0px;
         padding: 4px 0px; } }
 
@@ -2515,179 +2710,6 @@ div > span {
     fill: white;
     height: 100%;
     width: 100%; }
-.game-container > .test .config-page section.warnings .warning > .prompt .icon {
-  bottom: -0%;
-  margin: auto;
-  position: absolute;
-  top: -0%; }
-
-.game-container > .test .config-page {
-  scrollbar-color: #39aac2 white;
-  scrollbar-width: thin; }
-  .game-container > .test .config-page::-webkit-scrollbar {
-    background: white;
-    height: 14px;
-    width: 14px; }
-
-@media screen and (max-width: 992px) {
-  .game-container > .test .config-page::-webkit-scrollbar {
-    height: 10px;
-    width: 10px; } }
-  .game-container > .test .config-page::-webkit-scrollbar-corner {
-    background-color: white; }
-  .game-container > .test .config-page::-webkit-scrollbar-thumb {
-    background: #39aac2;
-    border-radius: 6px;
-    box-shadow: 0px 0px 3px 0px rgba(255, 255, 255, 0.3) inset; }
-    .game-container > .test .config-page::-webkit-scrollbar-thumb:hover {
-      box-shadow: 0px 0px 4px 2px rgba(255, 255, 255, 0.3) inset; }
-
-.game-container > .test .config-page {
-  overflow: auto;
-  padding: 12px; }
-  .game-container > .test .config-page section {
-    margin: 22px 0px;
-    text-align: center; }
-    .game-container > .test .config-page section > div {
-      display: inline-block;
-      text-align: center; }
-
-.game-container > .test .config-page section.settings {
-  font-family: "Open Sans", sans-serif;
-  font-size: 16px; }
-  @media (min-width: 480px) and (min-height: 480px) {
-    .game-container > .test .config-page section.settings {
-      font-size: 17px; } }
-  @media (min-width: 768px) and (min-height: 768px) {
-    .game-container > .test .config-page section.settings {
-      font-size: 18px; } }
-  .game-container > .test .config-page section.settings > div {
-    border-bottom: solid 1px #00abbe;
-    padding-bottom: 22px;
-    text-align: left; }
-  .game-container > .test .config-page section.settings p {
-    margin: 6px; }
-  .game-container > .test .config-page section.settings .selection-list {
-    padding-left: 16px; }
-    .game-container > .test .config-page section.settings .selection-list > li {
-      margin: 6px; }
-    .game-container > .test .config-page section.settings .selection-list > li > span {
-      vertical-align: top; }
-  .game-container > .test .config-page section.settings .setting-buttons {
-    display: inline-block;
-    margin-bottom: 8px;
-    vertical-align: top; }
-  .game-container > .test .config-page section.settings button.setting-button {
-    font-size: 18px;
-    min-width: 30px;
-    vertical-align: top; }
-    .game-container > .test .config-page section.settings button.setting-button span {
-      padding: 2px 3px; }
-  .game-container > .test .config-page section.settings .output {
-    display: inline-block;
-    font-size: 24px;
-    font-weight: bold;
-    margin: 0px 8px;
-    min-width: 35px; }
-
-.game-container > .test .config-page section.warnings .warning {
-  display: none;
-  text-align: center; }
-  .game-container > .test .config-page section.warnings .warning.visible {
-    display: block; }
-  .game-container > .test .config-page section.warnings .warning > .prompt {
-    border: solid 1px #f1664d;
-    display: inline-block;
-    font-family: "PT Sans", sans-serif;
-    font-size: 16px;
-    margin: 8px 0px;
-    max-width: 520px;
-    padding: 8px;
-    padding-left: 30px;
-    position: relative;
-    text-align: justify; }
-    .game-container > .test .config-page section.warnings .warning > .prompt .icon {
-      left: 4px; }
-  .game-container > .test .config-page section.warnings .warning > .controls {
-    margin: 8px 0px; }
-.dialog-box[data-dialog="articles"] .content-container .article-scroll {
-  scrollbar-color: #39aac2 white;
-  scrollbar-width: thin; }
-  .dialog-box[data-dialog="articles"] .content-container .article-scroll::-webkit-scrollbar {
-    background: white;
-    height: 14px;
-    width: 14px; }
-
-@media screen and (max-width: 992px) {
-  .dialog-box[data-dialog="articles"] .content-container .article-scroll::-webkit-scrollbar {
-    height: 10px;
-    width: 10px; } }
-  .dialog-box[data-dialog="articles"] .content-container .article-scroll::-webkit-scrollbar-corner {
-    background-color: white; }
-  .dialog-box[data-dialog="articles"] .content-container .article-scroll::-webkit-scrollbar-thumb {
-    background: #39aac2;
-    border-radius: 6px;
-    box-shadow: 0px 0px 3px 0px rgba(255, 255, 255, 0.3) inset; }
-    .dialog-box[data-dialog="articles"] .content-container .article-scroll::-webkit-scrollbar-thumb:hover {
-      box-shadow: 0px 0px 4px 2px rgba(255, 255, 255, 0.3) inset; }
-
-.dialog-box[data-dialog="articles"] .content-container .article-scroll {
-  height: 100%;
-  overflow-y: auto;
-  overflow-x: auto;
-  position: relative;
-  width: 100%; }
-
-.dialog-box .content-container .article-content h1,
-.dialog-box .content-container .article-content h2,
-.dialog-box .content-container .article-content p {
-  text-align: justify; }
-
-.dialog-box .content-container .article-content h1 {
-  margin-bottom: 16px; }
-
-.dialog-box .content-container .article-content h2 {
-  margin-top: 12px;
-  margin-bottom: 6px; }
-
-.dialog-box .content-container .article-content p {
-  text-indent: 1em; }
-.youtube-container {
-  height: 100%;
-  overflow: hidden;
-  width: 100%; }
-
-.movie-box {
-  background-color: #000000;
-  overflow: hidden;
-  position: relative; }
-  .movie-box iframe {
-    display: block;
-    margin: auto;
-    width: 100%; }
-  .movie-box .mask {
-    background-color: transparent;
-    display: none;
-    height: 100%;
-    left: 0px;
-    position: absolute;
-    top: 0px;
-    width: 100%; }
-    .movie-box .mask.block {
-      display: block; }
-
-.movie-zip {
-  background: linear-gradient(to bottom, #292929, #0c0c0c);
-  box-shadow: 0px 0px 0px 0px rgba(255, 255, 255, 0) inset;
-  cursor: row-resize;
-  display: block;
-  height: 12px;
-  transition: box-shadow 0.15s ease-in-out;
-  width: 100%; }
-  .movie-zip:hover {
-    box-shadow: 0px -10px 8px -8px rgba(255, 255, 255, 0.6) inset; }
-  .movie-zip.hidden {
-    display: block; }
 .game-container > .test .game-pages > .learn-page .page-next > div {
   bottom: -0%;
   margin: auto;
@@ -3078,6 +3100,42 @@ div > span {
 .game-container > .test .game-pages > .learn-page .container.solved .section.answers .content .meanings [data-pronoun],
 .game-container > .test .game-pages > .learn-page .container.solved .section.answers .content .meanings [data-explanation] {
   display: inline; }
+.youtube-container {
+  height: 100%;
+  overflow: hidden;
+  width: 100%; }
+
+.movie-box {
+  background-color: #000000;
+  overflow: hidden;
+  position: relative; }
+  .movie-box iframe {
+    display: block;
+    margin: auto;
+    width: 100%; }
+  .movie-box .mask {
+    background-color: transparent;
+    display: none;
+    height: 100%;
+    left: 0px;
+    position: absolute;
+    top: 0px;
+    width: 100%; }
+    .movie-box .mask.block {
+      display: block; }
+
+.movie-zip {
+  background: linear-gradient(to bottom, #292929, #0c0c0c);
+  box-shadow: 0px 0px 0px 0px rgba(255, 255, 255, 0) inset;
+  cursor: row-resize;
+  display: block;
+  height: 12px;
+  transition: box-shadow 0.15s ease-in-out;
+  width: 100%; }
+  .movie-zip:hover {
+    box-shadow: 0px -10px 8px -8px rgba(255, 255, 255, 0.6) inset; }
+  .movie-zip.hidden {
+    display: block; }
 @keyframes svg-animation {
   0% {
     transform: rotateZ(0deg); }
@@ -3111,6 +3169,48 @@ svg.spinner circle {
   stroke-linecap: round;
   stroke-width: 10px;
   transform-origin: 50% 50%; }
+.dialog-box[data-dialog="articles"] .content-container .article-scroll {
+  scrollbar-color: #39aac2 white;
+  scrollbar-width: thin; }
+  .dialog-box[data-dialog="articles"] .content-container .article-scroll::-webkit-scrollbar {
+    background: white;
+    height: 14px;
+    width: 14px; }
+
+@media screen and (max-width: 992px) {
+  .dialog-box[data-dialog="articles"] .content-container .article-scroll::-webkit-scrollbar {
+    height: 10px;
+    width: 10px; } }
+  .dialog-box[data-dialog="articles"] .content-container .article-scroll::-webkit-scrollbar-corner {
+    background-color: white; }
+  .dialog-box[data-dialog="articles"] .content-container .article-scroll::-webkit-scrollbar-thumb {
+    background: #39aac2;
+    border-radius: 6px;
+    box-shadow: 0px 0px 3px 0px rgba(255, 255, 255, 0.3) inset; }
+    .dialog-box[data-dialog="articles"] .content-container .article-scroll::-webkit-scrollbar-thumb:hover {
+      box-shadow: 0px 0px 4px 2px rgba(255, 255, 255, 0.3) inset; }
+
+.dialog-box[data-dialog="articles"] .content-container .article-scroll {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: auto;
+  position: relative;
+  width: 100%; }
+
+.dialog-box .content-container .article-content h1,
+.dialog-box .content-container .article-content h2,
+.dialog-box .content-container .article-content p {
+  text-align: justify; }
+
+.dialog-box .content-container .article-content h1 {
+  margin-bottom: 16px; }
+
+.dialog-box .content-container .article-content h2 {
+  margin-top: 12px;
+  margin-bottom: 6px; }
+
+.dialog-box .content-container .article-content p {
+  text-indent: 1em; }
 .player-container {
   margin-bottom: 12px; }
 
@@ -3121,247 +3221,6 @@ svg.spinner circle {
 
 .dialog-box[data-dialog="podcasts"] .subtitles-container {
   height: calc(100% - 54px); }
-.viewer .hint.container .button.open > div {
-  bottom: -0%;
-  margin: auto;
-  position: absolute;
-  top: -0%; }
-
-.viewer .hint .navigation {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none; }
-
-.viewer .hint.container .button.open > div {
-  background-color: #00c3cc;
-  border-radius: 50%;
-  box-shadow: 2px 2px 4px rgba(122, 122, 122, 0.3);
-  cursor: pointer;
-  height: 100%;
-  left: -100%;
-  overflow: hidden;
-  right: -100%;
-  transition-duration: 0.25s;
-  transition-property: width, height, background-color, padding;
-  transition-timing-function: cubic-bezier(0.75, -0.15, 0, 2);
-  width: 100%; }
-
-.viewer .hint.container {
-  bottom: 24px;
-  height: 0px;
-  left: 14px;
-  position: absolute;
-  width: calc(100% - 28px); }
-
-.viewer .hint.container .button.open {
-  bottom: 0px;
-  height: 30px;
-  left: 0px;
-  position: absolute;
-  width: 30px;
-  z-index: 7; }
-  .viewer .hint.container .button.open:hover > div {
-    background-color: #00d8d9;
-    height: 40px;
-    padding: 4px;
-    width: 40px; }
-  .viewer .hint.container .button.open .sprite {
-    position: relative;
-    top: 0%;
-    transition: top 0.5s 0.05s cubic-bezier(1, -1.45, 0, 1.95);
-    width: 100%; }
-    .viewer .hint.container .button.open .sprite .open {
-      padding: 4px; }
-    .viewer .hint.container .button.open .sprite .close {
-      padding: 8px; }
-  .viewer .hint.container .button.open .icon {
-    display: block;
-    fill: white;
-    height: 100%;
-    width: 100%; }
-
-.viewer .hint.container.visible .dialog {
-  bottom: 0px;
-  opacity: 1; }
-
-.viewer .hint.container.visible .sprite {
-  top: -100%; }
-
-.viewer .hint.container.displayed .dialog {
-  display: inline-block; }
-
-.viewer .hint .dialog {
-  background-color: white;
-  border-radius: 16px;
-  bottom: -20px;
-  box-shadow: 2px -2px 12px rgba(0, 0, 0, 0.7);
-  display: none;
-  font-family: "Roboto", sans-serif;
-  height: auto;
-  left: 0px;
-  max-width: 480px;
-  min-width: 238px;
-  opacity: 0;
-  overflow: hidden;
-  padding: 0px 0px 32px 0px;
-  position: absolute;
-  transition-delay: 0.25s, 0.05s;
-  transition-duration: 0.25s, 0.5s;
-  transition-property: opacity, bottom;
-  transition-timing-function: ease-out, cubic-bezier(1, -1.45, 0, 1.95);
-  width: auto;
-  z-index: 6; }
-
-.viewer .hint .navigation {
-  bottom: 0px;
-  box-shadow: 0px 2px 3px 0px rgba(77, 106, 107, 0.5);
-  height: 36px;
-  padding-left: 42px;
-  position: absolute;
-  right: 0px;
-  width: 100%; }
-  .viewer .hint .navigation .section.pages {
-    float: left; }
-  .viewer .hint .navigation .section.control {
-    float: left;
-    margin-left: 12px; }
-  .viewer .hint .navigation .button {
-    border-radius: 4px;
-    cursor: pointer;
-    display: block;
-    float: left;
-    height: 28px;
-    margin: 4px;
-    padding: 3px;
-    width: 28px; }
-    .viewer .hint .navigation .button.active {
-      background-color: #00c9b8; }
-    .viewer .hint .navigation .button.disabled {
-      cursor: default; }
-  .viewer .hint .navigation .button.nav {
-    display: none; }
-    .viewer .hint .navigation .button.nav .top {
-      fill: #80e4dc; }
-    .viewer .hint .navigation .button.nav .bottom {
-      fill: #00c9b8; }
-    .viewer .hint .navigation .button.nav:hover .top {
-      fill: #a4faf1; }
-    .viewer .hint .navigation .button.nav:hover .bottom {
-      fill: #00e7c1; }
-  .viewer .hint .navigation .section.control.multiple .button.nav {
-    display: block; }
-
-.viewer .hint .navigation .button .icon {
-  fill: #00c9b8;
-  transition: fill 0.15s ease-in-out, background-color 0.15s ease-in-out; }
-
-.viewer .hint .navigation .button:hover .icon {
-  fill: #00e7c1; }
-
-.viewer .hint .navigation .button.active .icon {
-  fill: white; }
-
-.viewer .hint .navigation .button.disabled .icon {
-  fill: #87aca9; }
-
-.viewer .hint .page {
-  display: none;
-  padding: 12px; }
-  .viewer .hint .page.active {
-    display: block; }
-  .viewer .hint .page.image {
-    padding: 0px; }
-  .viewer .hint .page.image .image-slider {
-    padding: 8px; }
-  .viewer .hint .page.image .image-slider .image-element {
-    border-radius: 8px 8px 12px 12px;
-    box-shadow: 1px 1px 7px rgba(122, 122, 122, 0.5); }
-
-.viewer .hint .page.word .section.word {
-  padding-left: 34px;
-  position: relative;
-  min-height: 34px; }
-  .viewer .hint .page.word .section.word .player {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    height: 34px;
-    padding: 0px 6px;
-    width: 34px; }
-    .viewer .hint .page.word .section.word .player[data-mp3] {
-      cursor: pointer; }
-  .viewer .hint .page.word .section.word .player:not([data-mp3]) ~ .tab.word:not([data-mp3]),
-  .viewer .hint .page.word .section.word .tab.word [data-pronoun] {
-    color: #748682;
-    font-size: 15px;
-    font-style: italic; }
-  .viewer .hint .page.word .section.word .tab.word {
-    display: inline-block;
-    font-family: "Raleway", sans-serif;
-    font-size: 17px;
-    margin-right: 0.34em; }
-    .viewer .hint .page.word .section.word .tab.word[data-mp3] {
-      border-bottom: dotted 1px #00a59d;
-      cursor: pointer;
-      transition-duration: 0.15s;
-      transition-property: border-bottom, color;
-      transition-timing-function: ease-in-out; }
-      .viewer .hint .page.word .section.word .tab.word[data-mp3]:hover {
-        color: #009191;
-        border-bottom: dotted 1px #009191; }
-
-.viewer .hint .page.word .section.translation {
-  border-top: solid 1px #009191;
-  margin-top: 12px;
-  padding-top: 12px; }
-  .viewer .hint .page.word .section.translation .tab.translation {
-    border: dotted 1px #748682;
-    border-radius: 4px;
-    color: #748682;
-    display: inline-block;
-    font-family: "PT Sans", sans-serif;
-    font-size: 17px;
-    margin: 3px 6px;
-    padding: 2px 8px; }
-    .viewer .hint .page.word .section.translation .tab.translation[data-keyword] {
-      border: dotted 1px #00ac8f;
-      color: black; }
-    .viewer .hint .page.word .section.translation .tab.translation [data-pronoun] {
-      color: #748682;
-      font-size: 15px;
-      font-style: italic; }
-    .viewer .hint .page.word .section.translation .tab.translation [data-explanation] {
-      color: #039089;
-      display: inline-block;
-      font-size: 14px;
-      font-style: italic;
-      margin: 0px 4px; }
-
-.viewer .hint .page.word .section.word .player .icon {
-  fill: #00a59d;
-  transition: transform 0.15s ease-in-out, fill 0.15s ease-in-out; }
-
-.viewer .hint .page.word .section.word .player[data-mp3]:hover .icon {
-  fill: #00e7c1; }
-
-.viewer .hint .page.word .section.word .player.on .icon {
-  fill: #00e7c1 !important;
-  transform: rotate(-45deg); }
-
-.viewer .hint .page.definition .sentence {
-  padding: 4px; }
-  .viewer .hint .page.definition .sentence:not(:only-child) {
-    list-style-type: decimal;
-    margin-left: 20px; }
-  .viewer .hint .page.definition .sentence p {
-    font-family: "Raleway", sans-serif;
-    font-size: 17px;
-    text-indent: 0px; }
-  .viewer .hint .page.definition .sentence [data-keyword] {
-    font-weight: bold; }
 .picture.loading p {
   bottom: -0%;
   margin: auto;
@@ -3653,3 +3512,244 @@ svg.spinner circle {
 .podcast-player > li.range.time .span.played {
   bottom: auto;
   top: 5px; }
+.viewer .hint.container .button.open > div {
+  bottom: -0%;
+  margin: auto;
+  position: absolute;
+  top: -0%; }
+
+.viewer .hint .navigation {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none; }
+
+.viewer .hint.container .button.open > div {
+  background-color: #00c3cc;
+  border-radius: 50%;
+  box-shadow: 2px 2px 4px rgba(122, 122, 122, 0.3);
+  cursor: pointer;
+  height: 100%;
+  left: -100%;
+  overflow: hidden;
+  right: -100%;
+  transition-duration: 0.25s;
+  transition-property: width, height, background-color, padding;
+  transition-timing-function: cubic-bezier(0.75, -0.15, 0, 2);
+  width: 100%; }
+
+.viewer .hint.container {
+  bottom: 24px;
+  height: 0px;
+  left: 14px;
+  position: absolute;
+  width: calc(100% - 28px); }
+
+.viewer .hint.container .button.open {
+  bottom: 0px;
+  height: 30px;
+  left: 0px;
+  position: absolute;
+  width: 30px;
+  z-index: 7; }
+  .viewer .hint.container .button.open:hover > div {
+    background-color: #00d8d9;
+    height: 40px;
+    padding: 4px;
+    width: 40px; }
+  .viewer .hint.container .button.open .sprite {
+    position: relative;
+    top: 0%;
+    transition: top 0.5s 0.05s cubic-bezier(1, -1.45, 0, 1.95);
+    width: 100%; }
+    .viewer .hint.container .button.open .sprite .open {
+      padding: 4px; }
+    .viewer .hint.container .button.open .sprite .close {
+      padding: 8px; }
+  .viewer .hint.container .button.open .icon {
+    display: block;
+    fill: white;
+    height: 100%;
+    width: 100%; }
+
+.viewer .hint.container.visible .dialog {
+  bottom: 0px;
+  opacity: 1; }
+
+.viewer .hint.container.visible .sprite {
+  top: -100%; }
+
+.viewer .hint.container.displayed .dialog {
+  display: inline-block; }
+
+.viewer .hint .dialog {
+  background-color: white;
+  border-radius: 16px;
+  bottom: -20px;
+  box-shadow: 2px -2px 12px rgba(0, 0, 0, 0.7);
+  display: none;
+  font-family: "Roboto", sans-serif;
+  height: auto;
+  left: 0px;
+  max-width: 480px;
+  min-width: 238px;
+  opacity: 0;
+  overflow: hidden;
+  padding: 0px 0px 32px 0px;
+  position: absolute;
+  transition-delay: 0.25s, 0.05s;
+  transition-duration: 0.25s, 0.5s;
+  transition-property: opacity, bottom;
+  transition-timing-function: ease-out, cubic-bezier(1, -1.45, 0, 1.95);
+  width: auto;
+  z-index: 6; }
+
+.viewer .hint .navigation {
+  bottom: 0px;
+  box-shadow: 0px 2px 3px 0px rgba(77, 106, 107, 0.5);
+  height: 36px;
+  padding-left: 42px;
+  position: absolute;
+  right: 0px;
+  width: 100%; }
+  .viewer .hint .navigation .section.pages {
+    float: left; }
+  .viewer .hint .navigation .section.control {
+    float: left;
+    margin-left: 12px; }
+  .viewer .hint .navigation .button {
+    border-radius: 4px;
+    cursor: pointer;
+    display: block;
+    float: left;
+    height: 28px;
+    margin: 4px;
+    padding: 3px;
+    width: 28px; }
+    .viewer .hint .navigation .button.active {
+      background-color: #00c9b8; }
+    .viewer .hint .navigation .button.disabled {
+      cursor: default; }
+  .viewer .hint .navigation .button.nav {
+    display: none; }
+    .viewer .hint .navigation .button.nav .top {
+      fill: #80e4dc; }
+    .viewer .hint .navigation .button.nav .bottom {
+      fill: #00c9b8; }
+    .viewer .hint .navigation .button.nav:hover .top {
+      fill: #a4faf1; }
+    .viewer .hint .navigation .button.nav:hover .bottom {
+      fill: #00e7c1; }
+  .viewer .hint .navigation .section.control.multiple .button.nav {
+    display: block; }
+
+.viewer .hint .navigation .button .icon {
+  fill: #00c9b8;
+  transition: fill 0.15s ease-in-out, background-color 0.15s ease-in-out; }
+
+.viewer .hint .navigation .button:hover .icon {
+  fill: #00e7c1; }
+
+.viewer .hint .navigation .button.active .icon {
+  fill: white; }
+
+.viewer .hint .navigation .button.disabled .icon {
+  fill: #87aca9; }
+
+.viewer .hint .page {
+  display: none;
+  padding: 12px; }
+  .viewer .hint .page.active {
+    display: block; }
+  .viewer .hint .page.image {
+    padding: 0px; }
+  .viewer .hint .page.image .image-slider {
+    padding: 8px; }
+  .viewer .hint .page.image .image-slider .image-element {
+    border-radius: 8px 8px 12px 12px;
+    box-shadow: 1px 1px 7px rgba(122, 122, 122, 0.5); }
+
+.viewer .hint .page.word .section.word {
+  padding-left: 34px;
+  position: relative;
+  min-height: 34px; }
+  .viewer .hint .page.word .section.word .player {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    height: 34px;
+    padding: 0px 6px;
+    width: 34px; }
+    .viewer .hint .page.word .section.word .player[data-mp3] {
+      cursor: pointer; }
+  .viewer .hint .page.word .section.word .player:not([data-mp3]) ~ .tab.word:not([data-mp3]),
+  .viewer .hint .page.word .section.word .tab.word [data-pronoun] {
+    color: #748682;
+    font-size: 15px;
+    font-style: italic; }
+  .viewer .hint .page.word .section.word .tab.word {
+    display: inline-block;
+    font-family: "Raleway", sans-serif;
+    font-size: 17px;
+    margin-right: 0.34em; }
+    .viewer .hint .page.word .section.word .tab.word[data-mp3] {
+      border-bottom: dotted 1px #00a59d;
+      cursor: pointer;
+      transition-duration: 0.15s;
+      transition-property: border-bottom, color;
+      transition-timing-function: ease-in-out; }
+      .viewer .hint .page.word .section.word .tab.word[data-mp3]:hover {
+        color: #009191;
+        border-bottom: dotted 1px #009191; }
+
+.viewer .hint .page.word .section.translation {
+  border-top: solid 1px #009191;
+  margin-top: 12px;
+  padding-top: 12px; }
+  .viewer .hint .page.word .section.translation .tab.translation {
+    border: dotted 1px #748682;
+    border-radius: 4px;
+    color: #748682;
+    display: inline-block;
+    font-family: "PT Sans", sans-serif;
+    font-size: 17px;
+    margin: 3px 6px;
+    padding: 2px 8px; }
+    .viewer .hint .page.word .section.translation .tab.translation[data-keyword] {
+      border: dotted 1px #00ac8f;
+      color: black; }
+    .viewer .hint .page.word .section.translation .tab.translation [data-pronoun] {
+      color: #748682;
+      font-size: 15px;
+      font-style: italic; }
+    .viewer .hint .page.word .section.translation .tab.translation [data-explanation] {
+      color: #039089;
+      display: inline-block;
+      font-size: 14px;
+      font-style: italic;
+      margin: 0px 4px; }
+
+.viewer .hint .page.word .section.word .player .icon {
+  fill: #00a59d;
+  transition: transform 0.15s ease-in-out, fill 0.15s ease-in-out; }
+
+.viewer .hint .page.word .section.word .player[data-mp3]:hover .icon {
+  fill: #00e7c1; }
+
+.viewer .hint .page.word .section.word .player.on .icon {
+  fill: #00e7c1 !important;
+  transform: rotate(-45deg); }
+
+.viewer .hint .page.definition .sentence {
+  padding: 4px; }
+  .viewer .hint .page.definition .sentence:not(:only-child) {
+    list-style-type: decimal;
+    margin-left: 20px; }
+  .viewer .hint .page.definition .sentence p {
+    font-family: "Raleway", sans-serif;
+    font-size: 17px;
+    text-indent: 0px; }
+  .viewer .hint .page.definition .sentence [data-keyword] {
+    font-weight: bold; }

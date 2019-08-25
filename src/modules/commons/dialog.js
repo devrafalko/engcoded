@@ -4,7 +4,7 @@ import Crossword from './../games/crossword/index';
 import Presentation from './../games/presentation/index';
 import Test from './../games/test/index';
 
-const { Card } = $commons;
+const { Card, Selector } = $commons;
 const { $templater } = $utils;
 const { $iconGameCrossword, $iconGameTest, $iconWordList, $iconAlignLeft,
   $iconAlignCenter, $iconSpy, $iconPalette, $iconTextSize, $iconClose,
@@ -15,6 +15,7 @@ class Dialog {
     this.data = { controllers: {} };
     this.state = { fontSize: null, opened: false, currentContentElements: {}, navigationOpened: false, gameActive: null };
     this.events = { onClose: null, beforeClose: null, onStopSpy: null };
+    this._createFontSelector();
     this._renderView();
     this._addListeners();
     this._setInitialState();
@@ -104,6 +105,34 @@ class Dialog {
     if (this.events.onClose) this.events.onClose(dialog);
   }
 
+  _createFontSelector() {
+    const options = this.fonts.map(({ name, family }, iter) => ({
+      text: name,
+      data: { name, family },
+      selected: iter === 0
+    }));
+
+    this.selector = new Selector({
+      header: this.fonts[0].name,
+      allowMultiple: false,
+      allowNone: false,
+      options
+    });
+
+    this.selector.header.style.fontFamily = this.fonts[0].family;
+    this.selector.options.forEach(({ data }, index) => {
+      this.selector.labels.get(String(index)).style.fontFamily = data.family;
+    });
+
+    this.selector.on.select = (map, selected) => {
+      const { family, name } = map.get(selected).data;
+      this.selector.header.innerHTML = name;
+      this.selector.header.style.fontFamily = family;
+      this.contentContainer.style.fontFamily = family;
+      Card.fit();
+    }
+  }
+
   _navigationMode(mode) {
     switch (mode) {
       case 'articles':
@@ -177,7 +206,6 @@ class Dialog {
     $on('button', ({ id, last, data, target }) => {
       if (id.startsWith('button.size')) this._fontSize(data, last);
       if (id.startsWith('button.align')) this._subtitlesAlign(last);
-      if (last === 'font') this._fontFamily(target.selectedIndex);
       if (last === 'color-text') this._colorText();
       if (last === 'close') this.close();
       if (last === 'spy-subtitles') this.spySubtitles(null);
@@ -213,7 +241,6 @@ class Dialog {
     this._subtitlesAlign('left');
     this._colorText();
     this._fontSize('md-medium', 'text-medium');
-    this._fontFamily(0);
     this.spySubtitles(true);
   }
 
@@ -235,12 +262,6 @@ class Dialog {
         this._toggleNavigation(next);
         break;
     }
-  }
-
-  _fontFamily(index) {
-    this.dom.get('button').get('font-select').style.fontFamily = this.fonts[index].family;
-    this.contentContainer.style.fontFamily = this.fonts[index].family;
-    Card.fit();
   }
 
   _subtitlesAlign(align) {
@@ -271,7 +292,7 @@ class Dialog {
   }
 
   seekOccurrence(id) {
-    switch(this.state.mode){
+    switch (this.state.mode) {
       case 'pictures':
         this.state.currentContentData.viewer.seek(id);
         break;
@@ -328,11 +349,7 @@ class Dialog {
               <ul ${classes('section.fonts')} class="section-font">
                 <li ${on('button.color-text', 'click')} ${classes('button.color-text')}>${child($iconPalette())}</li>
                 <li class="font-select">
-                  <select ${on('button.font', 'change')} ${ref('button.font-select')}>
-                    ${list(this.fonts, ({ name, family }, iter) =>/*html*/`
-                      <option ${when(iter === 0, () => `selected`)} style="font-family: ${family}">${name}</option>
-                    `)}
-                  </select>
+                  ${child(this.selector.view)}
                 </li>
                 <li ${on('button.size.text-small', 'click', { data: 'md-small' })} ${classes('button.text-small')} class="font-size-button text-small">${child($iconTextSize())}</li>
                 <li ${on('button.size.text-medium', 'click', { data: 'md-medium' })} ${classes('button.text-medium')} class="font-size-button text-medium">${child($iconTextSize())}</li>

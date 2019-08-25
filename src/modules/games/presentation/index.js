@@ -1,8 +1,8 @@
 import './navigation.scss';
 
-const { Scroller } = $commons;
+const { Scroller, Selector } = $commons;
 const { $templater } = $utils;
-const { $iconMinimize, $iconOccurrence, $iconShuffle, $iconSelect, $iconChevronRight,
+const { $iconMinimize, $iconOccurrence, $iconShuffle, $iconChevronRight,
   $iconChevronDoubleRight, $iconChevronLeft, $iconChevronDoubleLeft, $iconSpy, $iconSortAZ,
   $iconSortZA, $iconSort19, $iconSort91, $iconSortRandom, $iconChevronUp, $iconAlignLeft,
   $iconAlignRight, $iconAlignCenter } = $icons;
@@ -20,7 +20,6 @@ class Presentation {
       pageIndex: null,
       pageTopButtonVisible: false,
       pageWords: null,
-      selectOpened: false,
       validGoInput: false,
       buttonIndex: new Map([
         [0, 1],
@@ -72,7 +71,7 @@ class Presentation {
     };
 
     this._initialSortWords();
-    this._setSelectedTypes();
+    this._createSelector();
     this._buildView();
     this._buildRowReferences();
     this._addListeners();
@@ -206,18 +205,33 @@ class Presentation {
     this.ref.words.sort();
   }
 
-  _setSelectedTypes() {
+  _createSelector() {
     const sortedTypes = [...this.ref.words.typeNames.keys()].sort();
     this.state.selectedTypes = new Map();
-    this.state.selectedTypesNumber = 0;
-    sortedTypes.forEach((name) => {
-      this.state.selectedTypes.set(name, true);
-      this.state.selectedTypesNumber++;
+    sortedTypes.forEach((name) => this.state.selectedTypes.set(name, true));
+
+    const options = sortedTypes.map((name) => ({
+      text: name,
+      data: name,
+      selected: true
+    }));
+
+    this.selector = new Selector({
+      header: 'Word type',
+      allowMultiple: true,
+      allowNone: false,
+      options
     });
+
+    this.selector.on.select = (map) => {
+      map.forEach(({ data, selected }) => this.state.selectedTypes.set(data, selected));
+      this._filter();
+      this.page = 1;
+    }
   }
 
   _buildView() {
-    const templater = $templater(({ ref, child, classes, list, on }) =>/*html*/`
+    const templater = $templater(({ ref, child, classes, on }) =>/*html*/`
       <div ${ref('container')} ${classes('container')} class="presentation">
         <nav class="navigation-panel">
           <div class="controls game">
@@ -228,26 +242,7 @@ class Presentation {
                   <span class="icon-box">${child($iconOccurrence())}</span>
                 </div>
               </li>
-              <li ${ref('button.select')} class="select">
-                <div>
-                  <div ${ref('select.header')} class="select-box">
-                    <div class="header">
-                      <span class="text-box">Word type</span>
-                      <span class="icon-box">${child($iconSelect())}</span>
-                    </div>
-                  </div>
-                  <div ${ref('select.list')} ${classes('select.list')} class="list-box">
-                    <ul class="list">
-                      ${list(this.state.selectedTypes, (selected, name) =>/*html*/`
-                        <li data-type="${name}" ${on(`select.item.${name}`, 'click')}>
-                          <span class="text-box">${name}</span>
-                          <button class="switch-button" ${classes(`word-type.${name}`, selected ? ['on'] : [])}><span></span></button>
-                        </li>
-                      `)}
-                    </ul>
-                  </div>
-                </div>
-              </li>
+              <li class="selector-container">${child(this.selector.view)}</li>
             </ul>
           </div>
           <div class="controls navigation">
@@ -434,18 +429,8 @@ class Presentation {
 
   _addListeners() {
     const { $on } = this.html;
-
-    window.addEventListener('resize', () => this._fitSelectList());
-    document.body.addEventListener('click', (event) => {
-      const select = this.dom.get('button').get('select');
-      const list = this.dom.get('select').get('list');
-      if ((!select.contains(event.target) && !this.state.selectOpened) || list.contains(event.target)) return;
-      this._toggleSelect(!select.contains(event.target) || this.state.selectOpened ? 'close' : 'open');
-    });
-
     $on('rows', ({ data }) => this.pageWords = data);
     $on('find', ({ event, last }) => this._seekOccurrence(event, last));
-    $on('select.item', ({ last }) => this._switchWordType(last));
     $on('search-box', ({ event }) => this._filterLetters(event));
     $on('close', () => this.close());
     $on('page-top', () => this._pageTop());
@@ -473,18 +458,6 @@ class Presentation {
       this.state.currentScroll.y = event.target.scrollTop;
       this._togglePageTopButton();
     });
-  }
-
-  _switchWordType(name) {
-    const classes = this.classes.get('word-type').get(name);
-    const on = classes.has('on');
-    if (this.state.selectedTypesNumber === 1 && on) return;
-    classes.toggle('on');
-    this.state.selectedTypes.set(name, !on);
-    if (!on) this.state.selectedTypesNumber++;
-    else this.state.selectedTypesNumber--;
-    this._filter();
-    this.page = 1;
   }
 
   _addScroller() {
@@ -565,82 +538,6 @@ class Presentation {
     event.preventDefault();
     this.close();
     this.ref.dialog.seekOccurrence(id);
-  }
-
-  _toggleSelect(action) {
-    const header = this.dom.get('select').get('header');
-    const list = this.dom.get('select').get('list');
-    const classes = this.classes.get('select').get('list');
-
-    switch (action) {
-      case 'open':
-        this._resetSelectListPosition();
-        this._adjuster(document.body, header, list, 6);
-        classes.wait(10).add("visible");
-        this.state.selectOpened = true;
-        break;
-      case 'close':
-        classes.clear().remove('visible').wait(150).remove('displayed');
-        this.state.selectOpened = false;
-        break;
-    }
-  }
-
-  _fitSelectList() {
-    if (this.state.selectOpened === false) return;
-    if (this.state.fitDelayPending === true) return;
-    const header = this.dom.get('select').get('header');
-    const list = this.dom.get('select').get('list');
-
-    this.state.fitDelayPending = true;
-    setTimeout(() => {
-      this._adjuster(document.body, header, list, 6);
-      this.state.fitDelayPending = false;
-    }, 50);
-  }
-
-  _resetSelectListPosition() {
-    const styles = this.dom.get('select').get('list');
-    const classes = this.classes.get('select').get('list');
-    classes.clear().add('displayed').remove('visible');
-    styles.top = '0px';
-    styles.bottom = null;
-    styles.left = '0px';
-    styles.right = null;
-  }
-
-  _adjuster(container, header, list, topOffset = 0) {
-    const style = list.style;
-    const { left: headerLeft, top: headerTop, width: headerWidth, height: headerHeight } = header.getBoundingClientRect();
-    const { left: containerLeft, top: containerTop, width: containerWidth, height: containerHeight } = container.getBoundingClientRect();
-    const { width: listWidth, height: listHeight } = list.getBoundingClientRect();
-
-    switch (true) {
-      case (containerTop + containerHeight) - (headerTop + headerHeight) >= listHeight:
-        style.top = (headerTop + headerHeight + topOffset) + 'px';
-        break;
-      case (headerTop - containerTop) >= listHeight:
-        style.top = (headerTop - listHeight + topOffset) + 'px';
-        break;
-      default:
-        style.top = (headerTop + headerHeight + topOffset) + 'px';
-        break;
-    }
-
-    switch (true) {
-      case (containerLeft + containerWidth) - (headerLeft) >= listWidth:
-        style.left = (headerLeft) + 'px';
-        style.right = null;
-        break;
-      case (headerLeft + headerWidth - containerLeft) >= listWidth:
-        style.left = (headerLeft + headerWidth - listWidth) + 'px';
-        style.right = null;
-        break;
-      default:
-        style.left = '-0';
-        style.right = '-0';
-        break;
-    }
   }
 
   _updateTableScroll() {

@@ -1,0 +1,134 @@
+@import "./../../styles/rules";
+@import "./../../styles/responsive";
+
+.selector {
+  position: relative;
+
+  .header {
+    @extend %vertical-center;
+    border: solid 1px #01b9b9;
+    cursor: pointer;
+    height: 26px;
+    left: 0px;
+    padding: 2px;
+    padding-right: 18px;
+    width: 100%;
+  }
+
+  .header>.header-content {
+    color: #39f3f3;
+    display: inline-block;
+    font-family: "Open Sans", sans-serif;
+    font-size: 15px;
+    line-height: 20px;
+    overflow: hidden;
+    padding: 0px 4px;
+    text-overflow: ellipsis;
+    width: 100%;
+  }
+
+  .header>.header-icon {
+    @extend %vertical-center;
+    height: 26px;
+    right: 3px;
+    width: 12px;
+  }
+
+  .options {
+    max-width: 220px;
+    position: fixed;
+    z-index: 1;
+  }
+
+  .list {
+    background-color: white;
+    border-radius: 6px;
+    box-shadow: 2px 2px 5px 2px rgba(80, 80, 80, 0.5);
+    display: none;
+    max-width: 240px;
+    min-width: 160px;
+    opacity: 0;
+    padding: 6px 4px;
+    position: relative;
+    top: -6px;
+    transition-duration: 0.15s;
+    transition-property: top, opacity;
+    transition-timing-function: ease-in-out;
+  }
+
+  .options.displayed .list {
+    display: block;
+  }
+
+  .options.visible .list {
+    opacity: 1;
+    top: 0px;
+  }
+
+  .list>li {
+    border-bottom: solid 1px #dcdcdc;
+    margin: 0px 0px;
+    padding: 2px 0px;
+    padding-right: 44px;
+    position: relative;
+  }
+
+  .list .label {
+    color: #01b9b9;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+  }
+
+  .list .switch-button {
+    @extend %vertical-center;
+    position: absolute;
+    right: 0px;
+  }
+
+
+  @media (min-width: $grid-small) and (min-height: $grid-small) {
+    padding: 0px 4px;
+    width: 142px;
+
+    .header {
+      height: 30px;
+      padding-right: 24px;
+    }
+
+    .header>.header-content {
+      font-size: 17px;
+      line-height: 24px;
+    }
+
+    .header>.header-icon {
+      height: 30px;
+      width: 14px;
+    }
+  }
+
+  @media (min-width: $grid-medium) and (min-height: $grid-medium) {
+    padding: 0px 6px;
+
+    .header {
+      height: 36px;
+    }
+
+    .header>.header-content {
+      font-size: 18px;
+      line-height: 30px;
+    }
+
+    .header>.header-icon {
+      height: 30px;
+      width: 14px;
+    }
+
+    .list>li {
+      margin: 6px 0px;
+      padding: 4px 0px;
+    }
+  }
+}

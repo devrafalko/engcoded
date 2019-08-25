@@ -188,23 +188,13 @@ $grid-pictures-hide-point: 428px;
   transition-timing-function: ease-in-out;
 }
 
-.dialog-box .navigation-panel .controls.text .font-select select {
+.dialog-box .navigation-panel .controls.text .font-select .selector {
   @extend %vertical-center;
-  border: solid 1px #01b9b9;
   color: #39f3f3;
   left: 0px;
   outline-width: 0px;
   padding: 2px;
   width: 100%;
-
-  &>option {
-    background-color: #20667e;
-    color: #39f3f3;
-
-    &:checked {
-      background-color: #388fac;
-    }
-  }
 }
 
 .dialog-box>.navigation-panel .controls {
@@ -227,7 +217,7 @@ $grid-pictures-hide-point: 428px;
   &.text .font-select {
     width: 100px;
 
-    select {
+    .selector {
       font-size: 16px;
       height: 26px;
     }
@@ -302,7 +292,7 @@ $grid-pictures-hide-point: 428px;
     &.text .font-select {
       width: 120px;
 
-      select {
+      .selector {
         font-size: 18px;
         height: 28px;
       }
@@ -337,7 +327,7 @@ $grid-pictures-hide-point: 428px;
     &.text .font-select {
       width: 140px;
 
-      select {
+      .selector {
         height: 36px;
       }
     }
@@ -405,6 +395,11 @@ $grid-pictures-hide-point: 428px;
         display: block;
       }
     }
+
+    &>.navigation-panel:not(.opened) .selector .options {
+      display: none !important;
+    }
+
   }
 }
 
@@ -446,6 +441,10 @@ $grid-pictures-hide-point: 428px;
           height: $grid-nav-medium;
         }
       }
+    }
+
+    &>.navigation-panel:not(.opened) .selector .options {
+      display: none !important;
     }
   }
 }
