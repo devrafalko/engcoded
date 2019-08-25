@@ -1,5 +1,6 @@
 import type from 'of-type';
 import './../buttons.scss';
+import './../config.scss';
 import './../game.scss';
 import './navigation.scss';
 import './config.scss';
@@ -1603,7 +1604,7 @@ class Crossword {
                 <li>
                   <span class="key">Ctrl</span> + 
                   <span class="key">F</span>
-                  <span class="action">Find word in text</span>
+                  <span class="action">Find word in the text or picture</span>
                 </li>
                 <li>
                   <span class="key">↑</span>, 

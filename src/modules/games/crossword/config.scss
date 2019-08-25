@@ -106,36 +106,3 @@
     margin: 8px 0px;
   }
 }
-
-.game-container>.crossword .config-page section.shortcuts {
-  text-align: center;
-
-  &>ul {
-    display: inline-block;
-    text-align: left;
-  }
-
-  &>ul>li {
-    margin: 8px 0px;
-  }
-
-  .key {
-    border: solid 1px grey;
-    border-radius: 4px;
-    color: #929292;
-    cursor: default;
-    display: inline-block;
-    font-family: "Raleway", sans-serif;
-    font-size: 16px;
-    padding: 4px;
-    min-width: 26px;
-    text-align: center;
-  }
-
-  .action {
-    color: #929292;
-    font-family: "Roboto", sans-serif;
-    font-size: 17px;
-    margin: 0px 12px;
-  }
-}

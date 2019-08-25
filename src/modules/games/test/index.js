@@ -1,4 +1,5 @@
 import $type from 'of-type';
+import './../config.scss';
 import './navigation.scss';
 import './config.scss';
 import './test.scss';
@@ -174,23 +175,10 @@ class Task {
 
   _addListeners() {
     const { $on } = this.html;
-
-    $on('occurrence', ({ data }) => {
-      if (!this.state.solved) return;
-      const id = this.data.sorted[data];
-      this.wordTest.close();
-      this.wordTest.ref.dialog.seekOccurrence(id);
-    });
-
-    $on('answers', ({ data }) => {
-      if (this.state.solved) return;
-      this.state.solved = true;
-      if (data === this.data.correctIndex) this._correct(data);
-      else this._incorrect(data);
-    });
-
+    $on('occurrence', ({ data }) => this.occurrence(data));
+    $on('answers', ({ data }) => this.choose(data));
     if (this.data.clue === 'audio') {
-      $on('audio-button', () => this._playAudio());
+      $on('audio-button', () => this.playAudio());
       $on('player', ({ type }) => {
         if (type === 'play') {
           this.classes.get('audio-button').add('playing');
@@ -209,12 +197,26 @@ class Task {
     }
   }
 
+  choose(index) {
+    if (this.state.solved) return;
+    this.state.solved = true;
+    if (index === this.data.correctIndex) this._correct(index);
+    else this._incorrect(index);
+  }
+
+  occurrence(index) {
+    if (!this.state.solved) return;
+    const id = this.data.sorted[index];
+    this.wordTest.close();
+    this.wordTest.ref.dialog.seekOccurrence(id);
+  }
+
   _loadAudio(audio) {
     const sources = $type(audio, String) ? [audio] : audio.filter((item) => $type(item, Array)).map(([word, source]) => source);
     this.data.audioSources = sources;
   }
 
-  _playAudio() {
+  playAudio() {
     this.state.currentAudioIndex = 0;
     this.dom.get('player').src = this.data.audioSources[0];
     this.dom.get('player').play();
@@ -668,6 +670,19 @@ class WordTest {
     return this._on;
   }
 
+  get answersKeys() {
+    return new Map([
+      [49, 0],
+      [50, 1],
+      [51, 2],
+      [52, 3],
+      [65, 0],
+      [66, 1],
+      [67, 2],
+      [68, 3]
+    ]);
+  }
+
   buildView() {
     const template = $templater(({ ref, child, classes, on }) =>/*html*/`
       <div ${ref('container')} ${classes('container')} class="test hidden">
@@ -692,7 +707,6 @@ class WordTest {
         </nav>
         <ul class="game-pages">
           <li ${ref('page.config')} ${classes('page.config')} class="config-page hidden">
-          
             <section class="settings">
               <div>
                 <p>
@@ -748,6 +762,35 @@ class WordTest {
                 </li>
               </ul>
             </section>
+            <section class="shortcuts">
+              <ul>
+                <li>
+                  <span class="key">Enter</span>
+                  <span class="action">Switch to the next task</span>
+                </li>
+                <li>
+                  <span class="key">1</span>, 
+                  <span class="key">2</span>, 
+                  <span class="key">3</span>, 
+                  <span class="key">4</span> or
+                  <span class="key">a</span>, 
+                  <span class="key">b</span>, 
+                  <span class="key">c</span>, 
+                  <span class="key">d</span>
+                  <span class="action">Select the answer</span>
+                </li>
+                <li>
+                  <span class="key">Ctrl</span> + 
+                  <span class="key">Enter</span>
+                  <span class="action">Play pronunciation | Switch image</span>
+                </li>
+                <li>
+                  <span class="key">Ctrl</span> + 
+                  <span class="key">F</span>
+                  <span class="action">Find selected word in the text or picture</span>
+                </li>
+              </ul>
+            </section>
           </li>
           <li ${ref('page.learn')} ${classes('page.learn')} class="learn-page hidden">
             <section ${ref('learn-container')}></section>
@@ -790,12 +833,12 @@ class WordTest {
   }
 
   _runGame() {
-    const task = this.ref.virtual.next();
+    this.state.currentTask = this.ref.virtual.next();
     const container = this.dom.get('learn-container');
     container.innerHTML = '';
-    container.appendChild(task.view);
+    container.appendChild(this.state.currentTask.view);
 
-    task.on.success = () => {
+    this.state.currentTask.on.success = () => {
       this.state.taskFinished = true;
       this.ref.virtual.success();
       this._updateResolved();
@@ -806,7 +849,7 @@ class WordTest {
       this._switchPageNextButton(true);
     }
 
-    task.on.fail = () => {
+    this.state.currentTask.on.fail = () => {
       this.state.taskFinished = true;
       this.ref.virtual.fail();
       this._switchPageNextButton(true);
@@ -839,22 +882,54 @@ class WordTest {
       };
     });
 
-    $on('page-next', () => {
-      if (!this.state.taskFinished) return;
-      this._switchPageNextButton(false);
-      this._runGame();
-      this.state.taskFinished = false;
-    });
+    $on('page-next', () => this._runNextTask());
 
+    window.addEventListener('keydown', (event) => {
+      if (this.state.activePage !== 'learn' || !this.state.opened) return;
+      const answerKeys = [49, 50, 51, 52, 65, 66, 67, 68];
+      const task = this.state.currentTask;
+
+      if (event.keyCode === 13 && event.ctrlKey) {
+        event.preventDefault();
+        if (task.data.clue === 'audio') task.playAudio();
+        if (task.data.clue === 'img') task.slider.next();
+      }
+
+      if (event.keyCode === 70 && event.ctrlKey) {
+        event.preventDefault();
+        task.occurrence(task.data.correctIndex);
+      }
+
+      if (event.ctrlKey === true) return;
+
+      if (event.keyCode === 13) {
+        event.preventDefault();
+        this._runNextTask();
+      }
+
+      if (answerKeys.some((key) => key === event.keyCode)) {
+        event.preventDefault();
+        task.choose(this.answersKeys.get(event.keyCode));
+      }
+    });
   }
 
   open() {
+    this.state.opened = true;
     if (this.on.open) this.on.open();
     if (this.state.activePage === null) this._switchPage('config');
   }
 
   close() {
+    this.state.opened = false;
     if (this.on.close) this.on.close();
+  }
+
+  _runNextTask() {
+    if (!this.state.taskFinished || this.state.finished) return;
+    this._switchPageNextButton(false);
+    this._runGame();
+    this.state.taskFinished = false;
   }
 
   _switchPage(name) {

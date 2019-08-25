@@ -113,22 +113,18 @@ class Dialog {
     }));
 
     this.selector = new Selector({
-      header: this.fonts[0].name,
       allowMultiple: false,
       allowNone: false,
       options
     });
 
-    this.selector.header.style.fontFamily = this.fonts[0].family;
     this.selector.options.forEach(({ data }, index) => {
       this.selector.labels.get(String(index)).style.fontFamily = data.family;
     });
 
     this.selector.on.select = (map, selected) => {
       const { family, name } = map.get(selected).data;
-      this.selector.header.innerHTML = name;
-      this.selector.header.style.fontFamily = family;
-      this.contentContainer.style.fontFamily = family;
+      this._selectFont(name, family);
       Card.fit();
     }
   }
@@ -241,6 +237,7 @@ class Dialog {
     this._subtitlesAlign('left');
     this._colorText();
     this._fontSize('md-medium', 'text-medium');
+    this._selectFont(this.fonts[0].name, this.fonts[0].family);
     this.spySubtitles(true);
   }
 
@@ -281,6 +278,12 @@ class Dialog {
     Card.fit();
   }
 
+  _selectFont(name, family){
+    this.selector.header.innerHTML = name
+    this.selector.header.style.fontFamily = family;
+    this.contentContainer.style.fontFamily = family;
+  }
+  
   _fontSize(size, name) {
     const classes = this.classes.get('button').get(name);
     if (this.state.fontSizeClasses === classes) return;
