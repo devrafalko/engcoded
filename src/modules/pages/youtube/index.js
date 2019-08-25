@@ -136,7 +136,7 @@ class YouTube {
     if (Dialog.name === 'youtube') {
       const dialog = Dialog.contentContainer;
       const zip = this.views[this.state.currentMovieId].references.get('zip');
-      const movieHeight = (zip.getBoundingClientRect().y - 0) - dialog.getBoundingClientRect().y;
+      const movieHeight = (zip.getBoundingClientRect().top - 0) - dialog.getBoundingClientRect().top;
       this.data.player.setSize('100%', movieHeight);
     }
   }
@@ -160,7 +160,6 @@ class YouTube {
       content: this.views[movieId].template,
       cardArea: this.views[movieId].references.get('subtitles'),
       contentData: this.instances[movieId],
-      onStopSpy: () => this.instances[movieId].scroller.break(),
       onClose: () => {
         Timer.stop();
         this.state.currentMovieId = null;
@@ -275,7 +274,6 @@ class YouTube {
     const refs = this.views[movieId].references;
     const classes = this.views[movieId].classes;
     const zip = refs.get('zip');
-    const movie = refs.get('movie');
     const mask = classes.get('mask');
     const subtitles = refs.get('subtitles');
     let zipDimensions = zip.getBoundingClientRect();
@@ -283,17 +281,18 @@ class YouTube {
     let shift;
 
     const moveZip = (event) => {
-      this.moveZip(event.clientY, shift, dialog, zipDimensions, movie, subtitles);
+      this.moveZip(event.clientY, shift, dialog, zipDimensions, subtitles);
     };
 
     const mouseDown = (event) => {
       zipDimensions = zip.getBoundingClientRect();
       dialog = Dialog.contentContainer.getBoundingClientRect();
-      shift = event.clientY - zipDimensions.top; //CHROME: zipDimensions.x
+      shift = event.clientY - zipDimensions.top;
       mask.add('block');
       window.addEventListener('mousemove', moveZip);
       window.addEventListener('mouseup', mouseUp);
     };
+
     const mouseUp = () => {
       mask.remove('block');
       window.removeEventListener('mousemove', moveZip);
@@ -301,15 +300,23 @@ class YouTube {
     }
 
     zip.addEventListener('mousedown', mouseDown);
-    this.moveZip(zipDimensions.y, 0, dialog, zipDimensions, movie, subtitles);
+    this.moveZip(zipDimensions.top, 0, dialog, zipDimensions, subtitles);
     this.instances[movieId].zipHandler = true;
+
+    Dialog.events.onStopSpy = () => {
+      zipDimensions = zip.getBoundingClientRect();
+      dialog = Dialog.contentContainer.getBoundingClientRect();
+      this.instances[movieId].scroller.break();
+      this.moveZip(zipDimensions.top, 0, dialog, zipDimensions, subtitles);
+    }
+
   }
 
-  moveZip(position, shift, dialog, zip, movie, subtitles) {
-    const topEdge = dialog.top; //CHROME: dialog.y
+  moveZip(position, shift, dialog, zip, subtitles) {
+    const topEdge = dialog.top;
     const maxTop = topEdge + 200;
     const bottomEdge = topEdge + dialog.height;
-    const maxBottom = bottomEdge - 200;
+    const maxBottom = bottomEdge - 50;
     if (position < maxTop || position > maxBottom) return;
     const movieHeight = (position - shift) - topEdge;
     const subtitlesHeight = bottomEdge - (position - shift);
