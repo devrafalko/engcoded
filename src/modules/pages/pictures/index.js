@@ -11,11 +11,13 @@ class Pictures {
     this.dom = { page, container: navigation.pages };
     this.navigation = navigation;
     this.data = {};
+    this.state = {};
     this.instances = {};
     this.views = {};
 
     this._importPictures(pictures);
     this._renderItems();
+    this._addListeners();
   }
 
   _importPictures(pictures) {
@@ -38,6 +40,25 @@ class Pictures {
     this.dom.page.appendChild(items.view);
   }
 
+  _addListeners() {
+    window.addEventListener('keydown', (event) => {
+      if (Dialog.name !== 'pictures') return;
+      if (Dialog.state.gameActive !== null) return;
+      const viewer = this.instances[this.state.currentPictureId].viewer;
+      switch (event.keyCode) {
+        case 32: //space
+          viewer.hint.switch('toggle');
+          break;
+        case 27: //esc
+          viewer.hint.switch('close');
+          break;
+        case 13: //enter
+          viewer.next();
+          break;
+      }
+    });
+  }
+
   _openPicture(pictureId) {
     if (!this.instances[pictureId]) this._renderContentData(pictureId);
     if (!this.views[pictureId]) this._renderView(pictureId);
@@ -48,7 +69,10 @@ class Pictures {
       container: this.dom.container,
       content: this.views[pictureId].template,
       cardArea: this.views[pictureId].references.get('picture-area'),
-      contentData: instance
+      contentData: instance,
+      onClose: () => {
+        this.state.currentPictureId = null;
+      },
     });
     if (instance.loaded === false && instance.pending === false) this._loadPicture(pictureId);
   }
@@ -106,6 +130,7 @@ class Pictures {
         classes.get('page').get('picture').add('displayed');
         instance.loaded = true;
         instance.pending = false;
+        this.state.currentPictureId = pictureId;
       });
     }
 
