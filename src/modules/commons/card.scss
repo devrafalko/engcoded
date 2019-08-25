@@ -13,6 +13,7 @@ $bezier-soft-out: cubic-bezier(0.73, 0.18, 0.86, 0.45);
   max-width: 360px;
   opacity: 0;
   position: absolute;
+  text-align: center;
   transition: opacity 0.3s $bezier-soft-out;
   visibility: hidden;
   z-index: 3;
@@ -37,10 +38,13 @@ $bezier-soft-out: cubic-bezier(0.73, 0.18, 0.86, 0.45);
   background-color: white;
   border-radius: 12px;
   box-shadow: 2px 2px 5px 2px rgba(80, 80, 80, 0.5);
+  display: inline-block;
   min-width: 176px;
+  max-width: 360px;
   overflow: hidden;
   position: relative;
   top: 10px;
+  text-align: left;
   transition: top 0.3s $bezier-soft-out;
 }
 
@@ -206,6 +210,13 @@ $bezier-soft-out: cubic-bezier(0.73, 0.18, 0.86, 0.45);
         border-bottom: dotted 1px #009191;
       }
     }
+
+    & [data-explanation] {
+      color: #039089;
+      font-size: 14px;
+      font-style: italic;
+    }
+
   }
 }
 

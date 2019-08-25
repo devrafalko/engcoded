@@ -66,11 +66,6 @@ class Words {
     return this._map.typeNames;
   }
 
-  get types() {
-    if (!this._map.types) this._buildTypesMap();
-    return this._map.types;
-  }
-
   get clues() {
     if (!this._map.clues) this._buildCluesMap();
     return this._map.clues;
@@ -428,16 +423,10 @@ class Words {
   }
 
   _buildTypesMap() {
-    const map = new Map();
     const set = new Set();
-    this._map.records.forEach((record, id) => {
-      if (!map.has(record.type)) {
-        map.set(record.type, new Set());
-        set.add(record.type);
-      }
-      map.get(record.type).add(id);
+    this._map.records.forEach((record) => {
+      if (!set.has(record.type)) set.add(record.type);
     });
-    this._map.types = map;
     this._map.typeNames = set;
   }
 

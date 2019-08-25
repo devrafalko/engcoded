@@ -197,20 +197,28 @@ class Card {
       case containerWidth - (wordLeft) >= cardWidth: /* fitRight */
         style.left = (wordLeft + containerScrollX) + 'px';
         style.right = null;
+        style.padding = null;
+        style.maxWidth = '360px';
         break;
       case (wordLeft) + wordWidth >= cardWidth: /* fitLeft */
         style.right = (containerWidth - wordLeft - wordWidth - containerScrollX) + 'px';
         style.left = null;
+        style.padding = null;
+        style.maxWidth = '360px';
         break;
       case containerWidth > cardWidth: /* fitCenterX */
         style.margin = 'auto';
+        style.padding = '0px 6px';
         style.left = `calc(-100% + ${containerScrollX}px)`;
         style.right = `calc(-100% - ${containerScrollX}px)`;
+        style.maxWidth = '100%';
         break;
       default:
         style.margin = 'auto';
+        style.padding = '0px 6px';
         style.left = `calc(0% + ${containerScrollX}px)`;
         style.right = `calc(0% - ${containerScrollX}px)`;
+        style.maxWidth = '100%';
     }
 
     switch (true) {
