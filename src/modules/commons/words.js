@@ -167,7 +167,7 @@ class Words {
   }
 
   filter({ types = null, letters }) {
-    const firstLetters = letters.slice(0, 2);
+    const firstLetters = letters.toLowerCase().slice(0, 2);
     if (!this._map.alphabet.has(firstLetters)) return this.matchTemplate;
     const initial = this._map.alphabet.get(firstLetters).sort;
     const filteredLetters = letters.length > 2 ? reduceByLetters.call(this, initial, letters).sort : initial;

@@ -302,24 +302,30 @@ class Player {
     let moveState = false;
     const fn = (event) => {
       const { left, width } = element.getBoundingClientRect();
-      const { screenX } = event;
-      const position = ((screenX - left) / width);
+      const x = event.touches ? event.touches[0].screenX : event.screenX;
+      const position = ((x - left) / width);
       const limited = position < 0 ? 0 : position > 1 ? 1 : position;
       const stepped = step * Math.round((min + ((max - min) * limited)) / step);
       callback(stepped);
     };
 
-    element.addEventListener('mousedown', (event) => {
+    const onMouseDown = (event) => {
       moveState = true;
       fn(event);
       window.addEventListener('mousemove', fn);
-    });
-
-    window.addEventListener('mouseup', () => {
+      window.addEventListener('touchmove', fn);
+    }
+    const onMouseUp = () => {
       if (!moveState) return;
       window.removeEventListener('mousemove', fn);
+      window.removeEventListener('touchmove', fn);
       moveState = false;
-    });
+    };
+
+    element.addEventListener('mousedown', onMouseDown);
+    element.addEventListener('touchstart', onMouseDown);
+    window.addEventListener('mouseup', onMouseUp);
+    window.addEventListener('touchend', onMouseUp);
   }
 
   _scroll({ range, display, min, max, step, value }) {
