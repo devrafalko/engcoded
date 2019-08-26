@@ -1,4 +1,5 @@
 @import "./../../../styles/rules";
+@import "./../../../styles/responsive";
 
 .picture.area {
   height: 100%;
@@ -93,7 +94,7 @@
     display: none;
     position: absolute;
     transform: translate(-21px, 0px);
-    width: 42px;
+    width: 30px;
   }
 
   &.label>.icon {
@@ -121,6 +122,18 @@
 
   &.content.visible .label {
     display: block;
+  }
+
+  @media (min-width: $grid-small) and (min-height: $grid-small) {
+    &.label {
+      width: 36px;
+    }
+  }
+
+  @media (min-width: $grid-medium) and (min-height: $grid-medium) {
+    &.label {
+      width: 42px;
+    }
   }
 
 }

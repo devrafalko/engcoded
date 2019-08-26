@@ -1341,15 +1341,21 @@ class StarHint {
   }
 
   _onMouseDown(event) {
+    event.preventDefault();
     if (this.data.left === 0) return;
     this.event.mouseMove(event);
     window.addEventListener('mousemove', this.event.mouseMove);
+    window.addEventListener('touchmove', this.event.mouseMove);
     window.addEventListener('mouseup', this.event.mouseUp);
+    window.addEventListener('touchend', this.event.mouseUp);
     this.classes.get('cursor-star').add('displayed').wait(10).add('visible');
   };
 
   _onMouseUp() {
     window.removeEventListener('mousemove', this.event.mouseMove);
+    window.removeEventListener('touchmove', this.event.mouseMove);
+    window.removeEventListener('mouseup', this.event.mouseUp);
+    window.removeEventListener('touchend', this.event.mouseUp);
     this.classes.get('cursor-star').remove('visible').wait(250).remove('displayed').remove('allowed');
     const cell = this.state.allowedCell;
     if (cell !== null) {
@@ -1370,12 +1376,14 @@ class StarHint {
   };
 
   _onMouseMove(event) {
+    const x = event.touches ? event.touches[0].clientX : event.clientX;
+    const y = event.touches ? event.touches[0].clientY : event.clientY;
     const element = this.dom.get('cursor-star');
     if (this.state.delayMove === null) this.state.delayMove = setTimeout(() => {
-      element.style.left = `${event.clientX + 5}px`;
-      element.style.top = `${event.clientY + 5}px`;
+      element.style.left = `${x + 5}px`;
+      element.style.top = `${y + 5}px`;
       this.state.delayMove = null;
-      this._seekCell(event.target, (words, cell) => this._allowStarInput(words, cell));
+      this._seekCell(document.elementFromPoint(x, y), (words, cell) => this._allowStarInput(words, cell));
     }, 28);
   };
 
@@ -1388,6 +1396,7 @@ class StarHint {
 
   _seekCell(target, callback) {
     $loopParents(target, (parent, stop) => {
+      if (parent === null) return stop();
       if (parent.tagName === 'TD') {
         callback(this.crossword.ref.virtual.cell.get(parent) || null, parent);
         stop();
@@ -1476,7 +1485,7 @@ class Crossword {
             <ul class="buttons game">
               <li ${on('nav.previous', 'click', { data: -1 })}>${child($iconPrevious())}</li>            
               <li ${on('nav.next', 'click', { data: 1 })}>${child($iconNext())}</li>            
-              <li ${on('nav.star', 'mousedown')} class="button-star">${child($iconStar())}</li>
+              <li ${on('nav.star', ['mousedown', 'touchstart'])} class="button-star">${child($iconStar())}</li>
               <li ${ref('hints-output')} class="count-container"></li>
               <li ${ref('cursor-star')} ${classes('cursor-star')} class="cursor-star">${child($iconStar())}</li>
             </ul>
@@ -1700,7 +1709,7 @@ class Crossword {
   _addListeners() {
     const { $on } = this.html;
     window.addEventListener('resize', () => this._toggleNavigation('close'));
-    $on('nav', ({ last, data, event }) => {
+    $on('nav', ({ last, data, event, type }) => {
       if (last === 'config' || last === 'crossword') this._switchCrosswordPage(last);
       if (last === 'previous' || last === 'next') this.ref.game.switchWord(data);
       if (last === 'game-over') this.ref.game.gameOver();

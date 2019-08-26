@@ -257,7 +257,9 @@ class Viewer {
       currentWord: null,
       currentLabel: null,
       currentMove: null,
-      pendingDimensions: {}
+      pendingDimensions: {},
+      lastTapTime: null,
+      distance: null
     };
     this._renderView();
     this._addListeners();
@@ -387,6 +389,7 @@ class Viewer {
     if (smooth === false) {
       dims.zoom = this.zoom.next;
       dims.width = this.width.next;
+      dims.height = this.height.next;
       dims.left = this.left.next;
       dims.top = this.top.next;
       render.call(this);
@@ -394,6 +397,7 @@ class Viewer {
       this._mountAnimation(time, (volume) => {
         dims.zoom = this.zoom.prev + this.zoom.diff * volume;
         dims.width = this.width.prev + this.width.diff * volume;
+        dims.height = this.height.prev + this.height.diff * volume;
         dims.left = this.left.prev + this.left.diff * volume;
         dims.top = this.top.prev + this.top.diff * volume;
         render.call(this);
@@ -497,12 +501,12 @@ class Viewer {
 
   _renderView() {
     const templater = $templater(({ ref, on, child, classes, list }) =>/*html*/`
-      <div ${ref('container')} ${on('container', ['mousedown', 'mouseup', 'wheel', 'mousemove', 'mouseout'])} class="viewer container">
+      <div ${ref('container')} ${on('container', ['dblclick', 'mousedown', 'touchstart', 'mouseup', 'touchend', 'wheel', 'mousemove', 'touchmove', 'mouseout'])} class="viewer container">
         ${child(this.hint.view)}
         <div ${ref('content')} class="viewer content" ${classes('content', ['visible'])}>
           <img ${ref('image')} ${on('image', ['dragstart'])} class="viewer image"/>
           ${list(this.data.words.indeces, ({ id, index, x, y }) =>/*html*/`
-            <div ${on(`label.${index}`, ['mouseenter', 'mouseleave', 'click'], { capture: true, data: { index, id } })} ${classes(`label.${index}`)} class="viewer label" style="top:${y * 100}%; left:${x * 100}%">
+            <div ${on(`label.${index}`, ['mouseenter', 'mouseleave', 'click', 'touchstart'], { capture: true, data: { index, id } })} ${classes(`label.${index}`)} class="viewer label" style="top:${y * 100}%; left:${x * 100}%">
               ${child($iconPictureLabel(index))}
             </div>
           `)}
@@ -520,8 +524,9 @@ class Viewer {
     const image = references.get('image');
     const container = references.get('container');
 
-    $on('label', ({ type, target, last, data }) => {
-      if (type === 'click') {
+    $on('label', ({ type, target, last, data, event }) => {
+      if (type === 'click' || type === 'touchstart') {
+        event.preventDefault();
         this.hint.refresh(data.index);
         this.goTo(data.index, data.id);
         return
@@ -543,12 +548,65 @@ class Viewer {
     });
 
     $on('container', ({ type, event }) => {
-      if (type === 'wheel') return this._zoom(event);
-      if (type === 'mousedown' && (event.target === image || event.target === container)) return this._moveStart(event);
-      if (type === 'mouseup') return this._moveStop();
-      if (type === 'mouseleave') return this._moveStop();
-      if (type === 'mousemove' && this.state.move) return this._move(event);
+      switch (true) {
+        case this._dblTap(event):
+          event.preventDefault();
+          return this._zoom(event);
+        case type === 'mousedown' && (event.target === image || event.target === container):
+        case type === 'touchstart' && (event.target === image || event.target === container):
+          return this._moveStart(event);
+        case type === 'mouseup':
+        case type === 'touchend':
+        case type === 'mouseleave':
+          return this._moveStop(event);
+        case type === 'wheel':
+        case type === 'dblclick':
+          return this._zoom(event);
+        case type === 'mousemove' && this.state.move:
+        case type === 'touchmove' && event.touches.length === 1 && this.state.move:
+          return this._move(event);
+        case type === 'touchmove' && event.touches.length === 2 && this.state.move:
+          return this._touchZoom(event);
+      }
     });
+  }
+
+  _dblTap(event) {
+    if (event.type !== 'touchstart' || event.touches.length > 1) return false;
+    const current = Date.now();
+    const diff = current - this.state.lastTapTime;
+    this.state.lastTapTime = current;
+    return diff <= 200;
+  }
+
+  _touchZoom(event) {
+    const { clientX: x1, clientY: y1 } = event.touches[0];
+    const { clientX: x2, clientY: y2 } = event.touches[1];
+    const { x, y } = this._coords(event);
+
+    const initialZoom = this.initialZoom;
+    const prevZoom = this.zoom.next;
+    const distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+    const prevDistance = this.state.distance === null ? distance : this.state.distance;
+    const zoomAlteration = (distance - prevDistance) / this.image.naturalWidth;
+    this.state.distance = distance;
+
+    if (zoomAlteration > 0 && prevZoom === 1) return;
+    if (zoomAlteration < 0 && prevZoom === initialZoom) return;
+
+    const nextZoom = prevZoom + zoomAlteration;
+    const limitZoom = nextZoom > 1 ? 1 : nextZoom < initialZoom ? initialZoom : nextZoom;
+    const imagePercX = (x - this.left.next) / this.width.next;
+    const imagePercY = (y - this.top.next) / this.height.next;
+    const widthDiff = this.width.next - this.state.moveWidth;
+    const heightDiff = this.height.next - this.state.moveHeight;
+
+    this.zoom = limitZoom;
+    this.width = this.image.naturalWidth * prevZoom;
+    this.left = x - this.state.moveX - widthDiff * imagePercX;
+    this.top = y - this.state.moveY - heightDiff * imagePercY;
+
+    this._update({ smooth: false });
   }
 
   _zoom(event) {
@@ -560,25 +618,33 @@ class Viewer {
     const prevZoom = this.zoom.next;
     let nextZoom;
 
-    if (event.deltaY < 0) {
-      if (prevZoom === 1) return;
-      nextZoom = prevZoom + this.config.zoom;
-    } else if (event.deltaY > 0) {
-      if (prevZoom === initialZoom) return;
-      nextZoom = prevZoom - this.config.zoom;
+    switch (event.type) {
+      case 'dblclick':
+      case 'touchstart':
+        if (prevZoom === 1) return;
+        nextZoom = prevZoom + this.config.zoom * 3;
+        break;
+      case 'wheel':
+        if (event.deltaY < 0) {
+          if (prevZoom === 1) return;
+          nextZoom = prevZoom + this.config.zoom;
+        }
+        if (event.deltaY > 0) {
+          if (prevZoom === initialZoom) return;
+          nextZoom = prevZoom - this.config.zoom;
+        }
     }
 
+    const { x, y } = this._coords(event);
     const limitZoom = nextZoom > 1 ? 1 : nextZoom < initialZoom ? initialZoom : nextZoom;
     const zoomShiftX = this.image.naturalWidth * (limitZoom - prevZoom);
     const zoomShiftY = this.image.naturalHeight * (limitZoom - prevZoom);
-    const { x, y } = this._coords(event);
-    const imageX = x - left;
-    const imageY = y - top;
-    const _imagePercX = imageX / width;
-    const _imagePercY = imageY / height;
+    const _imagePercX = (x - left) / width;
+    const _imagePercY = (y - top) / height;
     const outside = _imagePercX < 0 || _imagePercX > 1 || _imagePercY < 0 || _imagePercY > 1;
     const imagePercX = outside ? .5 : _imagePercX;
     const imagePercY = outside ? .5 : _imagePercY;
+
     this._unmountAnimation();
     this.zoom = limitZoom;
     this.width = this.image.naturalWidth * this.zoom.next;
@@ -588,14 +654,19 @@ class Viewer {
   }
 
   _moveStart(event) {
+    event.preventDefault();
     const { x, y } = this._coords(event);
     this.state.moveX = x - this.state.pendingDimensions.left;
     this.state.moveY = y - this.state.pendingDimensions.top;
+    this.state.moveWidth = this.state.pendingDimensions.width;
+    this.state.moveHeight = this.state.pendingDimensions.height;
     this.state.move = true;
   }
 
-  _moveStop() {
+  _moveStop(event) {
+    this.state.distance = null;
     this.state.move = false;
+    if (event.touches && event.touches.length) this._moveStart(event);
   }
 
   _move(event) {
@@ -608,10 +679,26 @@ class Viewer {
 
   _coords(event) {
     const { top, left } = this.container.getBoundingClientRect();
-    const { clientX, clientY } = event;
+    let x, y;
+    switch (true) {
+      case !event.touches:
+        x = event.clientX;
+        y = event.clientY;
+        break;
+      case event.touches.length === 1:
+        x = event.touches[0].clientX;
+        y = event.touches[0].clientY;
+        break;
+      case event.touches.length === 2:
+        const { clientX: x1, clientY: y1 } = event.touches[0];
+        const { clientX: x2, clientY: y2 } = event.touches[1];
+        x = Math.min(x1, x2) + (Math.max(x1, x2) - Math.min(x1, x2)) / 2;
+        y = Math.min(y1, y2) + (Math.max(y1, y2) - Math.min(y1, y2)) / 2;
+        break;
+    }
     return {
-      x: clientX - left,
-      y: clientY - top
+      x: x - left,
+      y: y - top
     };
   }
 
