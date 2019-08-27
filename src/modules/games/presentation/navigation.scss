@@ -18,8 +18,8 @@
 }
 
 .game-container .presentation .controls.game {
-  padding: 0px 12px;
-  width: 100%;
+  padding-left: 6px;
+  width: calc(100% - 28px);
 
   &>ul {
     display: block;
@@ -28,6 +28,11 @@
 
   &>ul>li {
     margin: 0px;
+  }
+
+  @media (min-width: $grid-small) and (min-height: $grid-small) {
+    padding-left: 12px;
+    width: calc(100% - 40px);
   }
 }
 

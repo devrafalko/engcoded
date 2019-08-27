@@ -1477,30 +1477,6 @@ class Crossword {
     const template = $templater(({ ref, child, classes, on }) =>/*html*/`
       <div ${ref('container')} ${classes('container')} class="crossword">
         <nav ${ref('panel')} ${classes('panel')} class="navigation-panel">
-          <div class="controls game">
-            <ul class="buttons pages">
-              <li ${on('nav.config', 'click')} ${classes('button.config')} >${child($iconConfig())}</li>
-              <li ${on('nav.crossword', 'click')} ${classes('button.crossword')} class="disabled">${child($iconGameCrossword())}</li>
-            </ul>
-            <ul class="buttons game">
-              <li ${on('nav.previous', 'click', { data: -1 })}>${child($iconPrevious())}</li>            
-              <li ${on('nav.next', 'click', { data: 1 })}>${child($iconNext())}</li>            
-              <li ${on('nav.star', ['mousedown', 'touchstart'])} class="button-star">${child($iconStar())}</li>
-              <li ${ref('hints-output')} class="count-container"></li>
-              <li ${ref('cursor-star')} ${classes('cursor-star')} class="cursor-star">${child($iconStar())}</li>
-            </ul>
-            <ul class="buttons info">
-              <li>Words:</li>
-              <li ${ref('score')} ${classes('score')} class="output score"></li>
-              <li>/</li>
-              <li ${ref('total')} ${classes('total')} class="output total"></li>
-            </ul>
-            <ul class="buttons control">
-              <li>
-                <span ${on('nav.game-over', 'click')}>${child($iconGameFinish())}</span>
-              </li>
-            </ul>
-          </div>
           <div class="controls navigation">
             <ul>
               <li class="toggle-menu" ${on('nav.toggle', 'click')}>
@@ -1511,6 +1487,28 @@ class Crossword {
               <li ${on('nav.close', 'click')} class="close">${child($iconMinimize())}</li>
             </ul>
           </div>
+          <ul class="controls pages">
+            <li ${on('nav.config', 'click')} ${classes('button.config')} >${child($iconConfig())}</li>
+            <li ${on('nav.crossword', 'click')} ${classes('button.crossword')} class="disabled">${child($iconGameCrossword())}</li>
+          </ul>
+          <ul class="controls switches">
+            <li ${on('nav.previous', 'click', { data: -1 })}>${child($iconPrevious())}</li>            
+            <li ${on('nav.next', 'click', { data: 1 })}>${child($iconNext())}</li>            
+            <li ${on('nav.star', ['mousedown', 'touchstart'])} class="button-star">${child($iconStar())}</li>
+            <li ${ref('hints-output')} class="count-container"></li>
+            <li ${ref('cursor-star')} ${classes('cursor-star')} class="cursor-star">${child($iconStar())}</li>
+          </ul>
+          <ul class="controls info">
+            <li>Words:</li>
+            <li ${ref('score')} ${classes('score')} class="output score"></li>
+            <li>/</li>
+            <li ${ref('total')} ${classes('total')} class="output total"></li>
+          </ul>
+          <ul class="controls control">
+            <li>
+              <span ${on('nav.game-over', 'click')}>${child($iconGameFinish())}</span>
+            </li>
+          </ul>
         </nav>
         <ul class="game-pages">
           <li ${ref('page.config')} ${classes('page.config')} class="config-page hidden">

@@ -67,7 +67,7 @@ class Dialog {
 
   set pictures(value) {
     const classes = this.classes.get('controls').get('pictures');
-    classes[value ? 'add' : 'remove']('displayed');
+    classes.forEach((instance)=>instance[value ? 'add' : 'remove']('displayed'));
   }
 
   load({ name, container, content, contentData, cardArea, loaded, onClose, beforeClose, onStopSpy, mode }) {
@@ -321,44 +321,6 @@ class Dialog {
       return /*html*/`
         <div ${ref('dialog-box')} class="dialog-box">
           <nav ${ref('navigation-panel')} ${classes('navigation-panel')} class="navigation-panel">
-            <div class="controls game">
-              <ul>
-                <li ${on('button.game.presentation', 'click', { data: { name: 'presentation', instance: Presentation } })}>${child($iconWordList())}</li>
-                <li ${on('button.game.word-test', 'click', { data: { name: 'test', instance: Test } })}>${child($iconGameTest())}</li>
-                <li ${on('button.game.crossword', 'click', { data: { name: 'crossword', instance: Crossword } })}>${child($iconGameCrossword())}</li>
-              </ul>
-            </div>
-            <div class="controls pictures section-pictures" ${classes('controls.pictures')}>
-              <ul>
-                <li ${on('button.viewer.previous', 'click')}>${child($iconPrevious())}</li>
-                <li ${on('button.viewer.next', 'click')}>${child($iconNext())}</li>
-                <li ${on('button.viewer.spy', 'click')} ${classes('button.viewer.spy', ['active'])}>${child($iconSpy())}</li>
-                <li ${on('button.viewer.resize', 'click')}>${child($iconResize())}</li>
-                <li ${on('button.viewer.labels', 'click')} ${classes('button.viewer.labels', ['active'])}>${child($iconLabels())}</li>
-              </ul>
-              <ul class="info">
-                <li>Word:</li>
-                <li ${ref('viewer.output.current')} class="output score"></li>
-                <li>/</li>
-                <li ${ref('viewer.output.total')} class="output total"></li>
-              </ul>
-            </div>
-            <div class="controls text">
-              <ul ${classes('section.subtitles')} class="section-subtitles">
-                <li ${on('button.align.left', 'click')} ${classes('button.align.left')}>${child($iconAlignLeft())}</li>
-                <li ${on('button.align.center', 'click')} ${classes('button.align.center')}>${child($iconAlignCenter())}</li>
-                <li ${on('button.spy-subtitles', 'click')} ${classes('button.spy-subtitles')}>${child($iconSpy())}</li>
-              </ul>
-              <ul ${classes('section.fonts')} class="section-font">
-                <li ${on('button.color-text', 'click')} ${classes('button.color-text')}>${child($iconPalette())}</li>
-                <li class="font-select">
-                  ${child(this.selector.view)}
-                </li>
-                <li ${on('button.size.text-small', 'click', { data: 'md-small' })} ${classes('button.text-small')} class="font-size-button text-small">${child($iconTextSize())}</li>
-                <li ${on('button.size.text-medium', 'click', { data: 'md-medium' })} ${classes('button.text-medium')} class="font-size-button text-medium">${child($iconTextSize())}</li>
-                <li ${on('button.size.text-big', 'click', { data: 'md-big' })} ${classes('button.text-big')} class="font-size-button text-big">${child($iconTextSize())}</li>
-              </ul>
-            </div>
             <div class="controls navigation">
               <ul>
                 <li class="toggle-menu" ${on('button.toggle', 'click')}>
@@ -367,6 +329,52 @@ class Dialog {
                   <div><i></i></div>
                 </li>
                 <li ${on('button.close', 'click')} class="close">${child($iconClose())}</li>
+              </ul>
+            </div>
+            <div class="controls game">
+              <ul>
+                <li ${on('button.game.presentation', 'click', { data: { name: 'presentation', instance: Presentation } })}>${child($iconWordList())}</li>
+                <li ${on('button.game.word-test', 'click', { data: { name: 'test', instance: Test } })}>${child($iconGameTest())}</li>
+                <li ${on('button.game.crossword', 'click', { data: { name: 'crossword', instance: Crossword } })}>${child($iconGameCrossword())}</li>
+              </ul>
+            </div>
+            <div class="controls pictures switch" ${classes('controls.pictures.switch')}>
+              <ul>
+                <li ${on('button.viewer.previous', 'click')}>${child($iconPrevious())}</li>
+                <li ${on('button.viewer.next', 'click')}>${child($iconNext())}</li>
+              </ul>
+            </div>
+            <div class="controls pictures config" ${classes('controls.pictures.config')}>
+              <ul>
+                <li ${on('button.viewer.spy', 'click')} ${classes('button.viewer.spy', ['active'])}>${child($iconSpy())}</li>
+                <li ${on('button.viewer.resize', 'click')}>${child($iconResize())}</li>
+                <li ${on('button.viewer.labels', 'click')} ${classes('button.viewer.labels', ['active'])}>${child($iconLabels())}</li>
+              </ul>
+            </div>
+            <div class="controls pictures info" ${classes('controls.pictures.info')}>
+              <ul class="content">
+                <li>Word:</li>
+                <li ${ref('viewer.output.current')} class="output score"></li>
+                <li>/</li>
+                <li ${ref('viewer.output.total')} class="output total"></li>
+              </ul>
+            </div>
+            <div class="controls text" ${classes('section.subtitles')}>
+              <ul>
+                <li ${on('button.align.left', 'click')} ${classes('button.align.left')}>${child($iconAlignLeft())}</li>
+                <li ${on('button.align.center', 'click')} ${classes('button.align.center')}>${child($iconAlignCenter())}</li>
+                <li ${on('button.spy-subtitles', 'click')} ${classes('button.spy-subtitles')}>${child($iconSpy())}</li>
+              </ul>
+            </div>
+            <div class="controls font" ${classes('section.fonts')}>
+              <ul>
+                <li ${on('button.color-text', 'click')} ${classes('button.color-text')}>${child($iconPalette())}</li>
+                <li class="font-select">
+                  ${child(this.selector.view)}
+                </li>
+                <li ${on('button.size.text-small', 'click', { data: 'md-small' })} ${classes('button.text-small')} class="font-size-button text-small">${child($iconTextSize())}</li>
+                <li ${on('button.size.text-medium', 'click', { data: 'md-medium' })} ${classes('button.text-medium')} class="font-size-button text-medium">${child($iconTextSize())}</li>
+                <li ${on('button.size.text-big', 'click', { data: 'md-big' })} ${classes('button.text-big')} class="font-size-button text-big">${child($iconTextSize())}</li>
               </ul>
             </div>
           </nav>

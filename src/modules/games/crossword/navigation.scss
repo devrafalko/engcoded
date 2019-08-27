@@ -33,6 +33,7 @@ $grid-hide-point: 443px;
 }
 
 .game-container>.crossword>.navigation-panel {
+  text-align: left;
   z-index: 1;
 }
 
@@ -46,41 +47,45 @@ $grid-hide-point: 443px;
 
 .dialog-box .game-container>.crossword .navigation-panel {
   &[data-page="config"] {
-    .controls.game {
 
-      .buttons.game,
-      .buttons.info,
-      .buttons.control {
-        display: none;
-      }
+    .controls.switches,
+    .controls.info,
+    .controls.control {
+      display: none;
     }
   }
 
   &[data-page="crossword"] {
     @media (max-width: $grid-hide-point) {
-      padding-top: 34px;
 
       .toggle-menu {
-        display: block;
+        display: inline-block;
       }
 
-      .controls.game {
-        height: auto;
-
-        .buttons.pages,
-        .buttons.game,
-        .buttons.info,
-        .buttons.control {
-          margin-left: 0px;
-          height: 34px;
-          display: block;
-        }
+      .controls.pages,
+      .controls.switches,
+      .controls.info,
+      .controls.control {
+        margin: 0px;
+        height: 34px;
+        display: inline-block;
       }
     }
   }
 }
 
-.game-container>.crossword>.navigation-panel .controls.game .buttons.game {
+.game-container>.crossword>.navigation-panel .controls {
+
+  &.pages,
+  &.switches,
+  &.info,
+  &.control {
+    height: 100%;
+    margin: 0px 6px;
+  }
+}
+
+.game-container>.crossword>.navigation-panel .controls.switches {
   .button-star {
     margin-right: 0px;
 
@@ -140,7 +145,7 @@ $grid-hide-point: 443px;
   }
 }
 
-.game-container>.crossword>.navigation-panel .controls.game .buttons.info {
+.game-container>.crossword>.navigation-panel .controls.info {
   vertical-align: top;
 
   li {
@@ -152,7 +157,7 @@ $grid-hide-point: 443px;
   }
 }
 
-.game-container>.crossword>.navigation-panel .controls.game .buttons.info .output {
+.game-container>.crossword>.navigation-panel .controls.info .output {
   color: #2fe0e0;
   font-size: 18px;
   text-align: left;
@@ -176,7 +181,7 @@ $grid-hide-point: 443px;
   }
 }
 
-.game-container>.crossword>.navigation-panel .controls.game .buttons.control {
+.game-container>.crossword>.navigation-panel .controls.control {
   .icon {
     animation-direction: alternate;
     animation-duration: 0.2s;
@@ -192,65 +197,58 @@ $grid-hide-point: 443px;
   }
 }
 
-.game-container>.crossword>.navigation-panel .controls.game {
-  padding: 0px 4px;
+.game-container>.crossword>.navigation-panel .controls {
 
-  &>.buttons>li {
-    width: 26px;
-  }
-
-  .buttons.pages,
-  .buttons.game,
-  .buttons.info,
-  .buttons.control {
+  &.pages,
+  &.switches,
+  &.control {
     display: inline-block;
+
+    &>li {
+      width: 26px;
+    }
   }
 
-  .buttons.game {
+  &.switches {
     margin-left: 12px;
   }
 
-  .buttons.info {
+  &.info {
+    display: inline-block;
     margin-left: 0px;
   }
 
-  .buttons.info li {
+  &.info li {
     line-height: $grid-nav-small;
   }
 
-  .buttons.control {
+  &.control {
     margin-left: 0px;
   }
 
   @media (min-width: $grid-small) and (min-height: $grid-small) {
-    padding: 0px 8px;
 
-    .buttons.info li {
+    &.info li {
       line-height: $grid-nav-medium;
     }
   }
 
   @media (min-width: $grid-medium) and (min-height: $grid-medium) {
-    padding: 0px 12px;
 
-    &>.buttons>li {
-      width: 30px;
+    &.pages,
+    &.switches,
+    &.control {
+      &>li {
+        width: 30px;
+      }
     }
 
-    .buttons.game {
-      margin-left: 44px;
-    }
-
-    .buttons.info {
+    &.switches {
       margin-left: 22px;
     }
 
-    .buttons.info li {
+    &.info li {
       line-height: $grid-nav-large;
-    }
-
-    .buttons.control {
-      margin-left: 42px;
     }
   }
 }

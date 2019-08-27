@@ -2,9 +2,10 @@
 @import "./../../styles/responsive";
 
 $dialog-margin: 12px;
-$grid-articles-hide-point: 391px;
-$grid-youtube-hide-point: 561px;
-$grid-pictures-hide-point: 428px;
+$grid-articles-hide-point: 356px;
+$grid-youtube-hide-point: 528px;
+$grid-pictures-hide-point: 438px;
+$grid-controls-width: 98px;
 
 .dialog-box {
   background-color: white;
@@ -40,20 +41,18 @@ $grid-pictures-hide-point: 428px;
   height: $grid-nav-small;
   left: 0px;
   overflow: hidden;
-  padding-right: $grid-control-small;
   position: absolute;
+  text-align: right;
   top: 0px;
   width: 100%;
   z-index: 3;
 
   @media (min-width: $grid-small) and (min-height: $grid-small) {
     height: $grid-nav-medium;
-    padding-right: $grid-control-medium;
   }
 
   @media (min-width: $grid-medium) and (min-height: $grid-medium) {
     height: $grid-nav-large;
-    padding-right: $grid-control-large;
   }
 }
 
@@ -70,7 +69,8 @@ $grid-pictures-hide-point: 428px;
 
   &.game,
   &.pictures,
-  &.text {
+  &.text,
+  &.font {
     height: 100%;
   }
 
@@ -79,25 +79,29 @@ $grid-pictures-hide-point: 428px;
   }
 
   &.pictures,
-  &.text {
-    float: right;
+  &.text,
+  &.font {
+    display: none;
+
+    &.displayed {
+      display: inline-block;
+    }
   }
 
   &.navigation {
+    float: right;
     height: $grid-nav-small;
-    position: absolute;
-    right: 0px;
+    margin: 0px 4px;
     text-align: center;
-    top: 0px;
-    width: $grid-control-small;
 
     .close {
+      display: inline-block;
       width: 16px;
     }
 
     @media (min-width: $grid-small) and (min-height: $grid-small) {
       height: $grid-nav-medium;
-      width: $grid-control-medium;
+      margin: 0px 6px;
 
       .close {
         width: 18px;
@@ -106,7 +110,7 @@ $grid-pictures-hide-point: 428px;
 
     @media (min-width: $grid-medium) and (min-height: $grid-medium) {
       height: $grid-nav-large;
-      width: $grid-control-large;
+      margin: 0px 8px;
 
       .close {
         width: 20px;
@@ -125,27 +129,16 @@ $grid-pictures-hide-point: 428px;
       $color: #01b9b9,
       $hover-color: #2cd6d6);
     display: none;
-    position: absolute;
-    margin: 0px 12px;
-    right: 100%;
+    margin: 0px 4px;
 
     &>div {
       float: left;
     }
   }
-
-  .section-subtitles,
-  &.section-pictures,
-  .section-font {
-    display: none;
-
-    &.displayed {
-      display: inline-block;
-    }
-  }
 }
 
-.dialog-box .navigation-panel .controls>ul>li {
+.dialog-box .navigation-panel .controls>ul>li,
+.dialog-box .navigation-panel .controls>li {
   display: inline-block;
   height: 100%;
   margin: 0px 2px;
@@ -188,18 +181,24 @@ $grid-pictures-hide-point: 428px;
   transition-timing-function: ease-in-out;
 }
 
-.dialog-box .navigation-panel .controls.text .font-select .selector {
+.dialog-box .navigation-panel .controls.font .font-select .selector {
   @extend %vertical-center;
   color: #39f3f3;
+  height: 100%;
   left: 0px;
   outline-width: 0px;
   padding: 2px;
   width: 100%;
+
+  .header-content {
+    text-align: left;
+  }
 }
 
 .dialog-box>.navigation-panel .controls {
 
   &.text,
+  &.font,
   &.pictures,
   &.game {
     padding: 0px 4px;
@@ -210,11 +209,12 @@ $grid-pictures-hide-point: 428px;
     width: 26px;
   }
 
-  &.text>ul>li {
+  &.text>ul>li,
+  &.font>ul>li {
     width: 20px;
   }
 
-  &.text .font-select {
+  &.font .font-select {
     width: 100px;
 
     .selector {
@@ -223,7 +223,7 @@ $grid-pictures-hide-point: 428px;
     }
   }
 
-  &.text .font-size-button {
+  &.font .font-size-button {
     &.text-small {
       width: 14px;
 
@@ -251,10 +251,11 @@ $grid-pictures-hide-point: 428px;
     }
   }
 
-  &.pictures .info {
-    margin-left: 4px;
+  &.pictures.info {
     vertical-align: top;
+  }
 
+  &.pictures.info .content {
     li {
       color: #01b9b9;
       cursor: default !important;
@@ -280,16 +281,21 @@ $grid-pictures-hide-point: 428px;
   @media (min-width: $grid-small) and (min-height: $grid-small) {
 
     &.text,
-    &.pictures,
+    &.font,
     &.game {
       padding: 0px 8px;
     }
 
-    &.text>ul>li {
+    &.pictures {
+      padding: 0px 4px;
+    }
+
+    &.text>ul>li,
+    &.font>ul>li {
       width: 22px;
     }
 
-    &.text .font-select {
+    &.font .font-select {
       width: 120px;
 
       .selector {
@@ -298,11 +304,7 @@ $grid-pictures-hide-point: 428px;
       }
     }
 
-    &.pictures .info {
-      margin-left: 12px;
-    }
-
-    &.pictures .info li {
+    &.pictures.info .content li {
       line-height: $grid-nav-medium;
     }
   }
@@ -310,9 +312,14 @@ $grid-pictures-hide-point: 428px;
   @media (min-width: $grid-medium) and (min-height: $grid-medium) {
 
     &.text,
+    &.font,
     &.pictures,
     &.game {
       padding: 0px 12px;
+    }
+
+    &.pictures {
+      padding: 0px 6px;
     }
 
     &.pictures>ul>li,
@@ -320,11 +327,12 @@ $grid-pictures-hide-point: 428px;
       width: 30px;
     }
 
-    &.text>ul>li {
+    &.text>ul>li,
+    &.font>ul>li {
       width: 24px;
     }
 
-    &.text .font-select {
+    &.font .font-select {
       width: 140px;
 
       .selector {
@@ -332,7 +340,7 @@ $grid-pictures-hide-point: 428px;
       }
     }
 
-    &.text .font-size-button {
+    &.font .font-size-button {
       &.text-small {
         width: 14px;
 
@@ -360,11 +368,7 @@ $grid-pictures-hide-point: 428px;
       }
     }
 
-    &.pictures .info {
-      margin-left: 16px;
-    }
-
-    &.pictures .info li {
+    &.pictures.info .content li {
       line-height: $grid-nav-large;
     }
   }
@@ -372,27 +376,21 @@ $grid-pictures-hide-point: 428px;
 
 .dialog-box[data-dialog="articles"] {
   @media (max-width: $grid-articles-hide-point) {
-    &>.navigation-panel {
-      padding-top: $grid-nav-small;
-    }
-
     &>.navigation-panel .controls {
 
-      &.game,
-      &.navigation,
-      &.text>.section-font {
-        display: block;
+      &.navigation {
         height: $grid-nav-small;
-        float: none;
       }
 
-      &.text {
-        display: block;
-        float: none;
+      &.game,
+      &.text,
+      &.font {
+        height: $grid-nav-small;
+        float: left;
       }
 
       &.navigation .toggle-menu {
-        display: block;
+        display: inline-block;
       }
     }
 
@@ -405,39 +403,31 @@ $grid-pictures-hide-point: 428px;
 
 .dialog-box[data-dialog="youtube"],
 .dialog-box[data-dialog="podcasts"] {
-  @media (max-width: $grid-youtube-hide-point) {
-    &>.navigation-panel {
-      padding-top: $grid-nav-small;
-    }
 
+  @media (max-width: $grid-youtube-hide-point) and (min-height: 480px),
+  (max-width: 444px) and (max-height: 479px) {
     &>.navigation-panel .controls {
-      &.text {
-        float: left;
-      }
-
       &.navigation .toggle-menu {
-        display: block;
+        display: inline-block;
       }
 
-      .section-font {
-        display: block;
+      &.navigation {
+        height: $grid-nav-small;
       }
 
       &.game,
-      &.navigation,
-      &.text>.section-subtitles,
-      &.text>.section-font {
-        display: block;
+      &.text,
+      &.font {
         height: $grid-nav-small;
-        float: none;
+        float: left;
       }
 
       @media (min-width: $grid-small) {
 
         &.game,
         &.navigation,
-        &.text>.section-subtitles,
-        &.text>.section-font {
+        &.text,
+        &.font {
           height: $grid-nav-medium;
         }
       }
@@ -451,12 +441,7 @@ $grid-pictures-hide-point: 428px;
 
 .dialog-box[data-dialog="pictures"] {
   @media (max-width: $grid-pictures-hide-point) {
-    &>.navigation-panel {
-      padding-top: $grid-nav-small;
-    }
-
     &>.navigation-panel .controls {
-
       &.pictures>ul {
         display: block;
       }
@@ -466,21 +451,17 @@ $grid-pictures-hide-point: 428px;
       }
 
       &.navigation .toggle-menu {
-        display: block;
+        display: inline-block;
       }
 
       &.game,
-      &.navigation,
       &.pictures>ul {
-        display: block;
         height: $grid-nav-small;
-        float: none;
       }
 
     }
   }
 }
-
 
 .dialog-box .content-container {
   height: 100%;
