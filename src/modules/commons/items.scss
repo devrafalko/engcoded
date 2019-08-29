@@ -17,29 +17,14 @@
   text-align: left;
   vertical-align: top;
   width: 100%;
-}
 
-.items-container .item {
-  @include media(xlarge) {
-    width: 382px;
-  }
-
-  @include media(large) {
-    width: calc(33.3%);
-  }
-
-  @include media(medium) {
-    width: calc(50%);
-  }
-
-  @include media(small, andsmaller) {
-    width: 100%;
+  &>li {
+    float: left;
   }
 }
 
 .items-container .item {
   cursor: pointer;
-  float: left;
   padding: 4px;
 
   .outline {

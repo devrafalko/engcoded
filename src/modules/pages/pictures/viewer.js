@@ -204,7 +204,7 @@ class Hint {
     if (next === ocurrances.length) next = 0;
 
     this.viewer.goTo(ocurrances[next], id);
-    this.state.currentIndex = ocurrances[next];
+    this.refresh(ocurrances[next]);
   }
 
   _addListeners() {
@@ -368,11 +368,15 @@ class Viewer {
     }, 20);
   }
 
+  refresh(){
+    this.currentWord = this.currentWord;
+  }
+
   reset(smooth = true) {
     this.resize(smooth);
     this.currentWord = null;
     this.currentLabel = null;
-    this.hint.refresh(this.currentWord);
+    this.hint.refresh(null);
   }
 
   resize(smooth = true) {
@@ -442,7 +446,7 @@ class Viewer {
     const labelIndex = this.data.words.identifiers.get(id)[0];
     this.currentLabel = labelIndex;
     if (this.state.spy) this._adjust(labelIndex);
-    this.hint.refresh(this.currentWord);
+    this.hint.refresh(labelIndex);
   }
 
   next() {
@@ -451,7 +455,7 @@ class Viewer {
     const labelIndex = this.data.words.identifiers.get(id)[0];
     this.currentLabel = labelIndex;
     if (this.state.spy) this._adjust(labelIndex);
-    this.hint.refresh(this.currentWord);
+    this.hint.refresh(labelIndex);
   }
 
   seek(id) {
@@ -459,7 +463,7 @@ class Viewer {
     this.currentWord = this.data.words.iterators.get(id);
     this.currentLabel = labelIndex;
     if (this.state.spy) this._adjust(labelIndex);
-    this.hint.refresh(this.currentWord);
+    this.hint.refresh(labelIndex);
   }
 
   goTo(nextLabel, id) {
@@ -527,8 +531,8 @@ class Viewer {
     $on('label', ({ type, target, last, data, event }) => {
       if (type === 'click' || type === 'touchstart') {
         event.preventDefault();
-        this.hint.refresh(data.index);
         this.goTo(data.index, data.id);
+        this.hint.refresh(data.index);
         return
       }
 

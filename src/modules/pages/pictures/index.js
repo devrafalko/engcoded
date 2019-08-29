@@ -29,7 +29,7 @@ class Pictures {
   }
 
   _renderItems() {
-    const items = new Items({
+    this.items = new Items({
       id: 'pictures-table',
       items: this.data.pictures,
       open: (pictureId) => {
@@ -37,7 +37,7 @@ class Pictures {
         this._openPicture(pictureId);
       }
     });
-    this.dom.page.appendChild(items.view);
+    this.dom.page.appendChild(this.items.view);
   }
 
   _addListeners() {
@@ -63,6 +63,7 @@ class Pictures {
     if (!this.instances[pictureId]) this._renderContentData(pictureId);
     if (!this.views[pictureId]) this._renderView(pictureId);
     const instance = this.instances[pictureId];
+
     Dialog.load({
       name: 'pictures',
       mode: 'pictures',
@@ -74,6 +75,7 @@ class Pictures {
         this.state.currentPictureId = null;
       },
     });
+    instance.viewer.refresh();
     if (instance.loaded === false && instance.pending === false) this._loadPicture(pictureId);
   }
 

@@ -25,7 +25,7 @@ class Articles {
   }
 
   renderItems() {
-    const items = new Items({
+    this.items = new Items({
       id: 'articles-table',
       items: this.data.articles,
       open: (articleId) => {
@@ -33,7 +33,7 @@ class Articles {
         this.openArticle(articleId);
       }
     });
-    this.dom.page.appendChild(items.view);
+    this.dom.page.appendChild(this.items.view);
   }
 
   openArticle(articleId) {

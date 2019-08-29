@@ -39,7 +39,7 @@ class Podcasts {
   }
 
   renderItems() {
-    const items = new Items({
+    this.items = new Items({
       id: 'podcasts-table',
       items: this.data.podcasts,
       open: (podcastId) => {
@@ -48,7 +48,7 @@ class Podcasts {
         this.openPodcast(podcastId);
       }
     });
-    this.dom.page.appendChild(items.view);
+    this.dom.page.appendChild(this.items.view);
   }
 
   openPodcast(id) {

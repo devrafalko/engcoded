@@ -50,6 +50,7 @@ class View {
     };
 
     this.navigation.close = (name, elements, classes) => {
+      this.instances[name].items.active = false;
       classes.get('button').get(name).remove('active');
       classes.get('page').get(name).clear().remove('visible').add('hidden').wait(400).add('none');
     };
@@ -58,7 +59,7 @@ class View {
   }
 
   _runArticles(name, element) {
-    if (this.instances[name]) return;
+    if (this.instances[name]) return this.instances[name].items.active = true;
     this.instances[name] = new ArticleController({
       articles,
       page: element,
@@ -67,7 +68,7 @@ class View {
   }
 
   _runYouTube(name, element) {
-    if (this.instances[name]) return;
+    if (this.instances[name]) return this.instances[name].items.active = true;
     this.instances[name] = new YouTubeController({
       movies,
       page: element,
@@ -76,7 +77,7 @@ class View {
   }
 
   _runPodcasts(name, element) {
-    if (this.instances[name]) return;
+    if (this.instances[name]) return this.instances[name].items.active = true;
     this.instances[name] = new PodcastsController({
       podcasts,
       page: element,
@@ -85,7 +86,7 @@ class View {
   }
 
   _runPictures(name, element) {
-    if (this.instances[name]) return;
+    if (this.instances[name]) return this.instances[name].items.active = true;
     this.instances[name] = new PicturesController({
       pictures,
       page: element,

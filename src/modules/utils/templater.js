@@ -227,13 +227,13 @@ class Events {
     const paths = data ? data.paths : this._parseId(id);
 
     this._traverse(paths, (data) => {
-      let { element, action, capture } = data;
+      let { element, action, capture, delegate } = data;
       let actions = type(action, Array) ? action : [action];
       for (let _action of actions) {
         if (!this._handlers.has(_action)) this._handlers.set(_action, new Map());
         const handler = this._handlers.get(_action);
-        if (!handler.has(element)) handler.set(element, { paths, capture });
-        else if (paths.length > handler.get(element).paths.length) handler.set(element, { paths, capture });
+        if (!handler.has(element)) handler.set(element, { paths, capture, delegate });
+        else if (paths.length > handler.get(element).paths.length) handler.set(element, { paths, capture, delegate });
       }
     });
     const { captureMode, bubbleMode } = this._findCommonParents(paths);
@@ -313,8 +313,9 @@ class Events {
     const bubbleMode = new Map();
     let range = document.createRange();
     this._handlers.forEach((map, _action) => {
-      map.forEach(({ paths: pathsB, capture }, node) => {
+      map.forEach(({ paths: pathsB, capture, delegate }, node) => {
         let commons = capture ? captureMode : bubbleMode;
+        if (delegate !== null) return commons.set(_action, delegate);
         if (pathsA === pathsB) {
           range.setStart(commons.get(_action) || node, 0);
           range.setEnd(node, 0);
@@ -335,9 +336,9 @@ export default function (callback) {
   const stringContent = callback({
     ref: (name) => `data-reference="${name}"`,
     on: (name, action, _data = {}) => {
-      const { capture = false, data } = _data;
+      const { capture = false, data, delegate = null } = _data;
       const dataDefined = _data.hasOwnProperty('data');
-      events.reference(name, { name, action, dataDefined, data, capture });
+      events.reference(name, { name, action, dataDefined, data, capture, delegate });
       return `data-action="${name}"`;
     },
     child: (nodes) => {

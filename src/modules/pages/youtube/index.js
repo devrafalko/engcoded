@@ -53,7 +53,7 @@ class YouTube {
   }
 
   renderItems() {
-    const items = new Items({
+    this.items = new Items({
       id: 'movies-table',
       items: this.data.movies,
       open: (movieId) => {
@@ -63,7 +63,7 @@ class YouTube {
       }
     });
 
-    this.dom.page.appendChild(items.view);
+    this.dom.page.appendChild(this.items.view);
   }
 
   addListeners() {
