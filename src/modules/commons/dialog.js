@@ -8,7 +8,7 @@ const { Card, Selector } = $commons;
 const { $templater } = $utils;
 const { $iconGameCrossword, $iconGameTest, $iconWordList, $iconAlignLeft,
   $iconAlignCenter, $iconSpy, $iconPalette, $iconTextSize, $iconClose,
-  $iconPrevious, $iconNext, $iconResize, $iconLabels } = $icons;
+  $iconPrevious, $iconNext, $iconResize, $iconLabels, $iconKeyword, $iconBrush } = $icons;
 
 class Dialog {
   constructor() {
@@ -52,6 +52,15 @@ class Dialog {
     classes[value ? 'add' : 'remove']('displayed');
   }
 
+  get sentences() {
+    return this.classes.get('section').get('sentences');
+  }
+
+  set sentences(value) {
+    const classes = this.classes.get('section').get('sentences');
+    classes[value ? 'add' : 'remove']('displayed');
+  }
+
   get text() {
     return this.classes.get('section').get('fonts');
   }
@@ -67,7 +76,7 @@ class Dialog {
 
   set pictures(value) {
     const classes = this.classes.get('controls').get('pictures');
-    classes.forEach((instance)=>instance[value ? 'add' : 'remove']('displayed'));
+    classes.forEach((instance) => instance[value ? 'add' : 'remove']('displayed'));
   }
 
   load({ name, container, content, contentData, cardArea, loaded, onClose, beforeClose, onStopSpy, mode }) {
@@ -107,7 +116,9 @@ class Dialog {
 
   _createFontSelector() {
     const options = this.fonts.map(({ name, family }, iter) => ({
-      text: name,
+      content: $templater(() =>/*html*/`
+        <span class="label" style="font-family: ${family}">${name}</span>
+      `),
       data: { name, family },
       selected: iter === 0
     }));
@@ -116,10 +127,6 @@ class Dialog {
       allowMultiple: false,
       allowNone: false,
       options
-    });
-
-    this.selector.options.forEach(({ data }, index) => {
-      this.selector.labels.get(String(index)).style.fontFamily = data.family;
     });
 
     this.selector.on.select = (map, selected) => {
@@ -134,23 +141,32 @@ class Dialog {
       case 'articles':
         this.subtitles = false;
         this.text = true;
+        this.sentences = false;
         this.pictures = false;
         break;
       case 'youtube':
         this.subtitles = true;
         this.text = true;
+        this.sentences = false;
         this.pictures = false;
         break;
       case 'podcasts':
         this.subtitles = true;
         this.text = true;
+        this.sentences = false;
         this.pictures = false;
         break;
       case 'pictures':
         this.subtitles = false;
         this.text = false;
+        this.sentences = false;
         this.pictures = true;
         break;
+      case 'sentences':
+        this.subtitles = false;
+        this.text = true;
+        this.sentences = true;
+        this.pictures = false;
     }
   }
 
@@ -202,7 +218,10 @@ class Dialog {
     $on('button', ({ id, last, data, target }) => {
       if (id.startsWith('button.size')) this._fontSize(data, last);
       if (id.startsWith('button.align')) this._subtitlesAlign(last);
+      if (last === 'highlight-keywords') this._highlightKeywords();
+      if (last === 'show-words') this._showWords();
       if (last === 'color-text') this._colorText();
+      if (last === 'color-local') this._colorLocal();
       if (last === 'close') this.close();
       if (last === 'spy-subtitles') this.spySubtitles(null);
       if (last === 'toggle') this._toggleNavigation(last);
@@ -236,6 +255,8 @@ class Dialog {
   _setInitialState() {
     this._subtitlesAlign('left');
     this._colorText();
+    this._colorLocal();
+    this._showWords();
     this._fontSize('md-medium', 'text-medium');
     this._selectFont(this.fonts[0].name, this.fonts[0].family);
     this.spySubtitles(true);
@@ -278,12 +299,34 @@ class Dialog {
     Card.fit();
   }
 
-  _selectFont(name, family){
+  _colorLocal() {
+    const classes = this.classes.get('content-container');
+    const colored = classes.has('color-local');
+    this.classes.get('button').get('color-local')[colored ? 'remove' : 'add']('active');
+    classes[colored ? 'remove' : 'add']('color-local');
+    Card.fit();
+  }
+
+  _highlightKeywords() {
+    const classes = this.classes.get('content-container');
+    const colored = classes.has('highlight-keywords');
+    this.classes.get('button').get('highlight-keywords')[colored ? 'remove' : 'add']('active');
+    classes[colored ? 'remove' : 'add']('highlight-keywords');
+  }
+
+  _showWords() {
+    const classes = this.classes.get('content-container');
+    const colored = classes.has('show-words');
+    this.classes.get('button').get('show-words')[colored ? 'remove' : 'add']('active');
+    classes[colored ? 'remove' : 'add']('show-words');
+  }
+
+  _selectFont(name, family) {
     this.selector.header.innerHTML = name
     this.selector.header.style.fontFamily = family;
     this.contentContainer.style.fontFamily = family;
   }
-  
+
   _fontSize(size, name) {
     const classes = this.classes.get('button').get(name);
     if (this.state.fontSizeClasses === classes) return;
@@ -364,6 +407,13 @@ class Dialog {
                 <li ${on('button.align.left', 'click')} ${classes('button.align.left')}>${child($iconAlignLeft())}</li>
                 <li ${on('button.align.center', 'click')} ${classes('button.align.center')}>${child($iconAlignCenter())}</li>
                 <li ${on('button.spy-subtitles', 'click')} ${classes('button.spy-subtitles')}>${child($iconSpy())}</li>
+              </ul>
+            </div>
+            <div class="controls font" ${classes('section.sentences')}>
+              <ul>
+                <li ${on('button.show-words', 'click')} ${classes('button.show-words')}>${child($iconSpy())}</li>
+                <li ${on('button.highlight-keywords', 'click')} ${classes('button.highlight-keywords')}>${child($iconKeyword())}</li>
+                <li ${on('button.color-local', 'click')} ${classes('button.color-local')}>${child($iconBrush())}</li>
               </ul>
             </div>
             <div class="controls font" ${classes('section.fonts')}>

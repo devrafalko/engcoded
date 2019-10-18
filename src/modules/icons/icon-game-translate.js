@@ -2,7 +2,7 @@ const { $templater } = $utils;
 
 export default function () {
   return $templater(() =>/*html*/`
-    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+    <svg class="icon" x="0px" y="0px"
       viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
       <polygon points="138.71,137 132.29,137 120.293,197 150.707,197 		"/>
       <path d="M381.374,257c6.477,17.399,15.092,31.483,24.626,43.467c9.534-11.984,19.149-26.069,25.626-43.467H381.374z"/>

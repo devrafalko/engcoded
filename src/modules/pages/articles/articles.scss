@@ -13,6 +13,7 @@
 
   h1,
   h2,
+  ol>li,
   p {
     text-align: justify;
   }
@@ -28,5 +29,10 @@
 
   p {
     text-indent: 1em;
+  }
+
+  ol>li {
+    list-style-type: decimal;
+    margin: 12px 4px;
   }
 }

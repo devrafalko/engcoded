@@ -5,8 +5,8 @@ const { $iconSelect } = $icons;
 const { $templater } = $utils;
 
 class Selector {
-  constructor({ header = '', options = [], allowMultiple = false, allowNone = false }) {
-    this._config = { allowMultiple, allowNone };
+  constructor({ header = '', options = [], allowMultiple = false, allowNone = false, labels = [] }) {
+    this._config = { labels, allowMultiple, allowNone };
     this._data = { options, header };
     this._state = { selectOpened: false };
 
@@ -34,6 +34,7 @@ class Selector {
       },
     };
 
+    this._buildLabelsData(options, allowMultiple, allowNone, labels);
     this._buildMaps();
     this._buildView();
     this._addListeners();
@@ -56,23 +57,26 @@ class Selector {
   }
 
   get selected() {
-    if (this._config.allowMultiple) {
-      let selected = [];
-      this._data.selected.forEach((isSelected, index) => {
-        if (isSelected) selected.push(index);
-      })
-      return selected;
-    } else {
-      let firstSelected = this._data.selected.indexOf(true);
-      return firstSelected >= 0 ? firstSelected : null;
+    const map = new Map();
+    for (let { allowMultiple, selected, id } of this._labels) {
+      if (allowMultiple) {
+        map.set(id, []);
+        selected.forEach((isSelected, index) => {
+          if (isSelected) map.get(id).push(index);
+        })
+      } else {
+        let firstSelected = selected.indexOf(true);
+        map.set(id, firstSelected >= 0 ? firstSelected : null);
+      }
     }
-  }
-
-  get options() {
-    return this._data.map;
+    return map;
   }
 
   get labels() {
+    return this._labels;
+  }
+
+  get contents() {
     return this.dom.get('label');
   }
 
@@ -88,13 +92,27 @@ class Selector {
     this._toggleSelect('toggle');
   }
 
+  _buildLabelsData(options, allowMultiple, allowNone, labels) {
+    this._labels = [];
+    if (!labels.length) {
+      this._labels.push({ options, allowMultiple, allowNone });
+    } else {
+      labels.forEach(({ options = [], allowMultiple = false, allowNone = false }) => {
+        this._labels.push({ options, allowMultiple, allowNone });
+      });
+    }
+  }
+
   _buildMaps() {
-    this._data.map = new Map();
-    this._data.selected = [];
-    this._data.options.forEach(({ id = null, selected = false, data = null, text = '' }, index) => {
-      let _id = type(id, String) ? id : String(index);
-      this._data.map.set(index, { id: _id, index, selected, data, text });
-      this._data.selected.push(selected);
+    this._labels.forEach((label, index) => {
+      label.map = new Map();
+      label.selected = [];
+      label.id = index;
+      label.options.forEach(({ id = null, selected = false, data = null, content }, index) => {
+        let _id = type(id, String) ? id : String(index);
+        label.map.set(index, { id: _id, index, selected, data, content });
+        label.selected.push(selected);
+      });
     });
   }
 
@@ -118,16 +136,20 @@ class Selector {
           <li class="header-icon">${child($iconSelect())}</li>
         </ul>
         <div ${ref('options')} ${classes('options')} class="options">
-          <ul class="list">
-            ${list(this._data.map, ({ text, selected, index }) =>/*html*/`
-              <li ${on(`option.${index}`, 'click', { data: index })}>
-                <span ${ref(`label.${index}`)} class="label">${text}</span>
-                <button class="switch-button" ${classes(`switch-button.${index}`, selected ? ['on'] : [])}>
-                  <span></span>
-                </button>
-              </li>
-            `)}
-          </ul>
+          <div>
+          ${list(this._labels, ({ map, id }) =>/*html*/`
+            <ul class="list">
+              ${list(map, ({ selected, index, content }) =>/*html*/`
+                <li ${on(`option.${id}.${index}`, 'click', { data: { option: index, label: id } })}>
+                  <div ${ref(`label.${id}.${index}`)} class="content">${child(content)}</div>
+                  <button class="switch-button" ${classes(`switch-button.${id}.${index}`, selected ? ['on'] : [])}>
+                    <span></span>
+                  </button>
+                </li>
+              `)}
+            </ul>
+          `)}
+          </div>
         </div>
       </div>
     `);
@@ -216,24 +238,23 @@ class Selector {
     }
   }
 
-  _switchWordType(index) {
-    const howManySelected = this._data.selected.filter((selected) => selected).length;
-    const firstSelected = this._data.selected.indexOf(true);
-    const isCurrentOn = this._data.selected[index];
-    const allowMultiple = this._config.allowMultiple;
-    const allowNone = this._config.allowNone;
+  _switchWordType({ label, option }) {
+    const data = this._labels[label];
+    const howManySelected = data.selected.filter((selected) => selected).length;
+    const firstSelected = data.selected.indexOf(true);
+    const isCurrentOn = data.selected[option];
 
-    if (howManySelected === 1 && isCurrentOn && !allowNone) return;
-    if (howManySelected === 1 && !isCurrentOn && !allowMultiple) {
-      this._data.selected[firstSelected] = false;
-      this._data.map.get(firstSelected).selected = false;
-      this.classes.get('switch-button').get(String(firstSelected)).remove('on');
+    if (howManySelected === 1 && isCurrentOn && !data.allowNone) return;
+    if (howManySelected === 1 && !isCurrentOn && !data.allowMultiple) {
+      data.selected[firstSelected] = false;
+      data.map.get(firstSelected).selected = false;
+      this.classes.get('switch-button').get(String(data.id)).get(String(firstSelected)).remove('on');
     }
 
-    this._data.selected[index] = !this._data.selected[index];
-    this._data.map.get(index).selected = this._data.selected[index];
-    this.classes.get('switch-button').get(String(index)).toggle('on');
-    if (this.on.select) this.on.select(this._data.map, this.selected);
+    data.selected[option] = !data.selected[option];
+    data.map.get(option).selected = data.selected[option];
+    this.classes.get('switch-button').get(String(data.id)).get(String(option)).toggle('on');
+    if (this.on.select) this.on.select(data.map, this.selected.get(data.id), data.id);
   }
 }
 

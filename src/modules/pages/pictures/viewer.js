@@ -3,6 +3,7 @@ import type from 'of-type';
 import './hint.scss';
 
 const { Slider } = $commons;
+const { $audio } = $data;
 const { $templater, $casteljau, $loopParents } = $utils;
 const { $iconPictureLabel, $iconQuestionMark, $iconClose, $iconCardWord, $iconCardDefinition,
   $iconCardImage, $iconPreviousWord, $iconNextWord, $iconVolume } = $icons;
@@ -55,7 +56,6 @@ class Hint {
     const { id, meaning: meanings } = this.words.indeces.get(index);
     if (!this.words.records.has(id)) return;
     const { word, definition, meaning, audio, img } = this.words.records.get(id);
-
     this._renderWordPage(word, meaning, audio, meanings, (view) => {
       this.dom.get('page').get('word').innerHTML = '';
       this.dom.get('page').get('word').appendChild(view);
@@ -64,15 +64,16 @@ class Hint {
     this._renderDefinitionPage(definition, (empty, view) => {
       this.state.definitionDisabled = empty;
       this.classes.get('button').get('definition')[empty ? 'add' : 'remove']('disabled');
-      if (empty && this.state.active === 'definition') this._switchPage('word');
+      if (empty && this.state.activePage === 'definition') this._switchPage('word');
       if (empty) return;
       this.dom.get('page').get('definition').innerHTML = '';
       this.dom.get('page').get('definition').appendChild(view);
     });
 
     this._renderImagePage(img, (empty) => {
+      this.state.imageDisabled = empty;
       this.classes.get('button').get('image')[empty ? 'add' : 'remove']('disabled');
-      if (empty && this.state.active === 'image') this._switchPage('word');
+      if (empty && this.state.activePage === 'image') this._switchPage('word');
     });
 
     this.classes.get('section').get('control')[this.words.identifiers.get(id).length > 1 ? 'add' : 'remove']('multiple');
@@ -222,7 +223,8 @@ class Hint {
         if (element === current) return stop();
         if (element.hasAttribute('data-mp3')) {
           const audio = this.dom.get('audio');
-          audio.src = element.getAttribute('data-mp3');
+          const audioSource = $audio.get(element.getAttribute('data-mp3'));
+          audio.src = audioSource;
           audio.play();
           return stop();
         }
@@ -368,7 +370,7 @@ class Viewer {
     }, 20);
   }
 
-  refresh(){
+  refresh() {
     this.currentWord = this.currentWord;
   }
 

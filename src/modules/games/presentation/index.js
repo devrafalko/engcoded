@@ -5,7 +5,7 @@ const { $templater } = $utils;
 const { $iconMinimize, $iconOccurrence, $iconShuffle, $iconChevronRight,
   $iconChevronDoubleRight, $iconChevronLeft, $iconChevronDoubleLeft, $iconSpy, $iconSortAZ,
   $iconSortZA, $iconSort19, $iconSort91, $iconSortRandom, $iconChevronUp, $iconAlignLeft,
-  $iconAlignRight, $iconAlignCenter } = $icons;
+  $iconAlignRight, $iconAlignCenter, $iconCheckbox } = $icons;
 
 class Presentation {
   constructor(dialog, words) {
@@ -114,6 +114,18 @@ class Presentation {
     this._render();
   }
 
+  get check() {
+    return this.state.checkStatus;
+  }
+
+  set check(status) {
+    const statuses = ['checked', 'custom'];
+    const next = statuses.filter((name) => status === name);
+    const classes = this.classes.get('table-button').get('check');
+    this.state.checkStatus = status;
+    classes.remove(...statuses).add(...next);
+  }
+
   get totalPages() {
     if (this.pageWords === Infinity) return 1;
     const total = this.state.currentCollection.get('word-asc').length / this.pageWords;
@@ -155,9 +167,12 @@ class Presentation {
 
   get rows() {
     const reps = this.ref.words.repetitions.iterator;
-    return $templater(({ ref, child, list, on }) =>/*html*/`
+    return $templater(({ ref, classes, child, list, on }) =>/*html*/`
       ${list(this.ref.words.records, ({ word, type, meaning }, id) =>/*html*/`
         <tr ${ref(`row.${id}`)}>
+          <td class="checkbox" ${on(`check.${id}`, 'click')} ${classes(`check.${id}`)}>
+            ${child($iconCheckbox())}
+          </td>
           <td class="word">
             <p>${word}</p>
           </td>
@@ -208,25 +223,56 @@ class Presentation {
   _createSelector() {
     const sortedTypes = [...this.ref.words.typeNames.keys()].sort();
     this.state.selectedTypes = new Map();
+    this.state.selectedOptions = new Map([
+      ['selected', true],
+      ['unselected', true]
+    ]);
     sortedTypes.forEach((name) => this.state.selectedTypes.set(name, true));
 
     const options = sortedTypes.map((name) => ({
-      text: name,
+      content: $templater(({ ref }) =>/*html*/`
+        <span class="output" ${ref(`output.${name}`)}>243</span>
+        <span class="label">${name}</span>
+      `),
       data: name,
       selected: true
     }));
 
     this.selector = new Selector({
       header: 'Word type',
-      allowMultiple: true,
-      allowNone: false,
-      options
+      labels: [
+        {
+          allowMultiple: true, allowNone: false,
+          options: [
+            {
+              data: 'selected',
+              selected: this.state.selectedOptions.get('selected'),
+              content: $templater(({ ref }) =>/*html*/`
+                <span class="output" ${ref('output.selected')}></span>
+                <span class="label">selected</span>`)
+            },
+            {
+              data: 'unselected',
+              selected: this.state.selectedOptions.get('unselected'),
+              content: $templater(({ ref }) =>/*html*/`
+                <span class="output" ${ref('output.unselected')}></span>
+                <span class="label">unselected</span>`)
+            }
+          ]
+        },
+        { allowMultiple: true, allowNone: false, options }
+      ]
     });
 
-    this.selector.on.select = (map) => {
-      map.forEach(({ data, selected }) => this.state.selectedTypes.set(data, selected));
+    this.selector.on.select = (map, _, label) => {
+      map.forEach(({ data, selected }) => {
+        if (label === 0) this.state.selectedOptions.set(data, selected);
+        if (label === 1) this.state.selectedTypes.set(data, selected);
+      });
       this._filter();
       this.page = 1;
+      this._updateSelectAllButton();
+      this._updateTypeNumbers();
     }
   }
 
@@ -342,6 +388,9 @@ class Presentation {
             <table ${classes('table')}>
               <thead>
                 <tr>
+                  <th class="head checkbox" ${on(`table-button.check`, 'click')} ${classes('table-button.check')}>
+                    ${child($iconCheckbox())}
+                  </th>
                   <th class="head word">
                     <h1 class="header">Word</h1>
                     <div class="button-set">
@@ -435,11 +484,18 @@ class Presentation {
     $on('close', () => this.close());
     $on('page-top', () => this._pageTop());
 
+    $on('check', ({ id, last }) => {
+      this._updateSelected(last);
+      this._updateSelectAllButton();
+      this._updateTypeNumbers();
+    });
+
     $on('table-button', ({ id, last }) => {
       if (id.startsWith('table-button.sort')) this._switchSort(last);
       if (last === 'hide-word') this.classes.get('table').toggle(last);
       if (last === 'hide-translation') this.classes.get('table').toggle(last);
       if (last === 'word-align') this._switchWordAlign();
+      if (last === 'check') this._selectAll();
     })
 
     $on('go-pages', ({ event, last, type }) => {
@@ -473,7 +529,68 @@ class Presentation {
 
   _initialTableConfig() {
     this.pageWords = 25;
+    this.check = 'none';
     this._switchPageButton(0);
+    this._updateTypeNumbers();
+  }
+
+  _updateSelectAllButton() {
+    const allSelected = this.ref.words.selected;
+    const filtered = this.state.currentCollection.get('word-asc');
+    let visibleSelected = 0;
+    filtered.forEach((id) => {
+      if (allSelected.has(id)) visibleSelected++;
+    });
+
+    if (!filtered.length || visibleSelected === 0) this.check = 'none';
+    else if (visibleSelected === filtered.length) this.check = 'checked';
+    else this.check = 'custom';
+
+  }
+
+  _updateSelected(id, action = null) {
+    const identifiers = typeof id === 'string' ? [id] : id;
+
+    identifiers.forEach((id) => {
+      this.ref.words.select(id, action);
+      this.classes.get('check').get(id)[action === null ? 'toggle' : action ? 'add' : 'remove']('checked');
+    });
+
+    if (!this.state.selectedOptions.get('selected') || !this.state.selectedOptions.get('unselected')) {
+      this._filter();
+      this.page = this.page;
+    }
+  }
+
+  _selectAll() {
+    const currentCollection = this.state.currentCollection.get('word-asc');
+    switch (this.check) {
+      case 'none':
+      case 'custom':
+        this._updateSelected(currentCollection, true);
+        this._updateSelectAllButton();
+        this._updateTypeNumbers();
+        break;
+      case 'checked':
+        this._updateSelected(currentCollection, false);
+        this._updateSelectAllButton();
+        this._updateTypeNumbers();
+        break;
+    }
+  }
+
+  _updateTypeNumbers() {
+    const filtered = this.state.currentCollection.get('word-asc');
+    const outputs = this.selector.dom.get('output');
+    const records = this.ref.words.records;
+    const selected = this.ref.words.selected;
+    const map = { selected: 0, unselected: 0 };
+    for (let key of this.ref.words.typeNames) map[key] = 0;
+    filtered.forEach((id) => {
+      map[records.get(id).type]++;
+      map[selected.has(id) ? 'selected' : 'unselected']++;
+    });
+    outputs.forEach((element, key) => element.innerHTML = map[key]);
   }
 
   _switchWordAlign() {
@@ -650,10 +767,13 @@ class Presentation {
     this.state.currentSortMode = 'best-match';
     this._filter();
     this.page = 1;
+    this._updateSelectAllButton();
+    this._updateTypeNumbers();
   }
 
   _filter() {
     this.state.currentCollection = this.ref.words.filter({
+      selected: this.state.selectedOptions,
       types: this.state.selectedTypes,
       letters: this.state.filterLetters
     });

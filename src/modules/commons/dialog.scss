@@ -401,6 +401,7 @@ $grid-controls-width: 98px;
   }
 }
 
+.dialog-box[data-dialog="sentences"],
 .dialog-box[data-dialog="youtube"],
 .dialog-box[data-dialog="podcasts"] {
 
@@ -481,8 +482,15 @@ h2 {
 }
 
 .dialog-box .content-container[data-size="md-small"] {
+
+  ol>li,
+  dt,
   p {
     font-size: 16px;
+  }
+
+  dd {
+    font-size: 14px;
   }
 
   h2 {
@@ -491,8 +499,15 @@ h2 {
 }
 
 .dialog-box .content-container[data-size="md-medium"] {
+
+  ol>li,
+  dt,
   p {
     font-size: 19px;
+  }
+
+  dd {
+    font-size: 17px;
   }
 
   h2 {
@@ -501,8 +516,15 @@ h2 {
 }
 
 .dialog-box .content-container[data-size="md-big"] {
+
+  ol>li,
+  dt,
   p {
     font-size: 22px;
+  }
+
+  dd {
+    font-size: 20px;
   }
 
   h2 {
@@ -517,15 +539,18 @@ h2 {
 }
 
 [data-word] {
-  padding: 0px 3px;
   cursor: pointer;
+  padding: 0px 3px;
+}
 
-  .dialog-box .content-container.color-text & {
+.dialog-box .content-container.color-text {
+
+  &:not(.color-local) .text-content.sentences-content [data-word],
+  & .text-content:not(.sentences-content) [data-word] {
     border-radius: 4px;
     color: #347b85;
     text-shadow: 0px 0px 0px rgba(1, 185, 185, 0.5);
-    transition: color 0.15s ease-in-out, text-shadow 0.15s ease-in-out,
-      background-color 0.15s ease-in-out;
+    transition: box-shadow .1s ease-in-out, color .15s ease-in-out, text-shadow .15s ease-in-out, background-color .15s ease-in-out;
 
     &:hover {
       color: #1581ac;
@@ -535,6 +560,47 @@ h2 {
     &.active {
       background-color: #00bac7;
       color: white;
+
+      [data-key] {
+        fill: white;
+      }
+    }
+  }
+}
+
+[data-dialogue] {
+  display: inline-block;
+  vertical-align: top;
+
+  &>li {
+    &>h1 {
+      margin-bottom: 0px !important;
+    }
+
+    &>p {
+      text-indent: 0px !important;
+    }
+  }
+
+  &>li>h1 {
+    color: grey;
+    font-family: Roboto;
+    font-size: 1em;
+    font-weight: normal;
+  }
+
+  &>li {
+    white-space: nowrap;
+
+    &>h1 {
+      display: inline-block;
+      vertical-align: top;
+    }
+
+    &>p {
+      display: inline-block;
+      vertical-align: top;
+      white-space: normal;
     }
   }
 }

@@ -24,6 +24,15 @@ const common = {
             presets: ['@babel/preset-env']
           }
         }
+      },
+      {
+        test: /\.mp3$/i,
+        exclude: /(node_modules)/,
+        loader: 'file-loader',
+        options: {
+          name: '[name].[ext]',
+          outputPath:'./assets/audio'
+        },
       }
     ]
   },

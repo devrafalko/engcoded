@@ -1,7 +1,7 @@
 @import "./../../styles/rules.scss";
 @import "./../../styles/responsive.scss";
 
-$grid-hide-point: 441px;
+$grid-hide-point: 600px;
 
 body {
   height: 100vh;
@@ -86,8 +86,12 @@ body {
     height: $grid-main-nav-large;
   }
 
-  @media (max-width: $grid-hide-point) {
+  @media (max-width: $grid-small) {
     padding-top: $grid-main-nav-small;
+  }
+
+  @media (min-width: $grid-small) and (max-width: $grid-hide-point) {
+    padding-top: $grid-main-nav-medium;
   }
 }
 

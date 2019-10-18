@@ -2,6 +2,7 @@ import type from 'of-type';
 import './card.scss';
 
 const { Slider, Scroller } = $commons;
+const { $audio } = $data;
 const { $loopParents, $templater } = $utils;
 const { $iconCardDefinition, $iconCardImage, $iconCardWord, $iconClose, $iconVolume, $iconNextWord, $iconPreviousWord } = $icons;
 
@@ -89,7 +90,6 @@ class Card {
     this.state.currentIndex = index;
     this.state.currentContainer = container;
     this.state.currentContentData = contentData;
-
     const element = this.state.currentContentData.occurrenceMap.get(index)[0];
     if (scroll === false) return this.show(index, container);
     this.scroller.container = this.state.currentContainer;
@@ -122,7 +122,7 @@ class Card {
   show(index, container) {
     const elements = this.state.currentContentData.occurrenceMap.get(index);
     const relative = elements[0];
-    const parent = relative.offsetParent;
+    const parent = this.state.currentContainer;
     const card = this.dom.get('view');
     const classes = this.classes.get('view');
     if (!container.contains(card)) container.appendChild(card);
@@ -172,7 +172,9 @@ class Card {
         if (element === current) return stop();
         if (element.hasAttribute('data-mp3')) {
           const audio = this.dom.get('player');
-          audio.src = element.getAttribute('data-mp3');
+          const src = element.getAttribute('data-mp3');
+          const audioPath = $audio.get(src);
+          audio.src = audioPath;
           audio.play();
           return stop();
         }
@@ -182,15 +184,17 @@ class Card {
 
   _adjuster(container, word, card) {
     const style = card.style;
-    const wordTop = word.offsetTop;
-    const wordLeft = word.getBoundingClientRect().left - container.getBoundingClientRect().left;
+    const { left: _wordLeft, top: _wordTop } = word.getBoundingClientRect();
+    const { left: _containerLeft, top: _containerTop } = container.getBoundingClientRect();
+    const containerScrollY = container.scrollTop;
+    const containerScrollX = container.scrollLeft;
+    const wordTop = _wordTop - _containerTop + containerScrollY;
+    const wordLeft = _wordLeft - _containerLeft + containerScrollX;
     const wordWidth = word.offsetWidth;
     const wordHeight = word.offsetHeight;
     const containerWidth = container.clientWidth;
     const containerHeight = container.clientHeight;
-    const containerScrollY = container.scrollTop;
     const containerScrollHeight = container.scrollHeight;
-    const containerScrollX = container.scrollLeft;
     const cardWidth = card.offsetWidth;
     const cardHeight = card.offsetHeight;
     switch (true) {

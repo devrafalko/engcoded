@@ -1,11 +1,14 @@
 import $iconAlignCenter from './icon-align-center';
 import $iconAlignLeft from './icon-align-left';
 import $iconAlignRight from './icon-align-right';
+import $iconArrow from './icon-arrow';
+import $iconBrush from './icon-brush';
 import $iconCardDefinition from './icon-card-definition';
 import $iconCardImage from './icon-card-image';
 import $iconCardWord from './icon-card-word';
 import $iconCheckIn from './icon-check-in';
 import $iconCheckOut from './icon-check-out';
+import $iconCheckbox from './icon-checkbox';
 import $iconChevronDoubleLeft from './icon-chevron-double-left';
 import $iconChevronDoubleRight from './icon-chevron-double-right';
 import $iconChevronLeft from './icon-chevron-left';
@@ -24,6 +27,7 @@ import $iconGamePronunciation from './icon-game-pronunciation';
 import $iconGameTest from './icon-game-test';
 import $iconGameTranslate from './icon-game-translate';
 import $iconKeyboard from './icon-keyboard';
+import $iconKeyword from './icon-keyword';
 import $iconLabels from './icon-labels';
 import $iconMinimize from './icon-minimize';
 import $iconMute from './icon-mute';
@@ -57,4 +61,4 @@ import $iconTextSize from './icon-text-size';
 import $iconVolume from './icon-volume';
 import $iconWordList from './icon-word-list';
 
-export { $iconAlignCenter, $iconAlignLeft, $iconAlignRight, $iconCardDefinition, $iconCardImage, $iconCardWord, $iconCheckIn, $iconCheckOut, $iconChevronDoubleLeft, $iconChevronDoubleRight, $iconChevronLeft, $iconChevronRight, $iconChevronUp, $iconClose, $iconCrosswordHint, $iconConfig, $iconFastForward, $iconGameCrossword, $iconGameHearing, $iconGameDefinition, $iconGameFinish, $iconGameImage, $iconGamePronunciation, $iconGameTest, $iconGameTranslate, $iconKeyboard, $iconLabels, $iconMinimize, $iconMute, $iconNext, $iconNextWord, $iconOccurrence, $iconPalette, $iconPause, $iconPictureLabel, $iconPlayBuffer, $iconPlay, $iconPrevious, $iconPreviousWord, $iconPuzzle, $iconQuestionMark, $iconRewind, $iconResize, $iconSelect, $iconShuffle, $iconSortAZ, $iconSortZA, $iconSort19, $iconSort91, $iconSortRandom, $iconSpeed, $iconSpy, $iconStar, $iconTextPlay, $iconWarning, $iconTextSize, $iconVolume, $iconWordList };
+export { $iconAlignCenter, $iconAlignLeft, $iconAlignRight, $iconArrow, $iconBrush, $iconCardDefinition, $iconCardImage, $iconCardWord, $iconCheckIn, $iconCheckOut, $iconCheckbox, $iconChevronDoubleLeft, $iconChevronDoubleRight, $iconChevronLeft, $iconChevronRight, $iconChevronUp, $iconClose, $iconCrosswordHint, $iconConfig, $iconFastForward, $iconGameCrossword, $iconGameHearing, $iconGameDefinition, $iconGameFinish, $iconGameImage, $iconGamePronunciation, $iconGameTest, $iconGameTranslate, $iconKeyboard, $iconKeyword, $iconLabels, $iconMinimize, $iconMute, $iconNext, $iconNextWord, $iconOccurrence, $iconPalette, $iconPause, $iconPictureLabel, $iconPlayBuffer, $iconPlay, $iconPrevious, $iconPreviousWord, $iconPuzzle, $iconQuestionMark, $iconRewind, $iconResize, $iconSelect, $iconShuffle, $iconSortAZ, $iconSortZA, $iconSort19, $iconSort91, $iconSortRandom, $iconSpeed, $iconSpy, $iconStar, $iconTextPlay, $iconWarning, $iconTextSize, $iconVolume, $iconWordList };

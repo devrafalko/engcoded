@@ -6,11 +6,14 @@ import ArticleController from './modules/pages/articles/index';
 import YouTubeController from './modules/pages/youtube/index';
 import PodcastsController from './modules/pages/podcasts/index';
 import PicturesController from './modules/pages/pictures/index';
+import SentencesController from './modules/pages/sentences/index';
 
 const articles = require.context('./../db/articles', false, /\.js$/);
 const podcasts = require.context('./../db/podcasts', false, /\.js$/);
 const movies = require.context('./../db/movies', false, /\.js$/);
 const pictures = require.context('./../db/pictures', false, /\.js$/);
+const sentences = require.context('./../db/sentences', false, /\.js$/)
+
 const { Dialog } = $commons;
 const { $id } = $utils;
 
@@ -34,6 +37,7 @@ class View {
       { name: 'youtube', content: '<span>YouTube</span>' },
       { name: 'podcasts', content: '<span>Podcasts</span>' },
       { name: 'pictures', content: '<span>Pictures</span>' },
+      { name: 'sentences', content: '<span>Sentences</span>' },
     ]);
     document.body.appendChild(this.navigation.buttons);
     document.body.appendChild(this.navigation.pages);
@@ -44,6 +48,7 @@ class View {
       if (name === 'youtube') this._runYouTube(name, page);
       if (name === 'podcasts') this._runPodcasts(name, page);
       if (name === 'pictures') this._runPictures(name, page);
+      if (name === 'sentences') this._runSentences(name, page);
       Dialog.close();
       classes.get('button').get(name).add('active');
       classes.get('page').get(name).clear().remove('none', 'hidden').wait(400).add('visible');
@@ -89,6 +94,15 @@ class View {
     if (this.instances[name]) return this.instances[name].items.active = true;
     this.instances[name] = new PicturesController({
       pictures,
+      page: element,
+      navigation: this.navigation
+    });
+  }
+
+  _runSentences(name, element) {
+    if (this.instances[name]) return this.instances[name].items.active = true;
+    this.instances[name] = new SentencesController({
+      sentences,
       page: element,
       navigation: this.navigation
     });

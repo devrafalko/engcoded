@@ -8,6 +8,7 @@ class Words {
     this._map = {
       alphabet: new Map(),
       records: new Map(),
+      selected: new Set(),
       iterators: new Map(),
       identifiers: null,
       indeces: null,
@@ -69,6 +70,10 @@ class Words {
   get clues() {
     if (!this._map.clues) this._buildCluesMap();
     return this._map.clues;
+  }
+
+  get selected() {
+    return this._map.selected;
   }
 
   sort() {
@@ -158,15 +163,28 @@ class Words {
   }
 
   filterClues(set) {
-    const map = new Set();
+    const mapAll = new Set();
+    const mapSelected = new Set();
     const clues = [...set];
     this._map.records.forEach((record, id) => {
-      if (clues.some((name) => this.clues.get(name).has(id))) map.add(id);
+      if (clues.some((name) => this.clues.get(name).has(id))) {
+        if (this._map.selected.has(id)) mapSelected.add(id);
+        mapAll.add(id);
+      }
     });
-    return map;
+    return { all: mapAll, selected: mapSelected };
   }
 
-  filter({ types = null, letters }) {
+  select(id, action = null) {
+    if (action === null) this._map.selected[this._map.selected.has(id) ? 'delete' : 'add'](id);
+    else this._map.selected[action ? 'add' : 'delete'](id);
+  }
+
+  filter({ selected = null, types = null, letters }) {
+    const allowSelected = selected.get('selected');
+    const allowUnselected = selected.get('unselected');
+
+
     const firstLetters = letters.toLowerCase().slice(0, 2);
     if (!this._map.alphabet.has(firstLetters)) return this.matchTemplate;
     const initial = this._map.alphabet.get(firstLetters).sort;
@@ -189,7 +207,8 @@ class Words {
         let arr = sortMap.get(sortType);
         collection.forEach((id) => {
           let type = this.records.get(id).type;
-          if (types === null || types.get(type) === true) arr.push(id);
+          let allow = (this.selected.has(id) && allowSelected) || (!this.selected.has(id) && allowUnselected);
+          if (allow && (types === null || types.get(type) === true)) arr.push(id);
         });
       })
       return sortMap;

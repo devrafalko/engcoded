@@ -41,15 +41,11 @@
     z-index: 1;
   }
 
-  .list {
-    background-color: white;
+  .options>div {
     border-radius: 6px;
     box-shadow: 2px 2px 5px 2px rgba(80, 80, 80, 0.5);
-    display: none;
-    max-width: 240px;
-    min-width: 160px;
     opacity: 0;
-    padding: 6px 4px;
+    overflow: hidden;
     position: relative;
     top: -6px;
     transition-duration: 0.15s;
@@ -57,13 +53,39 @@
     transition-timing-function: ease-in-out;
   }
 
+  .list {
+    background-color: white;
+    display: none;
+    max-width: 240px;
+    min-width: 160px;
+    padding: 6px 4px;
+  }
+
+  .list:not(:last-child) {
+    padding-bottom: 0px;
+  }
+
+  .list:not(:first-child) {
+    padding-top: 0px;
+  }
+
   .options.displayed .list {
     display: block;
   }
 
-  .options.visible .list {
+  .options.visible>div {
     opacity: 1;
     top: 0px;
+  }
+
+  .list:first-child:not(:only-child) {
+    .label {
+      color: #737373;
+    }
+
+    li:last-child {
+      border-bottom-color: #bdbdbd;
+    }
   }
 
   .list>li {
@@ -74,13 +96,32 @@
     position: relative;
   }
 
+  .list>li .content {
+    white-space: nowrap;
+    width: 100%;
+  }
+
   .list .label {
     color: #01b9b9;
     display: inline-block;
     overflow: hidden;
     text-overflow: ellipsis;
+    vertical-align: top;
     white-space: nowrap;
-    width: 100%;
+  }
+
+  .list .output {
+    background-color: #f4f7f7;
+    border-radius: 8px;
+    color: #8c9898;
+    display: inline-block;
+    font-size: 14px;
+    overflow: hidden;
+    padding: 2px 6px;
+    text-overflow: ellipsis;
+    vertical-align: top;
+    white-space: nowrap;
+
   }
 
   .list .switch-button {

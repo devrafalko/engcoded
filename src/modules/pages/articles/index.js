@@ -62,7 +62,7 @@ class Articles {
       <div ${ref('scrollable')} class="article-scroll">
         <section ${ref('article')} class="article-content text-content">
           <h1>${article.header}</h1>
-          <article class="md-medium">
+          <article>
             ${list(article.text, (item) =>/*html*/`${item}`)}
           </article>
         </section>

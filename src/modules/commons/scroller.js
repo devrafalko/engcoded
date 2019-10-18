@@ -36,7 +36,10 @@ export default class Scroller {
   }
 
   get expectedScrollY() {
-    const position = this.element.offsetTop - this.offsetY;
+    if (this.element === this.dom.container) return 0;
+    const elementTop = this.element.getBoundingClientRect().top;
+    const containerTop = this.dom.container.getBoundingClientRect().top;
+    const position = (elementTop - containerTop + this.dom.container.scrollTop) - this.offsetY;
     return position < 0 ? 0 : position;
   }
 
@@ -75,10 +78,8 @@ export default class Scroller {
 
   scroll(element, callback) {
     this.element = element;
-
     const { start: startY, range: rangeY } = this.paramsY;
     const { start: startX, range: rangeX } = this.paramsX;
-
     const totalTime = this.config.scrollTime;
     const intervalTime = Math.round(1000 / this.config.fps);
     const intervalsNumber = Math.ceil(totalTime / intervalTime);
@@ -110,5 +111,4 @@ export default class Scroller {
       return $casteljau(coords, time);
     }
   }
-
 }

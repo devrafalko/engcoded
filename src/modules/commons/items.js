@@ -109,10 +109,10 @@ class Items {
               </header>
               <footer>
                 ${when(type(author, Object), () =>/*html*/`
-                  <address>by <a class="url" href="${author.url}" target="_blank">${author.name}</a></address>
+                  <address>by <a class="url" ${author.url ? /*html*/`href="${author.url}"` : ''} target="_blank">${author.name}</a></address>
                 `)}
                 ${when(type(link, Object), () =>/*html*/`
-                  <address>from <a class="url" href="${link.url}" target="_blank">${link.name}</a></address>
+                  <address>from <a class="url" ${link.url ? /*html*/`href="${link.url}"` : ''} target="_blank">${link.name}</a></address>
                 `)}
               </footer>
             </div>

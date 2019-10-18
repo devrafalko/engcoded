@@ -5,6 +5,7 @@ import './config.scss';
 import './test.scss';
 
 const { Slider } = $commons;
+const { $audio } = $data;
 const { $templater, $shuffle } = $utils;
 const { $iconMinimize, $iconConfig, $iconGameTest, $iconWarning, $iconChevronDoubleRight,
   $iconOccurrence, $iconQuestionMark, $iconPuzzle, $iconVolume } = $icons;
@@ -186,7 +187,8 @@ class Task {
         if (type === 'ended') {
           if (this.state.currentAudioIndex < this.data.audioSources.length - 1) {
             this.state.currentAudioIndex++;
-            this.dom.get('player').src = this.data.audioSources[this.state.currentAudioIndex];
+            const audioSource = $audio.get(this.data.audioSources[this.state.currentAudioIndex]);
+            this.dom.get('player').src = audioSource;
             this.dom.get('player').play();
           } else {
             this.classes.get('audio-button').remove('playing');
@@ -218,7 +220,8 @@ class Task {
 
   playAudio() {
     this.state.currentAudioIndex = 0;
-    this.dom.get('player').src = this.data.audioSources[0];
+    const audioSource = $audio.get(this.data.audioSources[0]);
+    this.dom.get('player').src = audioSource;
     this.dom.get('player').play();
   }
 
@@ -629,6 +632,7 @@ class WordTest {
     this.ref = { dialog, words, games };
     this.data = {
       permitedClueTypes: new Set(),
+      permitedWordsType: 'all',
       wordsMinNumber: 5,
       wordsMaxNumber: 50,
       wordsNumber: 10
@@ -660,6 +664,7 @@ class WordTest {
     this.buildView();
     this.addListeners();
     this._permitTestType('word');
+    this._permitTestWords('all');
   }
 
   get view() {
@@ -709,28 +714,39 @@ class WordTest {
           <li ${ref('page.config')} ${classes('page.config')} class="config-page hidden">
             <section class="settings">
               <div>
-                <p>
-                  <span>All words to use: </span>
-                  <span ${ref('output-total-words')} class="output"></span>
-                </p>
-                <p>
-                  <span>Words to learn: </span>
-                  <span ${ref('output-used-words')} class="output">${this.data.wordsNumber}</span>
-                  <span class="setting-buttons">
-                    <button ${on('config.words-number.min', 'click', { data: -Infinity })} ${classes('button.min')} class="setting-button"><span>min</span></button>
-                    <button ${on('config.words-number.decrease', 'click', { data: -1 })} ${classes('button.decrease')} class="setting-button"><span>-</span></button>
-                    <button ${on('config.words-number.increase', 'click', { data: 1 })} ${classes('button.increase')} class="setting-button"><span>+</span></button>
-                    <button ${on('config.words-number.max', 'click', { data: Infinity })} ${classes('button.max')} class="setting-button"><span>max</span></button>
-                  </span>
-                </p>
+                <div>
+                  <p>Words to use:</p>
+                  <ul class="selection-list">
+                    <li>${child(this._switchButtonWordsView('all'))} 
+                      <span>All words</span>
+                      <span ${ref('output-total-words')} class="output"></span>
+                    </li>
+                    <li>${child(this._switchButtonWordsView('selected'))} 
+                      <span>Selected words</span>
+                      <span ${ref('output-selected-words')} class="output"></span>
+                    </li>
+                  </ul>
+                </div>
+                <div>
+                  <p>
+                    <span>Words to learn:</span>
+                    <span ${ref('output-used-words')} class="output">${this.data.wordsNumber}</span>
+                    <span class="setting-buttons">
+                      <button ${on('config.words-number.min', 'click', { data: -Infinity })} ${classes('button.min')} class="setting-button"><span>min</span></button>
+                      <button ${on('config.words-number.decrease', 'click', { data: -1 })} ${classes('button.decrease')} class="setting-button"><span>-</span></button>
+                      <button ${on('config.words-number.increase', 'click', { data: 1 })} ${classes('button.increase')} class="setting-button"><span>+</span></button>
+                      <button ${on('config.words-number.max', 'click', { data: Infinity })} ${classes('button.max')} class="setting-button"><span>max</span></button>
+                    </span>
+                  </p>
+                </div>
                 <div>
                   <p>Test types:</p>
                   <ul class="selection-list">
-                    <li>${child(this._switchButtonView('word'))} <span>Translate from English into Polish</span></li>
-                    <li>${child(this._switchButtonView('meaning'))} <span>Translate from Polish into English</span></li>
-                    <li>${child(this._switchButtonView('audio'))} <span>Guess the word by the sound</span></li>
-                    <li>${child(this._switchButtonView('definition'))} <span>Guess the word by the definition</span></li>
-                    <li>${child(this._switchButtonView('img'))} <span>Guess the word by the picture</span></li>
+                    <li>${child(this._switchButtonClueView('word'))} <span>Translate from English into Polish</span></li>
+                    <li>${child(this._switchButtonClueView('meaning'))} <span>Translate from Polish into English</span></li>
+                    <li>${child(this._switchButtonClueView('audio'))} <span>Guess the word by the sound</span></li>
+                    <li>${child(this._switchButtonClueView('definition'))} <span>Guess the word by the definition</span></li>
+                    <li>${child(this._switchButtonClueView('img'))} <span>Guess the word by the picture</span></li>
                   </ul>
                 </div>
               </div>
@@ -821,7 +837,7 @@ class WordTest {
 
     this.classes.get('button').get('learn').remove('disabled');
     this.ref.virtual = new Test(this, {
-      filtered: this.data.filtered,
+      filtered: this.data.permitedWordsType === 'all' ? this.data.filtered : this.data.selected,
       clues: this.data.permitedClueTypes,
       number: this.data.wordsNumber
     });
@@ -866,7 +882,8 @@ class WordTest {
 
     $on('config', ({ id, data, last }) => {
       if (id.startsWith('config.words-number')) this._updateWordsNumber(data);
-      if (id.startsWith('config.switch')) this._permitTestType(last);
+      if (id.startsWith('config.switch-type')) this._permitTestType(last);
+      if (id.startsWith('config.switch-word')) this._permitTestWords(last);
       if (last === 'create') this.createTest();
     });
 
@@ -918,6 +935,7 @@ class WordTest {
     this.state.opened = true;
     if (this.on.open) this.on.open();
     if (this.state.activePage === null) this._switchPage('config');
+    this._updateFilteredWords();
   }
 
   close() {
@@ -952,7 +970,7 @@ class WordTest {
   _updateWordsNumber(value = 0) {
     const newValue = this.data.wordsNumber + value;
     const output = this.dom.get('output-used-words');
-    const all = this.data.totalWordsNumber;
+    const all = this.data.permitedWordsType === 'all' ? this.data.totalWordsNumber : this.data.selectedWordsNumber;
     const lowest = Math.min(all, this.data.wordsMaxNumber);
     const warning = this.classes.get('warning').get('insufficient-words');
     warning.remove('visible');
@@ -967,6 +985,11 @@ class WordTest {
         warning.add('visible');
         this._disableButtons('min', 'max', 'increase', 'decrease', 'create');
         this.state.disabled = true;
+        return;
+      case all === this.data.wordsMinNumber:
+        output.innerHTML = this.data.wordsMinNumber;
+        this.data.wordsNumber = this.data.wordsMinNumber;
+        this._disableButtons('min', 'max', 'increase', 'decrease');
         return;
       case newValue >= lowest:
         output.innerHTML = lowest;
@@ -983,22 +1006,47 @@ class WordTest {
     this.data.wordsNumber = newValue;
   }
 
-  _switchButtonView(clueType) {
+  _switchButtonWordsView(wordsType) {
     return $templater(({ classes, on }) =>/*html*/`
-    <button ${on(`config.switch.${clueType}`, 'click')} ${classes(`button.switch.${clueType}`)} class="switch-button">
+    <button ${on(`config.switch-words.${wordsType}`, 'click')} ${classes(`button.switch-words.${wordsType}`)} class="switch-button">
+      <span></span>
+    </button>`);
+  }
+
+  _switchButtonClueView(clueType) {
+    return $templater(({ classes, on }) =>/*html*/`
+    <button ${on(`config.switch-type.${clueType}`, 'click')} ${classes(`button.switch-type.${clueType}`)} class="switch-button">
       <span></span>
     </button>`);
   }
 
   _permitTestType(clueType) {
-    const classes = this.classes.get('button').get('switch').get(clueType);
+    const classes = this.classes.get('button').get('switch-type').get(clueType);
     let has = classes.has('on');
     if (has && this.data.permitedClueTypes.size === 1) return;
     classes[has ? 'remove' : 'add']('on');
     this.data.permitedClueTypes[has ? 'delete' : 'add'](clueType);
-    this.data.filtered = this.ref.words.filterClues(this.data.permitedClueTypes);
-    this.data.totalWordsNumber = this.data.filtered.size;
-    this.dom.get('output-total-words').innerHTML = this.data.totalWordsNumber;
+    this._updateFilteredWords();
+  }
+
+  _permitTestWords(wordsType) {
+    const types = ['all', 'selected'];
+    const classes = this.classes.get('button').get('switch-words');
+    types.forEach((type) => {
+      classes.get(type)[type === wordsType ? 'add' : 'remove']('on');
+    });
+    this.data.permitedWordsType = wordsType;
+    this._updateFilteredWords();
+  }
+
+  _updateFilteredWords() {
+    const { all, selected } = this.ref.words.filterClues(this.data.permitedClueTypes);
+    this.data.filtered = all;
+    this.data.selected = selected;
+    this.data.totalWordsNumber = all.size;
+    this.data.selectedWordsNumber = selected.size;
+    this.dom.get('output-total-words').innerHTML = all.size;
+    this.dom.get('output-selected-words').innerHTML = selected.size;
     this._updateWordsNumber();
   }
 
