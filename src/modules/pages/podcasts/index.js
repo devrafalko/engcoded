@@ -95,6 +95,7 @@ class Podcasts {
       cardArea: this.views[id].references.get('subtitles'),
       contentData: this.instances[id],
       onStopSpy: () => this.instances[id].scroller.break(),
+      onGame: () => Player.pause(),
       onClose: () => {
         Player.reset();
         this.state.currentId = null;

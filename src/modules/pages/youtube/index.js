@@ -151,6 +151,7 @@ class YouTube {
       content: this.views[movieId].template,
       cardArea: this.views[movieId].references.get('subtitles'),
       contentData: this.instances[movieId],
+      onGame: () => this.data.player.pauseVideo(),
       onClose: () => {
         Timer.stop();
         this.state.currentMovieId = null;

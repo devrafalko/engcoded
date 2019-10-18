@@ -79,7 +79,7 @@ class Dialog {
     classes.forEach((instance) => instance[value ? 'add' : 'remove']('displayed'));
   }
 
-  load({ name, container, content, contentData, cardArea, loaded, onClose, beforeClose, onStopSpy, mode }) {
+  load({ name, container, content, contentData, cardArea, loaded, onGame, onClose, beforeClose, onStopSpy, mode }) {
     const dialog = this.dom.get('dialog-box');
     if (this.state.currentContentData !== contentData) {
       dialog.setAttribute('data-dialog', name);
@@ -98,6 +98,7 @@ class Dialog {
     this._navigationMode(mode);
     if (type(loaded, Function)) loaded();
     if (type(onClose, Function)) this.events.onClose = onClose;
+    if (type(onGame, Function)) this.events.onGame = onGame;
     if (type(beforeClose, Function)) this.events.beforeClose = beforeClose;
     if (type(onStopSpy, Function)) this.events.onStopSpy = onStopSpy;
   }
@@ -191,6 +192,7 @@ class Dialog {
       const { games, words } = this.state.currentContentData;
       const classes = this.classes.get('game-container');
       this._toggleNavigation('close');
+      if (type(this.events.onGame, Function)) this.events.onGame();
       Card.hide(false);
       if (!games[name]) {
         games[name] = new instance(this, words, games);
