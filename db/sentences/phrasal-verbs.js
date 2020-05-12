@@ -3,7 +3,7 @@ import { w, l, lk, dialogue } from './../utils/utils.js';
 
 export default {
   title: 'Phrasal Verbs',
-  type: 'article',
+  type: 'sentences',
   id: '538e55jwk0l06zv0',
   thumbnail: '538e55qok0l06qy0',
   header: `Phrasal Verbs`,

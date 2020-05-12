@@ -1,4 +1,4 @@
-const { $words } = $data;
+const { $words, $collocations } = $data;
 const { $randomItem } = $utils;
 
 class Words {
@@ -361,7 +361,8 @@ class Words {
       let id = reference.id;
       if (!$words.has(id) || this._map.records.has(id)) return;
       let record = $words.get(id);
-      this._map.records.set(id, { ...record, id: id });
+      let collocations = $collocations.get(id) || null;
+      this._map.records.set(id, { ...record, id, collocations });
       let size = this._map.records.size - 1;
       this._map.iterators.set(id, size);
       this._map.iterators.set(size, id);

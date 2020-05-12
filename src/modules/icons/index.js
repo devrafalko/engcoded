@@ -15,6 +15,7 @@ import $iconChevronLeft from './icon-chevron-left';
 import $iconChevronRight from './icon-chevron-right';
 import $iconChevronUp from './icon-chevron-up';
 import $iconClose from './icon-close';
+import $iconCollocation from './icon-collocation';
 import $iconCrosswordHint from './icon-crossword-hint';
 import $iconConfig from './icon-config';
 import $iconFastForward from './icon-fast-forward';
@@ -61,4 +62,4 @@ import $iconTextSize from './icon-text-size';
 import $iconVolume from './icon-volume';
 import $iconWordList from './icon-word-list';
 
-export { $iconAlignCenter, $iconAlignLeft, $iconAlignRight, $iconArrow, $iconBrush, $iconCardDefinition, $iconCardImage, $iconCardWord, $iconCheckIn, $iconCheckOut, $iconCheckbox, $iconChevronDoubleLeft, $iconChevronDoubleRight, $iconChevronLeft, $iconChevronRight, $iconChevronUp, $iconClose, $iconCrosswordHint, $iconConfig, $iconFastForward, $iconGameCrossword, $iconGameHearing, $iconGameDefinition, $iconGameFinish, $iconGameImage, $iconGamePronunciation, $iconGameTest, $iconGameTranslate, $iconKeyboard, $iconKeyword, $iconLabels, $iconMinimize, $iconMute, $iconNext, $iconNextWord, $iconOccurrence, $iconPalette, $iconPause, $iconPictureLabel, $iconPlayBuffer, $iconPlay, $iconPrevious, $iconPreviousWord, $iconPuzzle, $iconQuestionMark, $iconRewind, $iconResize, $iconSelect, $iconShuffle, $iconSortAZ, $iconSortZA, $iconSort19, $iconSort91, $iconSortRandom, $iconSpeed, $iconSpy, $iconStar, $iconTextPlay, $iconWarning, $iconTextSize, $iconVolume, $iconWordList };
+export { $iconAlignCenter, $iconAlignLeft, $iconAlignRight, $iconArrow, $iconBrush, $iconCardDefinition, $iconCardImage, $iconCardWord, $iconCheckIn, $iconCheckOut, $iconCheckbox, $iconChevronDoubleLeft, $iconChevronDoubleRight, $iconChevronLeft, $iconChevronRight, $iconChevronUp, $iconClose, $iconCollocation, $iconCrosswordHint, $iconConfig, $iconFastForward, $iconGameCrossword, $iconGameHearing, $iconGameDefinition, $iconGameFinish, $iconGameImage, $iconGamePronunciation, $iconGameTest, $iconGameTranslate, $iconKeyboard, $iconKeyword, $iconLabels, $iconMinimize, $iconMute, $iconNext, $iconNextWord, $iconOccurrence, $iconPalette, $iconPause, $iconPictureLabel, $iconPlayBuffer, $iconPlay, $iconPrevious, $iconPreviousWord, $iconPuzzle, $iconQuestionMark, $iconRewind, $iconResize, $iconSelect, $iconShuffle, $iconSortAZ, $iconSortZA, $iconSort19, $iconSort91, $iconSortRandom, $iconSpeed, $iconSpy, $iconStar, $iconTextPlay, $iconWarning, $iconTextSize, $iconVolume, $iconWordList };

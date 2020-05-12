@@ -6,7 +6,6 @@ const imagesMap = new Map();
 images.keys().forEach((_path) => {
   let id = path.basename(_path, '.jpg');
   let imagePath = images(_path);
-  imagesMap.set(id, imagePath);
+  imagesMap.set(id, imagePath.default);
 });
-
 export default imagesMap;

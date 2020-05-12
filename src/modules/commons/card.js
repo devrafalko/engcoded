@@ -4,7 +4,7 @@ import './card.scss';
 const { Slider, Scroller } = $commons;
 const { $audio } = $data;
 const { $loopParents, $templater } = $utils;
-const { $iconCardDefinition, $iconCardImage, $iconCardWord, $iconClose, $iconVolume, $iconNextWord, $iconPreviousWord } = $icons;
+const { $iconCardDefinition, $iconCardImage, $iconCardWord, $iconClose, $iconVolume, $iconNextWord, $iconPreviousWord, $iconCollocation } = $icons;
 
 class Card {
   constructor() {
@@ -64,7 +64,7 @@ class Card {
     if (!contentData.words.indeces.has(index)) return;
     const { id, meaning: meanings } = contentData.words.indeces.get(index);
     if (!contentData.words.records.has(id)) return;
-    const { word, definition, meaning, audio, img } = contentData.words.records.get(id);
+    const { word, definition, meaning, audio, img, collocations } = contentData.words.records.get(id);
     this.hide(true);
     this._renderWordPage(word, meaning, audio, meanings, (wordPage) => {
       this.dom.get('page').get('word').innerHTML = '';
@@ -83,6 +83,14 @@ class Card {
       this.classes.get('button').get('image')[empty ? 'add' : 'remove']('disabled');
       if (empty && this.state.active === 'image') this._switchCard('word');
     });
+
+    this._renderCollocationPage(collocations, (empty, rendered) => {
+      this.classes.get('button').get('collocation')[empty ? 'add' : 'remove']('disabled');
+      if (empty && this.state.active === 'collocation') this._switchCard('word');
+      if (empty) return;
+      this.dom.get('page').get('collocation').innerHTML = '';
+      this.dom.get('page').get('collocation').appendChild(rendered);
+    })
 
     const occurrences = contentData.words.identifiers.get(id);
     this.classes.get('section').get('control')[occurrences.length > 1 ? 'add' : 'remove']('multiple');
@@ -342,6 +350,39 @@ class Card {
     callback(false);
   }
 
+  _renderCollocationPage(collocations, callback) {
+    if (!collocations) return callback(true);
+    let index = 0;
+    const { template, $on, references, classes } = $templater(({ ref, list, when, on, classes }) => /*html*/`
+      <ul>${list(collocations, (row) =>/*html*/`
+        <li>
+          <dl>${list(row, (word) =>/*html*/`
+            ${when(type(word, String), () =>/*html*/`
+              <dt data-keyword>${word}</dt>
+            `)}
+            ${when(type(word, Array), () =>/*html*/`
+              <dt ${ref(`term.${index}`)} ${on(`collocation.${index}`, ['mouseenter', 'mouseleave'], { capture: true })}>${word[0]}</dt>
+              <dd ${ref(`translation.${index}`)} ${classes(`translation.${index++}`)}>${word[1]}</dd>
+            `)}
+          `)}        
+          </dl>
+        </li>`)}
+      </ul>
+    `);
+
+    $on('collocation', ({ last, type, target, event }) => {
+      if (target !== event.target) return;
+      const translation = references.get('translation').get(last);
+      const translationClasses = classes.get('translation').get(last);
+      translationClasses[type === 'mouseenter' ? 'add' : 'remove']('visible');
+      const { top, height, left } = target.getBoundingClientRect();
+      translation.style.top = `${top + height + 4}px`;
+      translation.style.left = `${left}px`;
+    })
+
+    callback(false, template);
+  }
+
   _renderView() {
     const template = $templater(({ child, ref, classes, on }) => /*html*/`
       <div class="card container" ${ref('view')} ${classes('view')}>
@@ -350,6 +391,7 @@ class Card {
           <ul class="section pages">
             <li ${on('card.tab.word', 'click')} ${classes('button.word')} class="button">${child($iconCardWord())}</li>
             <li ${on('card.tab.definition', 'click')} ${classes('button.definition')} class="button">${child($iconCardDefinition())}</li>
+            <li ${on('card.tab.collocation', 'click')} ${classes('button.collocation')} class="button">${child($iconCollocation())}</li>
             <li ${on('card.tab.image', 'click')} ${classes('button.image')} class="button">${child($iconCardImage())}</li>
           </ul>
           <ul class="section control" ${classes('section.control')}>
@@ -362,6 +404,7 @@ class Card {
           <ul>
             <li ${ref('page.word')} ${on('page.word', 'click')} ${classes('page.word')} class="page word"></li>
             <li ${ref('page.definition')} ${classes('page.definition')} class="page definition"></li>
+            <li ${ref('page.collocation')} ${classes('page.collocation')} class="page collocation"></li>
             <li ${ref('page.image')} ${classes('page.image')} class="page image">
               ${child(this.slider.view)}
             </li>

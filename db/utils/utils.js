@@ -1,3 +1,5 @@
+import collocations from "../words/collocations";
+
 export function w(content, index) {
   return /*html*/`<span data-word="${index}">${content}</span>`;
 }
@@ -28,6 +30,10 @@ export function p(word) {
 
 export function e(word) {
   return /*html*/`<span data-explanation>(${word})</span>`;
+}
+
+export function s(word) {
+  return /*html*/`<span data-syntax>${word}</span>`;
 }
 
 export function list(items) {
