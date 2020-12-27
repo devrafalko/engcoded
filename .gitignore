@@ -1,4 +1,5 @@
 node_modules
 temp
+_raw
 .vscode
 debug-init.js
