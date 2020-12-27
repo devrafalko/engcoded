@@ -471,14 +471,17 @@ $md-ratio-map: ("md-small": 0.85, "md-medium": 1, "md-big": 1.15);
   z-index: 2;
 }
 
-p,
-h2 {
-  .dialog-box .content-container[data-align="left"] & {
-    text-align: left;
+.dialog-box[data-dialog="podcasts"], .dialog-box[data-dialog="youtube"]{
+  .content-container[data-align="left"] {
+    p, h2{
+      text-align: left;
+    }
   }
 
-  .dialog-box .content-container[data-align="center"] & {
-    text-align: center;
+  .content-container[data-align="center"] {
+    p, h2{
+      text-align: center;
+    }
   }
 }
 
