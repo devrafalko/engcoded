@@ -36,10 +36,10 @@ export function s(word) {
   return /*html*/`<span data-syntax>${word}</span>`;
 }
 
-export function list(items) {
+export function list(items, ordered=true) {
   let list = '';
   for (let item of items) list += /*html*/`<li>${item}</li>`
-  return /*html*/`<ol data-list>${list}</ol>`;
+  return ordered ? /*html*/`<ol data-list>${list}</ol>`:/*html*/`<ul data-list>${list}</ul>`;
 }
 
 export function dialogue() {
@@ -66,10 +66,18 @@ export function dialogue() {
   return /*html*/`<ul data-dialogue>${list}</ul>`;
 }
 
-export function header(content) {
-  return /*html*/`<h2>${content}</h2>`;
+export function header(content, order = 2) {
+  return /*html*/`<h${order}>${content}</h${order}>`;
 }
 
 export function paragraph(content) {
   return /*html*/`<p>${content}</p>`;
+}
+
+export function example(content) {
+  return /*html*/`<blockquote class="example">${content}</blockquote>`;
+}
+
+export function tip(content) {
+  return /*html*/`<blockquote class="tip">${content}</blockquote>`;
 }

@@ -34,8 +34,10 @@ export default {
   type: 'article',
   id: '${uniq()}',
   thumbnail: '',
+  tags: [''],
   header: \`${title}\`,
-  url: '${url}',
+  author: { name: '', url: ''},
+  link: { name: '', url: '${url}'},
   text: [
     \`\`, //\$\{w('', 0)\}
   ],

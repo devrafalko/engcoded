@@ -23,11 +23,11 @@ class Dialog {
 
   get fonts() {
     return [
-      { name: 'PT Serif', family: 'PT Serif' },
-      { name: 'EB Garamond', family: 'EB Garamond' },
-      { name: 'Cardo', family: 'Cardo' },
-      { name: 'Source Sans Pro', family: 'Source Sans Pro' },
-      { name: 'Open Sans', family: 'Open Sans' },
+      { name: 'PT Serif', family: 'PT Serif', medium: 19 },
+      { name: 'EB Garamond', family: 'EB Garamond', medium: 21 },
+      { name: 'Cardo', family: 'Cardo', medium: 20 },
+      { name: 'Source Sans Pro', family: 'Source Sans Pro', medium: 20 },
+      { name: 'Open Sans', family: 'Open Sans', medium: 19 },
     ];
   }
 
@@ -116,11 +116,11 @@ class Dialog {
   }
 
   _createFontSelector() {
-    const options = this.fonts.map(({ name, family }, iter) => ({
+    const options = this.fonts.map(({ name, family, medium }, iter) => ({
       content: $templater(() =>/*html*/`
         <span class="label" style="font-family: ${family}">${name}</span>
       `),
-      data: { name, family },
+      data: { name, family, medium },
       selected: iter === 0
     }));
 
@@ -131,8 +131,8 @@ class Dialog {
     });
 
     this.selector.on.select = (map, selected) => {
-      const { family, name } = map.get(selected).data;
-      this._selectFont(name, family);
+      const { family, name, medium } = map.get(selected).data;
+      this._selectFont(name, family, medium);
       Card.fit();
     }
   }
@@ -260,7 +260,7 @@ class Dialog {
     this._colorLocal();
     this._showWords();
     this._fontSize('md-medium', 'text-medium');
-    this._selectFont(this.fonts[0].name, this.fonts[0].family);
+    this._selectFont(this.fonts[0].name, this.fonts[0].family, this.fonts[0].medium);
     this.spySubtitles(true);
   }
 
@@ -323,10 +323,11 @@ class Dialog {
     classes[colored ? 'remove' : 'add']('show-words');
   }
 
-  _selectFont(name, family) {
+  _selectFont(name, family, medium) {
     this.selector.header.innerHTML = name
     this.selector.header.style.fontFamily = family;
     this.contentContainer.style.fontFamily = family;
+    this.contentContainer.style.fontSize = `${medium}px`;
   }
 
   _fontSize(size, name) {

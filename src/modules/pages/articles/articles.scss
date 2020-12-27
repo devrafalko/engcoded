@@ -10,10 +10,13 @@
 }
 
 .dialog-box .content-container .article-content {
-
+  ol, ul {
+    list-style-position: outside;
+  }
   h1,
   h2,
   ol>li,
+  ul>li,
   p {
     text-align: justify;
   }
@@ -22,9 +25,13 @@
     margin-bottom: 16px;
   }
 
-  h2 {
+  h2, h3, h4 {
     margin-top: 12px;
     margin-bottom: 6px;
+  }
+
+  h3, h4, h5{
+    margin-left: 1em;
   }
 
   p {
@@ -34,5 +41,23 @@
   ol>li {
     list-style-type: decimal;
     margin: 12px 4px;
+  }
+
+  ul:not([data-dialogue])>li {
+    list-style-type: circle;
+  }
+  
+  blockquote{
+    &.tip{
+      border-left: .2em #808080 solid;
+      padding: .3em .6em;
+      text-align: justify;
+    }
+    &.example{
+      color: #424242;
+      font-style: italic;
+      text-align: justify;
+      text-indent: 1em;
+    }
   }
 }

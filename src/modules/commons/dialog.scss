@@ -6,6 +6,7 @@ $grid-articles-hide-point: 356px;
 $grid-youtube-hide-point: 528px;
 $grid-pictures-hide-point: 438px;
 $grid-controls-width: 98px;
+$md-ratio-map: ("md-small": 0.85, "md-medium": 1, "md-big": 1.15);
 
 .dialog-box {
   background-color: white;
@@ -481,54 +482,46 @@ h2 {
   }
 }
 
-.dialog-box .content-container[data-size="md-small"] {
-
-  ol>li,
-  dt,
-  p {
-    font-size: 16px;
-  }
-
-  dd {
-    font-size: 14px;
-  }
-
-  h2 {
-    font-size: 20px;
-  }
-}
-
-.dialog-box .content-container[data-size="md-medium"] {
-
-  ol>li,
-  dt,
-  p {
-    font-size: 19px;
-  }
-
-  dd {
-    font-size: 17px;
-  }
-
-  h2 {
-    font-size: 23px;
-  }
-}
-
-.dialog-box .content-container[data-size="md-big"] {
-
-  ol>li,
-  dt,
-  p {
-    font-size: 22px;
-  }
-
-  dd {
-    font-size: 20px;
-  }
-
-  h2 {
-    font-size: 26px;
+@each $name, $ratio in $md-ratio-map {
+  .dialog-box .content-container[data-size="#{$name}"] .text-content {
+    dt,
+    p {
+      font-size: 1em * $ratio;
+    }
+    ol>li,
+    ul>li,
+    blockquote,
+    dd {
+      font-size: .92em * $ratio;
+    }
+    h1{
+      font-size: 1.46em * $ratio;
+    }
+    h2 {
+      font-size: 1.3em * $ratio;
+    }
+    h3 {
+      font-size: 1.22em * $ratio;
+    }
+    h4 {
+      font-size: 1.14em * $ratio;
+    }
+    h5 {
+      font-size: 1.06em * $ratio;
+    }
+  
+    blockquote{
+      margin: .8em 1em * $ratio;
+    }
+    ol, ul{
+      margin-left: 2em * $ratio;
+    }
+    ol>li, ul>li{
+      margin: 0.3em 0 * $ratio;
+    }
+    dt, p{
+      margin: .3em 0 * $ratio;
+    }
   }
 }
 

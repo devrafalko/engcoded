@@ -1,6 +1,6 @@
 const path = require('path');
 const webpack = require("webpack");
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const TerserPlugin = require('terser-webpack-plugin');
 const StylesLoader = require('styles-loader');
 const stylesLoader = (production) => {
@@ -31,7 +31,7 @@ const common = {
         loader: 'file-loader',
         options: {
           name: '[name].[ext]',
-          outputPath:'./assets/audio'
+          outputPath: './assets/audio'
         },
       }
     ]
@@ -98,7 +98,7 @@ const start = {
     watchContentBase: true,
     publicPath: '/src/',
     compress: true,
-    port: 8080,
+    port: 8081,
     open: true
   },
 };

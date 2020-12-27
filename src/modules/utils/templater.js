@@ -225,7 +225,6 @@ class Events {
     if (!arguments.length) return this;
     const data = this._identifiers.get(id);
     const paths = data ? data.paths : this._parseId(id);
-
     this._traverse(paths, (data) => {
       let { element, action, capture, delegate } = data;
       let actions = type(action, Array) ? action : [action];
@@ -298,10 +297,10 @@ class Events {
       let scope = type(currentScope, Map) ? currentScope : currentScope.scope;
       currentScope = scope.get(path);
     }
-
     loop(currentScope);
 
     function loop(current) {
+      if(current===undefined) return;
       let { data, scope } = current;
       if (data !== null) callback(data);
       scope.forEach((item) => loop(item));

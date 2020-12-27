@@ -13,7 +13,6 @@ class Items {
       table: null,
       headers: {}
     };
-
     this._renderView();
     this._renderItems();
     this._addListeners();
@@ -55,7 +54,7 @@ class Items {
 
     container.innerHTML = '';
     container.appendChild(template);
-    appendItem([...items.keys()], 0);
+    if(items) appendItem([...items.keys()], 0);
 
     function appendItem(collection, index) {
       let key = collection[index];
@@ -66,7 +65,7 @@ class Items {
       setTimeout(() => {
         heights[nextIndex] += columnElement.offsetHeight;
         if (collection.length - 1 > index) appendItem(collection, index + 1);
-      }, 50);
+      }, 20);
     }
 
     function min(heights) {

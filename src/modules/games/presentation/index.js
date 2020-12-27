@@ -473,7 +473,8 @@ class Presentation {
 
   _buildRowReferences() {
     this.data.rows = new Map();
-    this.dom.get('row').forEach((tr, id) => this.data.rows.set(tr, id));
+    const collection = this.dom.get('row') || [];
+    collection.forEach((tr, id) => this.data.rows.set(tr, id));
   }
 
   _addListeners() {
@@ -782,13 +783,13 @@ class Presentation {
   _render() {
     const table = this.dom.get('table-body');
     const rowsCollection = [];
+    table.innerHTML = '';
+    if(!this.data.rows.size) return;
     const total = this.pageWords === Infinity ? this.sorted.length : this.pageWords;
     for (let i = (this.page - 1) * total; i < this.page * total || i === this.sorted.length; i++) {
       let id = this.sorted[i];
       rowsCollection.push(this.dom.get('row').get(id));
     }
-
-    table.innerHTML = '';
     table.appendChild($templater(({ child, list }) => `
       ${list(rowsCollection, (item) => `${child(item)}`)}
     `).template);
